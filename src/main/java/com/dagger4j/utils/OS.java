@@ -1,4 +1,4 @@
-package com.dagger4j.kit;
+package com.dagger4j.utils;
 
 /**
  * Created by laotang on 2018/3/22.

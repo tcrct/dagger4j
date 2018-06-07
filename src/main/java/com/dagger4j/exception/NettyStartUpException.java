@@ -1,7 +1,7 @@
 package com.dagger4j.exception;
 
 /**
- *  MVC框架启动时异常
+ *  Dagger4j框架启动时异常
  * @author laotang
  * @date 2017/11/2
  */

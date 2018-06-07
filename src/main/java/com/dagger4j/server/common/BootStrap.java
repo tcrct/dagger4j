@@ -1,19 +1,25 @@
 package com.dagger4j.server.common;
 
+import com.dagger4j.exception.NettyStartUpException;
+import com.dagger4j.kit.ThreadPoolKit;
+import com.dagger4j.kit.ToolsKit;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.internal.PlatformDependent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -29,18 +35,35 @@ public class BootStrap implements Closeable {
 
     private static Logger logger = LoggerFactory.getLogger(BootStrap.class);
 
+    /**
+     * 项目名称
+     */
+    private String appName;
+    /** 应用地址*/
     private String host;
+    /** 应用端口*/
     private int port;
-    private boolean devModel;
-    private int bossThreadGroupCount;
+    /** 是否开发模式，默认为true*/
+    private boolean devModel = true;
+    /** boss线程数*/
+    private int bossThreadGroupCount = ServerConfig.MAX_BOSS_EXECUTORS_NUMBER;
+    /** worker线程数*/
     private int workerThreadGroupCount;
+    /** EventLoopGroup对象封装*/
     private Group group;
     protected ByteBufAllocator allocator;
+    /** SSL*/
     private SslContext sslContext;
+    /** 空闲时间，单位：秒*/
     private int idleTimeInSeconds = ServerConfig.IDLE_TIME_SECONDS;
+    /** */
     private int bockLog = ServerConfig.SO_BACKLOG;
     private static BootStrap _bootStrap;
     private long startTimeMillis = 0;
+    /**  是否开启请求Gzip压缩*/
+    private boolean enableGzip = true;
+    /**  是否开启请求跨域处理*/
+    private boolean enableCors = true;
 
     public static BootStrap getInstants() {
         return _bootStrap;
@@ -59,11 +82,12 @@ public class BootStrap implements Closeable {
         try {
             allocator = new PooledByteBufAllocator(PlatformDependent.directBufferPreferred());
         } catch (Exception e) {
-            throw new EmptyNullException(e.getMessage(), e);
+            throw new NettyStartUpException(e.getMessage(), e);
         }
     }
+
     private void loadLibrary() {
-        String libPath = System.getProperty("dunagframework.lib.path");
+        String libPath = System.getProperty("lib.path");
         if(ToolsKit.isEmpty(libPath)) {
             return;
         }
@@ -141,9 +165,10 @@ public class BootStrap implements Closeable {
         return sslContext != null;
     }
 
-    public void setSslContext(SslContext sslContext) {
+    public void builderSslContext(String certFilePath, String privateKeyPath, String privateKeyPassword) throws SSLException {
+            this.sslContext = SslContextBuilder.forServer(new File(certFilePath), new File(privateKeyPath), privateKeyPassword).build();
 //        sslContext = SslKit.buildServerSsl(certFile, keyFile);
-        this.sslContext = sslContext;
+//        this.sslContext = sslContext;
     }
 
     public int getIdleTimeInSeconds() {
@@ -173,10 +198,11 @@ public class BootStrap implements Closeable {
     @Override
     public void close() {
         try {
+            MultithreadEventLoopGroup workerGroup = getGroup().getWorkerMultithreadEventLoopGroup();
             if (null != workerGroup) {
                 workerGroup.shutdownGracefully();
             }
-
+            MultithreadEventLoopGroup bossGroup = getGroup().getBoosMultithreadEventLoopGroup();
             if (null != bossGroup) {
                 bossGroup.shutdownGracefully();
             }
@@ -214,5 +240,28 @@ public class BootStrap implements Closeable {
 
     public void setWorkerThreadGroupCount(int workerThreadGroupCount) {
         this.workerThreadGroupCount = workerThreadGroupCount;
+    }
+
+    public boolean isEnableGzip() {
+        return enableGzip;
+    }
+
+    public void setEnableGzip(boolean enableGzip) {
+        this.enableGzip = enableGzip;
+    }
+    public boolean isEnableCors() {
+        return enableCors;
+    }
+
+    public void setEnableCors(boolean enableCors) {
+        this.enableCors = enableCors;
+    }
+
+    public String getAppName() {
+        return null == appName ? "dagger4j" : appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }

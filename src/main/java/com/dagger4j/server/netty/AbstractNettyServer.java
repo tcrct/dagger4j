@@ -4,7 +4,8 @@ package com.dagger4j.server.netty;
 
 
 import com.dagger4j.exception.NettyStartUpException;
-import com.dagger4j.kit.OS;
+import com.dagger4j.utils.OS;
+import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.server.common.BootStrap;
 import com.dagger4j.server.common.Group;
 import com.dagger4j.server.common.IServer;
@@ -24,6 +25,7 @@ import java.lang.management.ManagementFactory;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -33,12 +35,13 @@ import java.nio.charset.Charset;
 public abstract class AbstractNettyServer implements IServer {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractNettyServer.class);
+    protected SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     protected ServerBootstrap nettyBootstrap;
     protected BootStrap bootStrap;
 
     public AbstractNettyServer(String host, int port) {
-        this(host, port);
+        this(host, port, false);
     }
 
     public AbstractNettyServer(String host, int port, boolean devModel) {
@@ -54,7 +57,7 @@ public abstract class AbstractNettyServer implements IServer {
         if(isUse()){
             throw new NettyStartUpException("Server Startup Fail: " + bootStrap.getPort() + " is use!");
         }
-//        添加ResourceLeakDetector，内存泄露检测
+       // 添加ResourceLeakDetector，内存泄露检测
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
         nettyBootstrap = new ServerBootstrap();
         Group group = EpollEventLoopGroups.group(bootStrap);

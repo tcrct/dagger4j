@@ -1,6 +1,6 @@
 package com.dagger4j.server.netty;
 
-import com.dagger4j.kit.NamedThreadFactory;
+import com.dagger4j.utils.NamedThreadFactory;
 import com.dagger4j.server.common.BootStrap;
 import com.dagger4j.server.common.Group;
 import com.dagger4j.server.common.ServerConfig;

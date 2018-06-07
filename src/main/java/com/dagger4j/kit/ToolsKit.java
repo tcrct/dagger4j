@@ -7,18 +7,8 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
-import com.duangframework.core.annotation.db.Id;
-import com.duangframework.core.common.Const;
-import com.duangframework.core.common.DuangId;
-import com.duangframework.core.common.IdEntity;
-import com.duangframework.core.common.dto.result.HeadDto;
-import com.duangframework.core.common.dto.result.ReturnDto;
-import com.duangframework.core.common.enums.IEnums;
-import com.duangframework.core.exceptions.EmptyNullException;
-import com.duangframework.core.utils.ClassUtils;
-import com.duangframework.core.utils.DuangThreadLocal;
-import com.duangframework.core.utils.IpUtils;
-import com.duangframework.core.utils.XmlHelper;
+import com.dagger4j.utils.DaggerId;
+import com.dagger4j.utils.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,62 +198,12 @@ public class ToolsKit {
         return false;
     }
 
-
-    /**
-     * 如果是10开头的IP，统统默认为阿里云的机器
-     * @return
-     */
-    public static boolean isAliyunHost() {
-        String  clientIp = IpUtils.getLocalHostIP(false).trim();
-        if(isEmpty(clientIp)) throw new EmptyNullException("getLocalHostIP Fail: Ip is Empty!");
-        String preFixIp = ConfigKit.duang().key("ip.prefix").defaultValue("10").asString();
-        return  clientIp.startsWith(preFixIp) ? true : false;
-    }
-
-
-    /**
-     * 使用环境，分内测(local)，外测(obt)，正式(api), 如果不设置，默认为api
-     * @return
-     */
-    public static String getUseEnv() {
-        if (ToolsKit.isEmpty(Const.USE_ENV)) {
-            String ip = IpUtils.getLocalHostIP();
-            String fatIp = "", uatIp = "";
-            try { fatIp = getEnvIp("fat.ips"); } catch (Exception e) { logger.warn(e.getMessage(), e); }
-            try { uatIp = getEnvIp("uat.ips"); } catch (Exception e) { logger.warn(e.getMessage(), e); }
-            if (ip.startsWith("192.168") || ip.startsWith("127")) {
-                Const.USE_ENV = "dev";
-            } else if (Arrays.asList(fatIp.split(",")).contains(ip)) {
-                Const.USE_ENV = "fat";  // fat
-            } else if (Arrays.asList(uatIp.split(",")).contains(ip)) {
-                Const.USE_ENV = "uat";  // uat
-            } else {
-                Const.USE_ENV = "pro";
-            }
-        }
-        return Const.USE_ENV;
-    }
-
-    private static String getEnvIp(String envKey) {
-        String ipAddress = "";
-        try {
-            ipAddress = ConfigKit.duang().key(envKey).asString();
-        } catch (Exception e) {
-            ipAddress = PropertiesKit.duang().key(envKey).asString();
-        }
-        logger.warn("getEnvIp: " + ipAddress);
-        if(ToolsKit.isEmpty(ipAddress)) {
-            throw new EmptyNullException("取环境机器IP时失败，请先在配置文件里设置: " + envKey);
-        }
-        return ipAddress;
-    }
-
-    public static DuangId message2DuangId(String id) {
-        boolean isObjectId = ToolsKit.isValidDuangId(id);
+    public static DaggerId message2DaggerId(String id) {
+        boolean isObjectId = ToolsKit.isValidDaggerId(id);
         if (isObjectId) {
-            return new DuangId(id);
+            return new DaggerId(id);
         } else {
-            throw new IllegalArgumentException(id + " is not Vaild DuangId");
+            throw new IllegalArgumentException(id + " is not Vaild DaggerId");
         }
     }
 
@@ -274,7 +214,7 @@ public class ToolsKit {
      *            待验证字符串
      * @return  如果是则返回true
      */
-    public static boolean isValidDuangId(String str) {
+    public static boolean isValidDaggerId(String str) {
         if (ToolsKit.isEmpty(str)) {
             return false;
         }
@@ -287,7 +227,7 @@ public class ToolsKit {
             if ((c < '0') || (c > '9')) {
                 if ((c < 'a') || (c > 'f')) {
                     if ((c < 'A') || (c > 'F')) {
-                        logger.warn(str + " is not DuangId!!");
+                        logger.warn(str + " is not DaggerId!!");
                         return false;
                     }
                 }
@@ -329,76 +269,10 @@ public class ToolsKit {
     }
 
 
-    /**
-     * 设置请求头DTO到ThreadLocal变量
-     * @param headDto       请求头DTO
-     */
-    public static void setThreadLocalDto(HeadDto headDto) {
-        requestHeaderThreadLocal.set(headDto);
-    }
-
-    /**
-     *  取ThreadLocal里的HeadDto对象
-     * @return
-     */
-    public static HeadDto getThreadLocalDto() {
-        return  requestHeaderThreadLocal.get();
-    }
-
-    /**
-     * 控制台打印信息
-     * @param message       要打印的信息
-     */
-    public static void console(Object message) {
-        if(ConfigKit.duang().key("debug").defaultValue(false).asBoolean()) {
-            if(message instanceof String) {
-                System.out.println(message);
-            } else {
-                System.out.println(toJsonString(message));
-            }
-        }
-    }
-
-    /**
-     *
-     * @param enums
-     * @param obj
-     * @return
-     */
-    public static ReturnDto<Object> buildReturnDto(IEnums enums, Object obj) {
-        ReturnDto<Object> dto = new ReturnDto<Object>();
-        HeadDto head = getThreadLocalDto();
-        if(isEmpty(head)) {
-            head = new HeadDto();
-        }
-        if (ToolsKit.isEmpty(enums)) {
-            head.setRet(IEnums.IENUMS_SUCCESS_CODE);
-            head.setMsg(IEnums.IENUMS_SUCCESS_MESSAGE);
-        } else {
-            head.setRet(enums.getCode());
-            head.setMsg(enums.getMessage());
-        }
-        dto.setHead(head);
-        dto.setData(obj);
-        return dto;
-    }
-
     public static String getFieldName(Field field) {
         JSONField jsonField = field.getAnnotation(JSONField.class);
         return (ToolsKit.isEmpty(jsonField)) ? field.getName() :
                 (ToolsKit.isEmpty(jsonField.format()) ? jsonField.name() : jsonField.format());
-    }
-
-    public static String getIdFieldName(Class<?> entityClass) {
-        Field idField = null;
-        Field[] fields = ClassUtils.getFields(entityClass);
-        for(Field field : fields) {
-            if(field.isAnnotationPresent(Id.class)) {
-                idField = field;
-                break;
-            }
-        }
-        return null == idField ? IdEntity.ENTITY_ID_FIELD : idField.getName();
     }
 
     public static FileFilter fileFilter(final File dir, final String extName){
@@ -415,7 +289,4 @@ public class ToolsKit {
         };
     }
 
-    public static boolean isDebug() {
-        return Const.IS_DEBUG;
-    }
 }

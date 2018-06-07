@@ -1,4 +1,4 @@
-package com.dagger4j.kit;
+package com.dagger4j.utils;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.LongAdder;
