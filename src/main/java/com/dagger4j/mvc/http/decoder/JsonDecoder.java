@@ -3,6 +3,8 @@ package com.dagger4j.mvc.http.decoder;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.dto.ReturnDto;
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 
@@ -32,7 +34,7 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
 //            parseArray(JSON.parseArray(json, ArrayList.class));
         }
         if(ToolsKit.isNotEmpty(json)) {
-            attributeMap.put(Const.DUANG_INPUTSTREAM_STR_NAME, json);
+            attributeMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
         }
         return attributeMap;
     }

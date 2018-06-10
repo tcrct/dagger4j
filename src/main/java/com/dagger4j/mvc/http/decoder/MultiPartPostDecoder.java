@@ -1,6 +1,7 @@
 package com.dagger4j.mvc.http.decoder;
 
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.http.upload.FileItem;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.FullHttpRequest;

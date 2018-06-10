@@ -4,16 +4,24 @@ import com.dagger4j.exception.HttpDecoderException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.decoder.AbstractDecoder;
 import com.dagger4j.mvc.http.decoder.DecoderFactory;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.DecoderException;
+import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
+
+import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
 import io.netty.handler.codec.http.multipart.DiskFileUpload;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -31,8 +39,15 @@ public class HttpRequest implements IRequest{
     private ChannelHandlerContext ctx;
     private FullHttpRequest request;
     private String requestId;
+    private Charset charset;
     private Map<String, String> headers;
     private Map<String, Object> params;
+    private Map<String, Cookie> cookies = new HashMap<>();
+    private byte[] content;
+    private Enumeration<String> paramKeyEnumeration;
+    protected static String[] EMPTY_ARRAYS = {};
+    private InetSocketAddress remoteAddress;
+    private LocalAddress localAddress;
 
     private HttpRequest(String id, ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         requestId = id;
@@ -45,6 +60,23 @@ public class HttpRequest implements IRequest{
         try {
             AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
             params = decoder.decoder();
+            // reqeust body
+            if(ToolsKit.isNotEmpty(request.content())) {
+                content = Unpooled.copiedBuffer(request.content()).array();
+            }
+            // cookies
+            String cookie = getHeader(Cookie.COOKIE_FIELD);
+            cookie = ToolsKit.isNotEmpty(cookie) ? cookie : getHeader(Cookie.COOKIE_FIELD.toLowerCase());
+            if (ToolsKit.isNotEmpty(cookie)) {
+                Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.LAX.decode(cookie);
+                if(ToolsKit.isNotEmpty(cookies)) {
+                    for(io.netty.handler.codec.http.cookie.Cookie nettyCookie : cookies) {
+                        parseCookie(nettyCookie);
+                    }
+                }
+            }
+            remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
+            localAddress = (LocalAddress)ctx.channel().localAddress();
         } catch (Exception e) {
             throw new HttpDecoderException(e.getMessage(), e);
         }
@@ -52,58 +84,82 @@ public class HttpRequest implements IRequest{
 
     @Override
     public Object getAttribute(String name) {
-
-        return null;
+        return params.get(name);
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        return null;
+        if(ToolsKit.isEmpty(paramKeyEnumeration)) {
+            paramKeyEnumeration = new Vector(params.keySet()).elements();
+        }
+        return paramKeyEnumeration;
     }
 
     @Override
     public String getCharacterEncoding() {
-        return null;
+        if(null == charset) {
+            String encodering = headers.get(HttpHeaderNames.CONTENT_ENCODING.toLowerCase());
+            if (ToolsKit.isEmpty(encodering)) {
+                charset = Charset.defaultCharset();
+            } else {
+                charset = Charset.forName(encodering);
+            }
+        }
+        return charset.name();
     }
 
     @Override
     public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
-
+        charset = Charset.forName(env);
     }
 
     @Override
     public long getContentLength() {
-        return 0;
+        return null == content ? 0 : content.length;
     }
 
     @Override
     public String getContentType() {
-        return null;
+        return headers.get(HttpHeaderNames.CONTENT_TYPE);
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return null;
+        return new ByteArrayInputStream(content);
     }
 
     @Override
     public String getParameter(String name) {
-        return null;
+        Object paramObj = params.get(name);
+        return ToolsKit.isEmpty(paramObj) ? null : (String)paramObj;
     }
 
     @Override
     public Enumeration<String> getParameterNames() {
-        return null;
+        return getAttributeNames();
     }
 
     @Override
     public String[] getParameterValues(String name) {
-        return new String[0];
+        Object valueObj = params.get(name);
+        return (ToolsKit.isNotEmpty(valueObj) && valueObj instanceof List) ?
+                        ((List<String>) valueObj).toArray(EMPTY_ARRAYS) : null;
     }
 
     @Override
     public Map<String, String[]> getParameterMap() {
-        return null;
+        if(ToolsKit.isEmpty(params)) {
+            return null;
+        }
+        Map<String, String[]> paramMap = new HashMap<>();
+        for (Iterator<Map.Entry<String,Object>> it = params.entrySet().iterator(); it.hasNext();){
+            Map.Entry<String,Object> entry = it.next();
+            Object valueObj = entry.getValue();
+            if(valueObj instanceof  List) {
+                paramMap.put(entry.getKey(), ((List<String>)valueObj).toArray(EMPTY_ARRAYS));
+            }
+        }
+        return paramMap;
     }
 
     @Override
@@ -113,42 +169,45 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getScheme() {
-        return null;
+        System.out.println(remoteAddress.toString());
+        return remoteAddress.getHostString();
     }
 
     @Override
     public String getServerName() {
-        return null;
+        return remoteAddress.getHostName();
     }
 
     @Override
     public int getServerPort() {
+        System.out.println(remoteAddress.getPort());
+        System.out.println(localAddress.toString());
         return 0;
     }
 
     @Override
     public String getRemoteAddr() {
-        return ctx.channel().remoteAddress().toString();
+        return remoteAddress.toString();
     }
 
     @Override
     public String getRemoteHost() {
-        return null;
+        return remoteAddress.getHostName();
     }
 
     @Override
-    public void setAttribute(String name, Object o) {
-
+    public void setAttribute(String name, Object value) {
+        params.put(name, value);
     }
 
     @Override
     public void removeAttribute(String name) {
-
+        params.remove(name);
     }
 
     @Override
-    public boolean isSecure() {
-        return false;
+    public boolean isSSL() {
+        return "https".equalsIgnoreCase(getScheme()) ? true : false;
     }
 
     @Override
@@ -202,6 +261,37 @@ public class HttpRequest implements IRequest{
             }
         }
         return headers;
+    }
+
+    @Override
+    public boolean keepAlive() {
+        return HttpUtil.isKeepAlive(request);
+}
+
+    @Override
+    public Map<String, Cookie> cookies() {
+        return this.cookies;
+    }
+
+    @Override
+    public Cookie getCookie(String name) {
+        return this.cookies.get(name);
+    }
+
+    @Override
+    public void setCookie(Cookie cookie) {
+        this.cookies.put(cookie.name(), cookie);
+    }
+
+    private void parseCookie(io.netty.handler.codec.http.cookie.Cookie nettyCookie) {
+        Cookie cookie = new Cookie();
+        cookie.name(nettyCookie.name());
+        cookie.value(nettyCookie.value());
+        cookie.httpOnly(nettyCookie.isHttpOnly());
+        cookie.path(nettyCookie.path());
+        cookie.domain(nettyCookie.domain());
+        cookie.maxAge(nettyCookie.maxAge());
+        cookies.put(cookie.name(), cookie);
     }
 
 

@@ -1,6 +1,7 @@
 package com.dagger4j.server.netty.handler;
 
 import com.dagger4j.mvc.http.HttpRequest;
+import com.dagger4j.mvc.http.HttpResponse;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.utils.DaggerId;
@@ -29,8 +30,9 @@ public class RequestHandler implements Runnable {
     }
 
     private void init() {
-        IRequest  iRequest = new HttpRequest.Builder().context(ctx).request(fullHttpRequest).requestId(new DaggerId().toString()).build();
-        IResponse iResponse = new HttpResponse.Builder().context(ctx).headerDate(new Ai).build();
+        IRequest  iRequest = new HttpRequest.Builder().context(ctx).request(fullHttpRequest).id(new DaggerId().toString()).build();
+        IResponse iResponse = new HttpResponse.Builder().request(iRequest).build();
+        Main.doTask(iRequest, iResponse);
     }
 
     @Override
