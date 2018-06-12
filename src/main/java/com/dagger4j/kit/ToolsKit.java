@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Created by laotang on 2017/10/31.
  */
-public class ToolsKit {
+public final class ToolsKit {
 
     private static Logger logger = LoggerFactory.getLogger(ToolsKit.class);
 

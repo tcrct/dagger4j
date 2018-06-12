@@ -6,7 +6,7 @@ import java.util.List;
  * @author Created by laotang
  * @date createed in 2018/6/12.
  */
-public class Mapping {
+public class RequestMapping {
 
     private String value;       // action映射的路径值
     private String desc;        // action的简要说明
@@ -14,7 +14,7 @@ public class Mapping {
     private long timeout = 0L; //请求过期时间
     private List<ValidationParam> paramList;  // 验证的参数集合
 
-    public Mapping(String value, String desc, int order, long timeout, List<ValidationParam> paramList) {
+    public RequestMapping(String value, String desc, int order, long timeout, List<ValidationParam> paramList) {
         this.value = value;
         this.desc = desc;
         this.order = order;

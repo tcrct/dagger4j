@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  *
- * Mapping注里的@Param
+ * Mapping注解的@Param
  * @author Created by laotang
  * @date createed in 2018/5/29.
  * @see @Validation.java
