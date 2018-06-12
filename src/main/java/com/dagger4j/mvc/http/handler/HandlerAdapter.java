@@ -12,9 +12,17 @@ public abstract class HandlerAdapter implements IHttpHandler {
     List<IHandler> afterHandlerList = new ArrayList();
 
 
-    @Override
     public abstract void before(List<IHandler> beforeHandlerList);
-    @Override
     public abstract void after(List<IHandler> afterHandlerList);
 
+
+    @Override
+    public List<IHandler> getBeforeHandlerList() {
+        return beforeHandlerList;
+    }
+
+    @Override
+    public List<IHandler> getAfterHandlerList() {
+        return afterHandlerList;
+    }
 }

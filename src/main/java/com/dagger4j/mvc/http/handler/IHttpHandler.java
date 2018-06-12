@@ -1,6 +1,5 @@
 package com.dagger4j.mvc.http.handler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,8 +9,8 @@ import java.util.List;
  */
 public interface IHttpHandler {
 
-    void before(List<IHandler> beforeHandlerList);
+    List<IHandler> getBeforeHandlerList();
 
-    void after(List<IHandler> afterHandlerList);
+    List<IHandler> getAfterHandlerList();
 
 }
