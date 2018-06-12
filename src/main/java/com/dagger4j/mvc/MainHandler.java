@@ -1,7 +1,7 @@
 package com.dagger4j.mvc;
 
 import com.dagger4j.exception.MvcException;
-import com.dagger4j.mvc.http.HandlerChainFactory;
+import com.dagger4j.mvc.http.handler.HandlerChainFactory;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 
@@ -14,8 +14,8 @@ import java.io.IOException;
 public class MainHandler {
 
     //前置
-    private void before() {
-
+    public static void startContextListener() {
+        // 扫描所有的类
     }
 
     /**

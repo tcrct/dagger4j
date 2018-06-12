@@ -1,6 +1,8 @@
-package com.dagger4j.mvc.http;
+package com.dagger4j.mvc.http.handler;
 
 import com.dagger4j.exception.MvcException;
+import com.dagger4j.mvc.http.IRequest;
+import com.dagger4j.mvc.http.IResponse;
 
 import java.util.ArrayList;
 import java.util.Iterator;
