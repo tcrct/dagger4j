@@ -16,6 +16,10 @@ public class HttpResponse implements IResponse {
         request = iRequest;
     }
 
+    public static HttpResponse build(IRequest request) {
+        return new HttpResponse(request);
+    }
+
     @Override
     public void addHeader(String key, String value) {
 
@@ -81,20 +85,4 @@ public class HttpResponse implements IResponse {
         return null;
     }
 
-    public static class Builder {
-        private IRequest request;
-
-        public Builder() {
-        }
-
-        public Builder request(IRequest iRequest) {
-            request = iRequest;
-            return this;
-        }
-
-        public HttpResponse build() {
-            return new HttpResponse(request);
-        }
-
-    }
 }

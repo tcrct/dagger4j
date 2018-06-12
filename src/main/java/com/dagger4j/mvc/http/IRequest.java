@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public interface IRequest {
 
+    String getRequestId();
+
     /**
      *
      * @return

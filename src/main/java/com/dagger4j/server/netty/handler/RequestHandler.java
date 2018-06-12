@@ -31,8 +31,8 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
-        IRequest  iRequest = new HttpRequest.Builder().context(ctx).request(fullHttpRequest).id(new DaggerId().toString()).build();
-        IResponse iResponse = new HttpResponse.Builder().request(iRequest).build();
+        IRequest  iRequest = HttpRequest.build(ctx, fullHttpRequest);
+        IResponse iResponse = HttpResponse.build(iRequest);
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
             throw new NettyStartUpException("build dagger4j request or response fail");
         }

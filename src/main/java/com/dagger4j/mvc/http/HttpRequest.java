@@ -4,6 +4,7 @@ import com.dagger4j.exception.HttpDecoderException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.decoder.AbstractDecoder;
 import com.dagger4j.mvc.http.decoder.DecoderFactory;
+import com.dagger4j.utils.DaggerId;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.local.LocalAddress;
@@ -49,15 +50,20 @@ public class HttpRequest implements IRequest{
     private InetSocketAddress remoteAddress;
     private LocalAddress localAddress;
 
-    private HttpRequest(String id, ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
-        requestId = id;
+    private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+        requestId = new DaggerId().toString();
         ctx = channelHandlerContext;
         request = fullHttpRequest;
         init();
     }
 
+    public static HttpRequest build(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
+        return new HttpRequest(channelHandlerContext, fullHttpRequest);
+    }
+
     private void init() {
         try {
+            // 根据请求方式，解码请求参数
             AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
             params = decoder.decoder();
             // reqeust body
@@ -82,6 +88,9 @@ public class HttpRequest implements IRequest{
         }
     }
 
+    public String getRequestId() {
+        return requestId;
+    }
     @Override
     public Object getAttribute(String name) {
         return params.get(name);
@@ -292,33 +301,5 @@ public class HttpRequest implements IRequest{
         cookie.domain(nettyCookie.domain());
         cookie.maxAge(nettyCookie.maxAge());
         cookies.put(cookie.name(), cookie);
-    }
-
-
-    public static class Builder {
-        private ChannelHandlerContext channelHandlerContext;
-        private FullHttpRequest fullHttpRequest;
-        private String requestId;
-
-        public Builder() {}
-
-        public Builder context(ChannelHandlerContext ctx) {
-            channelHandlerContext = ctx;
-            return this;
-        }
-
-        public Builder request(FullHttpRequest request) {
-            fullHttpRequest = request;
-            return this;
-        }
-
-        public Builder id(String id) {
-            requestId = id;
-            return this;
-        }
-
-        public HttpRequest build() {
-            return new HttpRequest(requestId, channelHandlerContext, fullHttpRequest);
-        }
     }
 }
