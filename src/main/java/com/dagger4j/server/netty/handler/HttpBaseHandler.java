@@ -1,6 +1,5 @@
 package com.dagger4j.server.netty.handler;
 
-import com.dagger4j.exception.NettyStartUpException;
 import com.dagger4j.exception.VerificationException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.server.common.BootStrap;

@@ -7,6 +7,7 @@ package com.dagger4j.mvc.http.enums;
 public enum ConstEnums {
 
     INPUTSTREAM_STR_NAME("dagger4j_inputstream_str", "以JSON或XML方式提交参数时，暂存在Request里的key"),
+    REQUEST_TIMEOUT("3", "默认的请求过期时间"),
     ;
 
 

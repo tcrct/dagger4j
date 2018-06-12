@@ -1,7 +1,5 @@
 package com.dagger4j.mvc.http;
 
-import io.netty.channel.ChannelHandlerContext;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
@@ -12,6 +10,7 @@ import java.util.Map;
 public class HttpResponse implements IResponse {
 
     private IRequest request;
+    private int status;
 
     private HttpResponse(IRequest iRequest){
         request = iRequest;
@@ -43,8 +42,13 @@ public class HttpResponse implements IResponse {
     }
 
     @Override
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    @Override
     public int getStatus() {
-        return 0;
+        return status;
     }
 
     @Override

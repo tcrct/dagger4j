@@ -51,6 +51,12 @@ public interface IResponse {
     int getStatus();
 
     /**
+     * 设置返回状态标识
+     * @return
+     */
+    void setStatus(int status);
+
+    /**
      * 设置编码格式
      * @return
      */
