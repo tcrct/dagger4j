@@ -23,6 +23,7 @@ public class Route {
     private Method actionMethod;       // 执行的方法
     private HttpMethod[] httpMethod;  //请求类型
     private List<ValidationParam> validationParamList; //
+    private boolean singleton; //是否单例
 
     public Route(Class<?> controllerClass, Method actionMethod) {
         this.controllerClass = controllerClass;
@@ -37,8 +38,8 @@ public class Route {
         return actionMethod;
     }
 
-    public void setActionMethod(Method actionMethod) {
-        this.actionMethod = actionMethod;
+    public RequestMapping getRequestMapping() {
+        return requestMapping;
     }
 
     public void builderMapping(Method actionMethod) {
@@ -95,6 +96,12 @@ public class Route {
         return validationParam;
     }
 
+    public boolean isSingleton() {
+        return singleton;
+    }
 
+    public void setSingleton(boolean singleton) {
+        this.singleton = singleton;
+    }
 }
 
