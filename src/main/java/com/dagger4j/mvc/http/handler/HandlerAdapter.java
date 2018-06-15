@@ -8,21 +8,21 @@ import java.util.List;
  */
 public abstract class HandlerAdapter implements IHttpHandler {
 
-    List<IHandler> beforeHandlerList = new ArrayList();
-    List<IHandler> afterHandlerList = new ArrayList();
-
-
     public abstract void before(List<IHandler> beforeHandlerList);
     public abstract void after(List<IHandler> afterHandlerList);
 
 
     @Override
     public List<IHandler> getBeforeHandlerList() {
+        List<IHandler> beforeHandlerList = new ArrayList();
+        before(beforeHandlerList);
         return beforeHandlerList;
     }
 
     @Override
     public List<IHandler> getAfterHandlerList() {
+        List<IHandler> afterHandlerList = new ArrayList();
+        after(afterHandlerList);
         return afterHandlerList;
     }
 }

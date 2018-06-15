@@ -1,13 +1,16 @@
 package com.dagger4j.mvc.http.decoder;
 
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.upload.FileItem;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.multipart.*;
+import io.netty.handler.codec.http.multipart.FileUpload;
+import io.netty.handler.codec.http.multipart.HttpPostMultipartRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.MixedAttribute;
 
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +43,12 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
                             ByteBuf byteBuf = fileUpload.getByteBuf();
                             bytes = ByteBufUtil.getBytes(byteBuf);
                         } else {
-                            bytes = Files.readAllBytes(fileUpload.getFile().toPath());
+                            bytes = fileUpload.get();
                         }
-                        fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), fileUpload.getFile().length(), bytes);
+                        if(null == bytes) {
+                            throw new MvcException("MultiPartPostDecoder Is Fail :  bytes is null... " );
+                        }
+                        fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), bytes.length, bytes);
                         attributeMap.put(fileItem.getName(), fileItem);
                     }
                 }
