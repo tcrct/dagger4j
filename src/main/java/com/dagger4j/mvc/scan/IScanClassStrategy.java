@@ -1,0 +1,19 @@
+package com.dagger4j.mvc.scan;
+
+import java.util.Map;
+
+/**
+ * CLASS文件扫描策略类接口
+ * Created by laotang on 2018/6/16.
+ */
+public interface IScanClassStrategy {
+
+    /**
+     * 返回class集合<br/>
+     * map key:  class的全名，包路径+类名称<br/>
+     * map value:  类对象<br/>
+     * @return
+     */
+    Map<String, Class<?>> getClassMap();
+
+}

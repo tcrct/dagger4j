@@ -73,7 +73,7 @@ public final class PathKit {
      */
     public static String getPath(String packagePath) {
         packagePath = packagePath.contains(".") ? packagePath.replace(".", "/") : packagePath;
-        String path = getClassLoader().getResource(fixPath(packagePath)).getPath();
+        String path = ClassKit.getClassLoader().getResource(fixPath(packagePath)).getPath();
         return new File(path).getAbsolutePath();
     }
 
@@ -85,7 +85,7 @@ public final class PathKit {
     public static Enumeration<URL> getPaths(String packagePath) {
         packagePath = packagePath.contains(".") ? packagePath.replace(".", "/") : packagePath;
         try {
-            return getClassLoader().getResources(fixPath(packagePath));
+            return ClassKit.getClassLoader().getResources(fixPath(packagePath));
         } catch (IOException e) {
             throw new MvcException(e.getMessage(), e);
         }
@@ -122,7 +122,7 @@ public final class PathKit {
 
     /***
      * 根据类对象返回包路径
-     * @param object
+     * @param clazz
      * @return
      */
     public static String getPackagePath(Class<?> clazz) {
@@ -156,11 +156,6 @@ public final class PathKit {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static ClassLoader getClassLoader() {
-        ClassLoader ret = Thread.currentThread().getContextClassLoader();
-        return ret != null ? ret : PathKit.class.getClassLoader();
     }
 
 }
