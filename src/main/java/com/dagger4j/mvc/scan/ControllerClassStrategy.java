@@ -15,9 +15,22 @@ public class ControllerClassStrategy extends AbstractScanClassStrategy {
 
     // controller class pool
     private static final Map<String, Class<?>> clontrllerClassMap = new HashMap<>();
+    private static ControllerClassStrategy ourInstance = new ControllerClassStrategy();
 
     private String packagePath;
     private List<String> jarNames;
+
+    /**
+     * 取配置文件里指定的包路径与jar文件前缀
+     * @return
+     */
+    public static ControllerClassStrategy getInstance() {
+        return ourInstance;
+    }
+
+    private ControllerClassStrategy(){
+        this("" ,null);
+    }
 
     public ControllerClassStrategy(String packagePath, List<String> jarNames){
         this.packagePath = packagePath;
@@ -26,6 +39,9 @@ public class ControllerClassStrategy extends AbstractScanClassStrategy {
 
     @Override
     public Map<String, Class<?>> getClassMap() {
+        if(!clontrllerClassMap.isEmpty()) {
+            return clontrllerClassMap;
+        }
         List<Class<?>> classList = getAllClass(packagePath, jarNames);
         if(ToolsKit.isEmpty(classList)) {
             return null;

@@ -5,11 +5,13 @@ import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.PathKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.ioc.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.annotation.Annotation;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -25,7 +27,13 @@ public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
 
     private static final Map<String, List<Class<?>>> allClassMap = new HashMap<>();
 
-    public List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
+    /**
+     * 根据指定路径及jar文件前缀包名下的类对象集合
+     * @param packagePath       包路径
+     * @param jarNames              jar包名前经集合
+     * @return
+     */
+    protected List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
         List<Class<?>> classList = allClassMap.get(packagePath);
         if(ToolsKit.isEmpty(classList)) {
             classList = scanClass(packagePath, jarNames);
@@ -34,10 +42,6 @@ public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
             }
         }
         return classList;
-    }
-
-    public Map<String, Class<?>> getAllAnnotactionClass(List<Class<?>> sourceList, Annotaction annotaction) {
-
     }
 
     /**
