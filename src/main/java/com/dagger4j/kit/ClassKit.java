@@ -1,19 +1,12 @@
 package com.dagger4j.kit;
 
 import com.dagger4j.exception.MvcException;
-import com.dagger4j.mvc.http.enums.ConstEnums;
-import com.dagger4j.mvc.scan.ScanFileFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.lang.reflect.Modifier;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Created by laotang
@@ -24,9 +17,6 @@ public final class ClassKit {
     private static final Logger logger = LoggerFactory.getLogger(ClassKit.class);
 
 
-
-    // service class pool
-    private static final Map<String, Class<?>> serviceClassMap = new HashMap<>();
     // entity class pool
     private static final Map<String, Class<?>> entityClassMap = new HashMap<>();
     // othor class pool
@@ -92,7 +82,7 @@ public final class ClassKit {
 //    public static List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
 //        List<Class<?>> classList = allClassMap.get(packagePath);
 //        if(ToolsKit.isEmpty(classList)) {
-//           classList = ScanFileFactory.scanClass(packagePath, jarNames);
+//           classList = ScanClassFactory.scanClass(packagePath, jarNames);
 //            if(ToolsKit.isNotEmpty(classList))  {
 //                allClassMap.put(packagePath, classList);
 //            }
@@ -100,8 +90,5 @@ public final class ClassKit {
 //        return classList;
 //    }
 
-    public static Map<String, Class<?>> getClontrllerClassMap() {
-        return clontrllerClassMap;
-    }
 
 }

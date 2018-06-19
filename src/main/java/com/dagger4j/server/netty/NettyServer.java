@@ -1,11 +1,13 @@
 package com.dagger4j.server.netty;
 
+import com.dagger4j.exception.MvcException;
+import com.dagger4j.exception.NettyStartUpException;
+import com.dagger4j.mvc.core.StartContextListener;
 import com.dagger4j.server.common.BootStrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -29,7 +31,7 @@ public class NettyServer extends AbstractNettyServer {
                 public void operationComplete(Future<Void> future) throws Exception {
                     if (future.isSuccess()) {
                         // 启动上下文监听器
-//                        bootStrap.startContextListener();
+                        StartContextListener.getInstance().start();
                         System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup in "+bootStrap.getStartTimeMillis()+" ms, God bless no bugs!");
                     } else {
                         System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup failed");
@@ -43,7 +45,11 @@ public class NettyServer extends AbstractNettyServer {
             //成功绑定到端口之后,给channel增加一个 管道关闭的监听器并同步阻塞,直到channel关闭,线程才会往下执行,结束进程。
             future.channel().closeFuture().sync();//相当于在这里阻塞，直到Server Channel关闭
         } catch (InterruptedException e) {
-            throw new RuntimeException("启动Netty服务失败: " + e.getMessage(), e);
+            throw new NettyStartUpException("启动Netty服务失败: " + e.getMessage(), e);
+        } catch (MvcException e) {
+            throw new NettyStartUpException("启动MVC程序失败: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new NettyStartUpException("启动程序失败: " + e.getMessage(), e);
         } finally {
             clearPidFile();
             shutdown();

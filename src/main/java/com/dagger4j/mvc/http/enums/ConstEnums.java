@@ -10,6 +10,11 @@ public enum ConstEnums {
     REQUEST_TIMEOUT("3", "默认的请求过期时间"),
     CLASS_URL_PROTOCOL_FILE_FIELD("file", "calss类文件URL对象的类型"),
     CLASS_URL_PROTOCOL_JAR_FIELD("jar", "calss类文件URL对象的类型"),
+    DEFAULT_ENCODING("utf-8", "默认的编码格式"),
+    BASE_PACKAGE_PAGE("base.package.path", "要扫描的类路径"),
+    PRODUCT_APPID("product.appid", "项目APPID"),
+    PRODUCT_CODE("product.code", "项目简单称"),
+    JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
     ;
 
 

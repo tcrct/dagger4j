@@ -6,11 +6,8 @@ import com.dagger4j.kit.ToolsKit;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultithreadEventLoopGroup;
 import io.netty.channel.ServerChannel;
-import io.netty.channel.epoll.EpollServerSocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -64,6 +61,7 @@ public class BootStrap implements Closeable {
     private boolean enableGzip = true;
     /**  是否开启请求跨域处理*/
     private boolean enableCors = true;
+
 
     public static BootStrap getInstants() {
         return _bootStrap;
