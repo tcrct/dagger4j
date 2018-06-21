@@ -3,8 +3,8 @@ package com.dagger4j.mvc.route;
 import com.dagger4j.kit.PathKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.HttpMethod;
-import com.dagger4j.mvc.ioc.Mapping;
-import com.dagger4j.mvc.ioc.Validation;
+import com.dagger4j.mvc.annotation.Mapping;
+import com.dagger4j.mvc.annotation.Validation;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

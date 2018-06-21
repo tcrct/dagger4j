@@ -1,4 +1,4 @@
-package com.dagger4j.mvc.ioc;
+package com.dagger4j.mvc.annotation;
 
 /**
  * Created by laotang on 2017/11/5.

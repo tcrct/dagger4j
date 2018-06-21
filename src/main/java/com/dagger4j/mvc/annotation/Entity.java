@@ -1,4 +1,4 @@
-package com.dagger4j.mvc.ioc;
+package com.dagger4j.mvc.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

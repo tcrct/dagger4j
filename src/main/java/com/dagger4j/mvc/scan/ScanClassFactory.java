@@ -15,6 +15,19 @@ public class ScanClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ScanClassFactory.class);
     private static ControllerClassStrategy controllerClassStrategy;
     private static ServiceClassStrategy serviceClassStrategy;
+    private static EntityClassStrategy entityClassStrategy;
+    private static ProxyClassStrategy proxyClassStrategy;
+
+
+    /**
+     *  扫描所有Controller, Service, Entity类
+     */
+    public static void initScanClass() throws Exception {
+        getControllerClassMap();
+        getServiceClassMap();
+        getEntityClassMap();
+        getProxyClassMap();
+    }
 
     /**
      * 取出所有Controller类
@@ -36,6 +49,28 @@ public class ScanClassFactory {
             serviceClassStrategy = ServiceClassStrategy.getInstance();
         }
         return serviceClassStrategy.getClassMap();
+    }
+
+    /**
+     * 取出所有Entity类
+     * @return
+     */
+    public static Map<String,Class<?>> getEntityClassMap() {
+        if(ToolsKit.isEmpty(entityClassStrategy)) {
+            entityClassStrategy = EntityClassStrategy.getInstance();
+        }
+        return entityClassStrategy.getClassMap();
+    }
+
+    /**
+     * 取出所有Proxy类
+     * @return
+     */
+    public static Map<String,Class<?>> getProxyClassMap() {
+        if(ToolsKit.isEmpty(proxyClassStrategy)) {
+            proxyClassStrategy = ProxyClassStrategy.getInstance();
+        }
+        return proxyClassStrategy.getClassMap();
     }
 
 }

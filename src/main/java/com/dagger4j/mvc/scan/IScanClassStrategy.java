@@ -14,6 +14,6 @@ public interface IScanClassStrategy {
      * map value:  类对象<br/>
      * @return
      */
-    Map<String, Class<?>> getClassMap();
+    Map<String, Class<?>> getClassMap() throws Exception;
 
 }
