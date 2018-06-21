@@ -2,8 +2,9 @@ package com.dagger4j.mvc.scan;
 
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.annotation.Entity;
+import com.dagger4j.mvc.annotation.Proxy;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.proxy.IProxy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class ProxyClassStrategy extends AbstractScanClassStrategy {
     }
 
     /**
-     * 扫描Entity
+     * 扫描实现了IPorxy接口的类
      * @return
      */
     @Override
@@ -53,8 +54,8 @@ public class ProxyClassStrategy extends AbstractScanClassStrategy {
             return null;
         }
         for(Class<?> clazz : classList) {
-            Entity annotation = clazz.getAnnotation(Entity.class);
-            if(ToolsKit.isNotEmpty(annotation)) {
+            // 类有Proxy注解且实现了IProxy接口
+            if(clazz.isAnnotationPresent(Proxy.class) && IProxy.class.isAssignableFrom(clazz)){
                 proxyClassMap.put(clazz.getName(), clazz);
             }
         }

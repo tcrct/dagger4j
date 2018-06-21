@@ -27,6 +27,7 @@ public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
 
     /**
      * 根据指定路径及jar文件前缀包名下的类对象集合
+     * 如果类是抽象类或接口则不扫描到集合
      * @param packagePath       包路径
      * @param jarNames              jar包名前经集合
      * @return
