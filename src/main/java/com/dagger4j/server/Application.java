@@ -1,6 +1,7 @@
 package com.dagger4j.server;
 
 import com.dagger4j.mvc.http.handler.IHttpHandler;
+import com.dagger4j.mvc.plugin.IPlugin;
 import com.dagger4j.server.common.BootStrap;
 import com.dagger4j.server.netty.NettyServer;
 
@@ -35,6 +36,10 @@ public class Application {
     }
 
     public Application handles(IHttpHandler handlerChain) {
+        return application;
+    }
+
+    public Application plugins(IPlugin pluginChain) {
         return application;
     }
 
