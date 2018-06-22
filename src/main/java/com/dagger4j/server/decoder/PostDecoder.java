@@ -1,4 +1,4 @@
-package com.dagger4j.mvc.http.decoder;
+package com.dagger4j.server.decoder;
 
 import com.dagger4j.kit.ToolsKit;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

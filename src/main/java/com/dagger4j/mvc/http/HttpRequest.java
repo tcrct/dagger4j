@@ -2,8 +2,8 @@ package com.dagger4j.mvc.http;
 
 import com.dagger4j.exception.HttpDecoderException;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.http.decoder.AbstractDecoder;
-import com.dagger4j.mvc.http.decoder.DecoderFactory;
+import com.dagger4j.server.decoder.AbstractDecoder;
+import com.dagger4j.server.decoder.DecoderFactory;
 import com.dagger4j.utils.DaggerId;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

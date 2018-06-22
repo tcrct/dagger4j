@@ -1,4 +1,4 @@
-package com.dagger4j.mvc.http.decoder;
+package com.dagger4j.server.decoder;
 
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;

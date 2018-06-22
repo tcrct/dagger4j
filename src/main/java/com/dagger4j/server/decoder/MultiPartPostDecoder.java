@@ -1,4 +1,4 @@
-package com.dagger4j.mvc.http.decoder;
+package com.dagger4j.server.decoder;
 
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
