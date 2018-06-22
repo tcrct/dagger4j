@@ -1,0 +1,28 @@
+package com.dagger4j.mvc.annotation;
+
+/**
+ * Created by laotang on 2017/11/5.
+ */
+
+import com.dagger4j.mvc.http.enums.ConstEnums;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * 定义 Handler 类注解
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Handler {
+    /**
+     *  处理器位置，是在RequestAccessHandler前或后，
+     *  如果是前(ConstEnums.HANDLE.BEFORE)则对request进行处理
+     *  如果是后(ConstEnums.HANDLE.AFTER)则对response处理
+      */
+    ConstEnums.HANDLE location() default ConstEnums.HANDLE.BEFORE;
+
+    int index() default 0;
+}

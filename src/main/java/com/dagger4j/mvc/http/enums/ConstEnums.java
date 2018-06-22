@@ -1,10 +1,7 @@
 package com.dagger4j.mvc.http.enums;
 
 
-import com.dagger4j.mvc.annotation.Controller;
-import com.dagger4j.mvc.annotation.Entity;
-import com.dagger4j.mvc.annotation.Plugin;
-import com.dagger4j.mvc.annotation.Service;
+import com.dagger4j.mvc.annotation.*;
 
 import java.lang.annotation.Annotation;
 
@@ -56,6 +53,7 @@ public enum ConstEnums {
         SERVICE_ANNOTATION(Service.class, "所有Service类的注解，必须在类添加该注解否则框架忽略扫描"),
         ENTITY_ANNOTATION(Entity.class, "所有Entity类的注解，必须在类添加该注解否则框架忽略扫描"),
         PLUGIN_ANNOTATION(Plugin.class, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描"),
+        HANDLER_ANNOTATION(Handler.class, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描"),
         ;
 
         Class<? extends Annotation> clazz;
@@ -81,6 +79,9 @@ public enum ConstEnums {
     }
 
 
+    public enum HANDLE {
+        BEFORE, AFTER;
+    }
 
 
 

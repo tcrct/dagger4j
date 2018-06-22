@@ -15,12 +15,7 @@ import java.io.IOException;
  */
 public class MainHandler {
 
-    //前置
-    public static void startContextListener() {
-        // 扫描所有的类
-    }
-
-    /**
+     /**
      * 取得request所请求的资源路径。
      * <p>
      * 资源路径为<code>getRequestURI()</code>。

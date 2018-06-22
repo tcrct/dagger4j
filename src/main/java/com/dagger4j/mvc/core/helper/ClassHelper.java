@@ -28,6 +28,7 @@ public class ClassHelper {
             for(ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {
                 if (clazz.isAnnotationPresent(classEnums.getClazz())) {
                     setClass2Map(classEnums.getName(), clazz);
+                    break;
                 }
             }
         }
