@@ -2,7 +2,7 @@ package com.dagger4j.mvc;
 
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.http.handler.HandlerChainFactory;
+import com.dagger4j.mvc.core.helper.HandlerHelper;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.handler.RequestAccessHandler;
@@ -60,11 +60,11 @@ public class MainHandler {
         }
         try {
             // 请求访问处理器前的处理器链，可以对请求进行过滤
-            HandlerChainFactory.doBeforeHandler(target, request, response);
+            HandlerHelper.doBeforeChain(target, request, response);
             // 请求访问处理器
             RequestAccessHandler.doHandler(target, request, response);
             //返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
-            HandlerChainFactory.doAfterHandler(target, request, response);
+            HandlerHelper.doAfterChain(target, request, response);
         } catch (Exception e) {
             response.setStatus(500);
         }

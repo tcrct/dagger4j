@@ -1,8 +1,12 @@
 package com.dagger4j;
 
-import com.dagger4j.mvc.http.handler.HandlerAdapter;
+import com.dagger4j.mvc.http.handler.HandlerChain;
+import com.dagger4j.mvc.http.handler.TestHttpHandler;
+import com.dagger4j.mvc.http.handler.TestHttpHandler2;
 import com.dagger4j.mvc.http.handler.IHandler;
+import com.dagger4j.mvc.plugin.TestHttpPlugin;
 import com.dagger4j.mvc.plugin.IPlugin;
+import com.dagger4j.mvc.plugin.PluginChain;
 import com.dagger4j.server.Application;
 
 import java.util.List;
@@ -13,42 +17,24 @@ import java.util.List;
  */
 public final class Dagger {
 
+    public static void main( String[] args ) {
 
-    public static void main( String[] args )
-    {
-        Application.duang().port(12345).handles(new HandlerAdapter() {
+        Application.duang().port(12345)
+                .handles(new HandlerChain() {
                     @Override
-                    public void before(List<IHandler> beforeHandlerList) {
-                        beforeHandlerList.add(null);
+                    public void before(List<IHandler> beforeList) {
+                        beforeList.add(new TestHttpHandler());
                     }
                     @Override
-                    public void after(List<IHandler> afterHandlerList) {
-                    }
-                }).plugins(new IPlugin() {
-                    @Override
-                    public void start() throws Exception {
-
-                    }
-
-                    @Override
-                    public void stop() throws Exception {
-
+                    public void after(List<IHandler> afterList) {
+                        afterList.add(new TestHttpHandler2());
                     }
                 })
-//                .handles(new IHttpHandler() {
-//
-//                    @Override
-//                    public void addBeforeHandlers(List<IHandler> handlers) throws Exception {
-//                        handlers.addHandler(new xxxxHandler())
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public IHandler addAfterHandlers(IHandler handler) throws Exception {
-//                        return null;
-//                    }
-//                })
-//                .use()
-                .run();
+                .plugins(new PluginChain() {
+                    @Override
+                    public void addPlugin(List<IPlugin> pluginList) {
+                        pluginList.add(new TestHttpPlugin());
+                    }
+                }).run();
     }
 }

@@ -1,7 +1,9 @@
 package com.dagger4j.server;
 
-import com.dagger4j.mvc.http.handler.IHttpHandler;
-import com.dagger4j.mvc.plugin.IPlugin;
+import com.dagger4j.mvc.core.helper.HandlerHelper;
+import com.dagger4j.mvc.core.helper.PluginHelper;
+import com.dagger4j.mvc.http.handler.HandlerChain;
+import com.dagger4j.mvc.plugin.PluginChain;
 import com.dagger4j.server.common.BootStrap;
 import com.dagger4j.server.netty.NettyServer;
 
@@ -35,11 +37,14 @@ public class Application {
         return application;
     }
 
-    public Application handles(IHttpHandler handlerChain) {
+    public Application handles(HandlerChain handlerChain) {
+        HandlerHelper.setBeforeHandlerList(handlerChain.getBeforeHandlerList());
+        HandlerHelper.setAfterHandlerList(handlerChain.getAfterHandlerList());
         return application;
     }
 
-    public Application plugins(IPlugin pluginChain) {
+    public Application plugins(PluginChain pluginChain) {
+        PluginHelper.setPluginList(pluginChain.getPluginList());
         return application;
     }
 
@@ -48,6 +53,9 @@ public class Application {
     }
 
     public void run() {
+        System.out.println("beforeHandlerList: " + HandlerHelper.beforeHandlerList.get(0).getClass().getName());
+        System.out.println("afterHandlerList: " + HandlerHelper.afterHandlerList.get(0).getClass().getName());
+        System.out.println("plugin: " + PluginHelper.getPlugins().get(0).getClass().getName());
         BootStrap bootStrap = new BootStrap(host, port);
         new NettyServer(bootStrap).start();
     }

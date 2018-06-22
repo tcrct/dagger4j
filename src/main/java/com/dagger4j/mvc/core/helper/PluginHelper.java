@@ -1,6 +1,5 @@
 package com.dagger4j.mvc.core.helper;
 
-import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.mvc.plugin.IPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,9 @@ public class PluginHelper {
     public static List<IPlugin> getPlugins() {
         return plugins;
     }
+    public static void setPluginList(List<IPlugin> pluginList) {
+        plugins.addAll(pluginList);
+    }
     public static void setPlugin(IPlugin plugin) {
         plugins.add(plugin);
     }
@@ -34,12 +36,6 @@ public class PluginHelper {
      * @throws Exception
      */
     static {
-        List<Class<?>> pluginList = ClassHelper.getPluginClassList();
-        for(Class<?> pluginClass : pluginList) {
-            if(pluginClass.isAssignableFrom(IPlugin.class)) {
-                setPlugin((IPlugin)ObjectKit.newInstance(pluginClass));
-            }
-        }
         for(Iterator<IPlugin> it = getPlugins().iterator(); it.hasNext();){
             IPlugin plugin = it.next();
             if(null != plugin){

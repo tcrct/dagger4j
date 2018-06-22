@@ -20,6 +20,7 @@ public enum ConstEnums {
     PRODUCT_CODE("product.code", "项目简单称"),
     JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
     REPORT_MAPPING_KEY("/dagger/report", "框架报告映射路径前缀"),
+    DAGGER_INPUTSTREAM_STR_FIELD("dagger_inputstream_str", "框架报告映射路径前缀"),
     ;
 
 

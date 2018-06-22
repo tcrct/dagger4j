@@ -1,6 +1,5 @@
 package com.dagger4j.kit;
 
-import com.duangframework.core.exceptions.ExecutorServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,13 +71,13 @@ public class ThreadPoolKit {
 			return (FutureTask)es.submit(futureTask);
 		} catch (Exception e) {
 			logger.warn("ThreadPoolKit execute is error: "+ e.getMessage(), e);
-			throw new ExecutorServiceException(e.getMessage(), e);
+			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * 执行任务
-	 * @param futureTask	线程任务
+	 * @param thread	线程任务
 	 * @return
 	 */
 	public static <T> FutureTask<T> run(Thread thread) {

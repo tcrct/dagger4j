@@ -1,13 +1,8 @@
 package com.dagger4j.mvc.http.handler;
 
 import com.dagger4j.exception.MvcException;
-import com.dagger4j.mvc.core.Controller;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
-import com.dagger4j.mvc.route.RequestMapping;
-import com.dagger4j.mvc.route.Route;
-
-import java.lang.reflect.Method;
 
 /**
  * 请求访问处理器
@@ -17,8 +12,9 @@ public class RequestAccessHandler{
 
     private static final Object[] NULL_ARGS = new Object[0];
 
-    public static void doHandler(String target, IRequest request, IResponse response) throws MvcException {
 
+    public static void doHandler(String target, IRequest request, IResponse response) throws MvcException {
+        /*
 //        Action action = InstanceFactory.getActionMapping().get(target);
         Route route = null;
 //        if(null == action){
@@ -50,5 +46,6 @@ public class RequestAccessHandler{
         method.invoke(controller, NULL_ARGS);
         // 返回结果
         controller.getRender().setContext(request, response).render();
+        */
     }
 }

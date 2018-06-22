@@ -1,7 +1,7 @@
 package com.dagger4j.mvc.http.decoder;
 
-import com.duangframework.core.common.Const;
-import com.duangframework.core.kit.ToolsKit;
+import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
 import org.w3c.dom.*;
@@ -13,25 +13,27 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Created by laotang
  * @date createed in 2018/1/6.
  */
-public class XmlDecoder extends AbstractDecoder<Map<String, String[]>> {
+public class XmlDecoder extends AbstractDecoder<Map<String, List<String>>> {
 
     public XmlDecoder(FullHttpRequest request) {
         super(request);
     }
 
     @Override
-    public Map<String, String[]> decoder() throws Exception {
+    public Map<String, List<String>> decoder() throws Exception {
         String xml = request.content().toString(HttpConstants.DEFAULT_CHARSET);
         if (ToolsKit.isNotEmpty(xml)){
             paramsMap.putAll(getMapFromXML(xml));
-            paramsMap.put(Const.DUANG_INPUTSTREAM_STR_NAME, new String[]{xml});
+            paramsMap.put(ConstEnums.DAGGER_INPUTSTREAM_STR_FIELD.getValue(), Collections.singletonList(xml));
         }
         return paramsMap;
     }
@@ -45,8 +47,8 @@ public class XmlDecoder extends AbstractDecoder<Map<String, String[]>> {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, String[]> getMapFromXML(String xmlString) throws ParserConfigurationException, IOException, SAXException {
-        Map<String, String[]> map = new HashMap<>();
+    public Map<String, List<String>> getMapFromXML(String xmlString) throws ParserConfigurationException, IOException, SAXException {
+        Map<String, List<String>> map = new HashMap<>();
         InputStream is = null;
         try {
             // 这里用Dom的方式解析回包的最主要目的是防止API新增回包字段
@@ -62,8 +64,7 @@ public class XmlDecoder extends AbstractDecoder<Map<String, String[]>> {
                 if (node instanceof Element) {
                     String content = node.getTextContent();
                     if(ToolsKit.isNotEmpty(content)) {
-                        String[] nodeValueArray = {content};
-                        map.put(node.getNodeName(), nodeValueArray);
+                        map.put(node.getNodeName(), Collections.singletonList(content));
                     }
                 }
                 i++;

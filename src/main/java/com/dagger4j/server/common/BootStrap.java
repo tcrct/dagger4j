@@ -68,7 +68,7 @@ public class BootStrap implements Closeable {
     }
 
     public BootStrap(String host, int port) {
-        this.host = host;
+        this.host = ToolsKit.isEmpty(host) ? "0.0.0.0" : host ;
         this.port = port;
         this.startTimeMillis = System.currentTimeMillis();
         init();

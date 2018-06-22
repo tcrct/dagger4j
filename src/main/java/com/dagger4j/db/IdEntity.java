@@ -3,7 +3,6 @@ package com.dagger4j.db;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dagger4j.kit.ToolsKit;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.Date;
 
@@ -74,12 +73,6 @@ public class IdEntity implements java.io.Serializable {
         this.id = id+"";
     }
 
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
-
 	public Date getCreatetime() {
 		return createtime;
 	}
@@ -128,4 +121,16 @@ public class IdEntity implements java.io.Serializable {
 		this.source = source;
 	}
 
+	@Override
+	public String toString() {
+		return "IdEntity{" +
+				"id='" + id + '\'' +
+				", createtime=" + createtime +
+				", createuserid='" + createuserid + '\'' +
+				", updatetime=" + updatetime +
+				", updateuserid='" + updateuserid + '\'' +
+				", status='" + status + '\'' +
+				", source='" + source + '\'' +
+				'}';
+	}
 }
