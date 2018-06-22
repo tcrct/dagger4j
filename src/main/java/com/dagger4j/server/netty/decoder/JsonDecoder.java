@@ -1,4 +1,4 @@
-package com.dagger4j.server.decoder;
+package com.dagger4j.server.netty.decoder;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

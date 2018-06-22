@@ -1,4 +1,4 @@
-package com.dagger4j.server.decoder;
+package com.dagger4j.server.netty.decoder;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpConstants;
