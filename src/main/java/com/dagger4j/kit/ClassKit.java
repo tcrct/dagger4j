@@ -28,6 +28,14 @@ public final class ClassKit {
     }
 
     /**
+     * 实例化类文件, 默认实例化
+     * @param clazz  类文件
+     * @return
+     */
+    public static Class<?> loadClass(Class<?> clazz) {
+        return loadClass(clazz, true);
+    }
+    /**
      * 实例化类文件
      * @param clazz  类文件
      * @param isInit  是否实例

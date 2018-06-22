@@ -95,7 +95,7 @@ public final class PathKit {
     public static String getRootClassPath() {
         if (rootClassPath == null) {
             try {
-                String path = getClassLoader().getResource("").toURI().getPath();
+                String path = ClassKit.getClassLoader().getResource("").toURI().getPath();
                 rootClassPath = new File(path).getAbsolutePath();
             }
             catch (Exception e) {

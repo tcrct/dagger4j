@@ -25,10 +25,10 @@ public class Route {
     private List<ValidationParam> validationParamList; //
     private boolean singleton; //是否单例
 
-    public Route(Class<?> controllerClass, Method actionMethod) {
+    public Route(Class<?> controllerClass, String controllerMappingKey, Method actionMethod) {
         this.controllerClass = controllerClass;
         this.actionMethod = actionMethod;
-        builderMapping(actionMethod);;
+        builderMapping(controllerMappingKey, actionMethod);
     }
     public Class<?> getControllerClass() {
         return controllerClass;
@@ -42,7 +42,7 @@ public class Route {
         return requestMapping;
     }
 
-    public void builderMapping(Method actionMethod) {
+    public void builderMapping(String controllerKey, Method actionMethod) {
         Mapping methodMapping = actionMethod.getAnnotation(Mapping.class);
         if(ToolsKit.isEmpty(methodMapping)) {
             return;
@@ -64,8 +64,13 @@ public class Route {
         }
 
         this.httpMethod = methodMapping.method();
-        String value = PathKit.fixPath(methodMapping.value());
-        this.requestMapping = new RequestMapping(value,
+        String methodKey = PathKit.fixPath(methodMapping.value());
+        String routeKey = methodKey;
+        if(!controllerKey.equalsIgnoreCase(methodKey)) {
+            routeKey = controllerKey + methodKey;
+        }
+        routeKey = PathKit.fixPath(routeKey);
+        this.requestMapping = new RequestMapping(routeKey,
                 methodMapping.desc(),
                 methodMapping.order(),
                 methodMapping.timeout(),

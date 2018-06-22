@@ -19,11 +19,19 @@ import java.util.jar.JarFile;
 /**
  * Created by laotang on 2018/6/16.
  */
-public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
+public abstract class ClassTemplate {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractScanClassStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClassTemplate.class);
 
     private static final Map<String, List<Class<?>>> allClassMap = new HashMap<>();
+
+    protected String packageName;
+    protected List<String> jarNames;
+
+    protected ClassTemplate(String packageName, List<String> jarNames) {
+        this.packageName = packageName;
+        this.jarNames = jarNames;
+    }
 
     /**
      * 根据指定路径及jar文件前缀包名下的类对象集合
@@ -32,12 +40,12 @@ public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
      * @param jarNames              jar包名前经集合
      * @return
      */
-    protected List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
-        List<Class<?>> classList = allClassMap.get(packagePath);
+    public List<Class<?>> getList() {
+        List<Class<?>> classList = allClassMap.get(packageName);
         if(ToolsKit.isEmpty(classList)) {
-            classList = scanClass(packagePath, jarNames);
+            classList = scanClass(packageName, jarNames);
             if(ToolsKit.isNotEmpty(classList))  {
-                allClassMap.put(packagePath, classList);
+                allClassMap.put(packageName, classList);
             }
         }
         return classList;
@@ -164,9 +172,13 @@ public abstract class AbstractScanClassStrategy implements IScanClassStrategy {
             }
             Class<?> clazz = ClassKit.loadClass(ClassKit.getClassLoader().loadClass(packageName + "." + className), false);
             if(ToolsKit.isNotEmpty(clazz)) {
-                classList.add(clazz);
+                checkAndAddClass(clazz, classList);
             }
         }
     }
 
+    /**
+     * 验证是否允许添加类
+     */
+    public abstract void checkAndAddClass(Class<?> clazz,  List<Class<?>> classList);
 }

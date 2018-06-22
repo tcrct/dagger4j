@@ -1,6 +1,6 @@
 package com.dagger4j.mvc.scan;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * CLASS文件扫描策略类接口
@@ -14,6 +14,6 @@ public interface IScanClassStrategy {
      * map value:  类对象<br/>
      * @return
      */
-    Map<String, Class<?>> getClassMap() throws Exception;
+    List<Class<?>> getList() throws Exception;
 
 }
