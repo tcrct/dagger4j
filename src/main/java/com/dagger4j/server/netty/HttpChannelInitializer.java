@@ -1,6 +1,7 @@
 package com.dagger4j.server.netty;
 
 import com.dagger4j.server.common.BootStrap;
+import com.dagger4j.server.netty.handler.HttpFilterRuleHandler;
 import com.dagger4j.server.netty.handler.HttpBaseHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -59,13 +60,13 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin().allowNullOrigin().allowCredentials().build();
             channelPipeline.addLast(new CorsHandler(corsConfig));
         }
+//        channelPipeline.addLast(new HttpFilterRuleHandler());
         // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
         channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println("exceptionCaught");
         logger.warn(cause.getMessage(), cause);
         ctx.fireExceptionCaught(cause);
     }

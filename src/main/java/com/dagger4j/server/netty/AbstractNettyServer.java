@@ -62,7 +62,7 @@ public abstract class AbstractNettyServer implements IServer {
         nettyBootstrap = new ServerBootstrap();
         Group group = EpollEventLoopGroups.group(bootStrap);
         nettyBootstrap.group(group.getBoosMultithreadEventLoopGroup(), group.getWorkerMultithreadEventLoopGroup());
-        nettyBootstrap.option(ChannelOption.SO_BACKLOG, bootStrap.getBockLog())  //连接数
+        nettyBootstrap.option(ChannelOption.SO_BACKLOG, bootStrap.getBockLog())
                 .childOption(ChannelOption.ALLOCATOR, bootStrap.getAllocator())
                 .childOption(ChannelOption.MESSAGE_SIZE_ESTIMATOR, DefaultMessageSizeEstimator.DEFAULT)
                 .childOption(ChannelOption.SO_RCVBUF, 65536)

@@ -1,5 +1,6 @@
 package com.dagger4j.kit;
 
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,13 +91,13 @@ public class ThreadPoolKit {
 	}
 
 	static class NamedThreadFactory implements ThreadFactory {
-		private static final AtomicInteger pool_seq = new AtomicInteger(1);
+//		private static final AtomicInteger pool_seq = new AtomicInteger(1);
 		private final AtomicInteger mThreadNum = new AtomicInteger(1);
 		private final String mPrefix;
 		private final ThreadGroup mGroup;
 
 		public NamedThreadFactory() {
-			mPrefix = "duang-" + pool_seq.getAndIncrement() + "-thread-";
+			mPrefix = ConstEnums.FRAMEWORK_OWNER.getValue() + "@thread-";
 			SecurityManager s = System.getSecurityManager();
 			mGroup = (s == null) ? Thread.currentThread().getThreadGroup() : s.getThreadGroup();
 		}

@@ -4,7 +4,6 @@ import com.dagger4j.exception.VerificationException;
 import com.dagger4j.kit.ThreadPoolKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.core.helper.RouteHelper;
-import com.dagger4j.mvc.http.HttpResponse;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.route.Route;
 import com.dagger4j.server.common.BootStrap;
