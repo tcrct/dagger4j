@@ -21,6 +21,9 @@ public enum ConstEnums {
     JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
     REPORT_MAPPING_KEY("/dagger/report", "框架报告映射路径前缀"),
     DAGGER_INPUTSTREAM_STR_FIELD("dagger_inputstream_str", "框架报告映射路径前缀"),
+    FRAMEWORK_OWNER_FILED("framework-x-owenr", ""),
+    FRAMEWORK_OWNER("dagger", "框架名称"),
+    RESPONSE_STATUS("status", "返回结果状态码"),
     ;
 
 

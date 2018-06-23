@@ -13,7 +13,7 @@ import java.io.IOException;
  * Created by laotang on 2018/6/10.
  * @author laotang
  */
-public class MainHandler {
+public class MvcMain {
 
      /**
      * 取得request所请求的资源路径。

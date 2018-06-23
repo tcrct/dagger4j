@@ -2,6 +2,7 @@ package com.dagger4j.mvc.route;
 
 import com.dagger4j.kit.PathKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Controller;
 import com.dagger4j.mvc.http.enums.HttpMethod;
 import com.dagger4j.mvc.annotation.Mapping;
 import com.dagger4j.mvc.annotation.Validation;
@@ -75,6 +76,9 @@ public class Route {
                 methodMapping.order(),
                 methodMapping.timeout(),
                 validationParamList);
+
+        // 是否单例
+        setSingleton(controllerClass.getAnnotation(Controller.class).scope().equalsIgnoreCase("singleton"));
     }
 
     /**

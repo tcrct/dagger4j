@@ -2,12 +2,11 @@ package com.dagger4j.server.netty.handler;
 
 import com.dagger4j.exception.NettyStartUpException;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.MainHandler;
+import com.dagger4j.mvc.MvcMain;
 import com.dagger4j.mvc.http.HttpRequest;
 import com.dagger4j.mvc.http.HttpResponse;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
-import com.dagger4j.utils.DaggerId;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
@@ -36,6 +35,7 @@ public class RequestHandler implements Runnable {
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
             throw new NettyStartUpException("build dagger4j request or response fail");
         }
-        MainHandler.doTask(iRequest, iResponse);
+        // 执行请求任务
+        MvcMain.doTask(iRequest, iResponse);
     }
 }

@@ -1,5 +1,6 @@
 package com.dagger4j.mvc.core.helper;
 
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ThreadPoolKit;
@@ -8,10 +9,7 @@ import com.dagger4j.mvc.http.enums.ConstEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
@@ -31,6 +29,71 @@ public class BeanHelper {
      * Bean Map [已实例]
      */
     private static Map<String, List<Object>> beanMap = new ConcurrentHashMap<>();
+    /**
+     * ioc所需要的bean
+     */
+    private static Map<Class<?>, Object> iocBeanMap = new HashMap<>();
+
+    /**
+     * 返回所有Bean，其中：</br>
+     *          key为<p>ConstEnums.ANNOTATION_CLASS</p>里指定的Name,
+     *          value为Bean的List集合
+     * @return  Map<String, List<Object>>
+     */
+    public static Map<String, List<Object>> getBeanMap() {
+        return beanMap;
+    }
+
+    public static List<Object> getControllerBeanList() {
+        return beanMap.get(ConstEnums.ANNOTATION_CLASS.CONTROLLER_ANNOTATION.getName());
+    }
+    public static List<Object> getServiceBeanList() {
+        return beanMap.get(ConstEnums.ANNOTATION_CLASS.SERVICE_ANNOTATION.getName());
+    }
+    public static List<Object> getEntityBeanList() {
+        return beanMap.get(ConstEnums.ANNOTATION_CLASS.ENTITY_ANNOTATION.getName());
+    }
+
+    /**
+     *  根据Class取出对应的Ioc Bean
+     */
+    public static <T> T getBean(Class<?> clazz, Object targetObj) {
+        if (!iocBeanMap.containsKey(clazz) && !targetObj.getClass().equals(Class.class)) {
+            throw new MvcException(targetObj.getClass().getName() + " 无法根据类名获取实例: " + clazz + " , 请检查是否后缀名是否正确！");
+        }
+        return (T)iocBeanMap.get(clazz);
+    }
+
+    /**
+     *  根据Class取出对应的Ioc Bean
+     */
+    public static <T> T getBean(Class<?> clazz) {
+        if (!iocBeanMap.containsKey(clazz)) {
+            throw new MvcException("无法根据类名["+clazz.getName()+"]获取实例 , 请检查！");
+        }
+        return (T)iocBeanMap.get(clazz);
+    }
+
+    /**
+     * 所需要的Ioc Bean集合
+     * @return
+     */
+    public static Map<Class<?>, Object> getIocBeanMap() {
+        if(ToolsKit.isEmpty(iocBeanMap)) {
+
+            List<Object> iocBeanList = new ArrayList<Object>() {
+                {
+                    this.addAll(getControllerBeanList());
+                    this.addAll(getServiceBeanList());
+                }
+            };
+
+            for (Object bean : iocBeanList) {
+                iocBeanMap.put(bean.getClass(), bean);
+            }
+        }
+        return iocBeanMap;
+    }
 
     static {
         for(ConstEnums.ANNOTATION_CLASS annotationClass : ConstEnums.ANNOTATION_CLASS.values()) {

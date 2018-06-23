@@ -21,7 +21,10 @@ import java.util.*;
 public class RouteHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(RouteHelper.class);
-    private static Map<String, Route> actionMapping = new HashMap<>();
+    // 普通风格
+   private static Map<String, Route> routeMap = new HashMap<>();
+    // restful风格
+    private static Map<String, Route> restfulRouteMap = new HashMap<>();
 
     static {
         try {
@@ -48,8 +51,11 @@ public class RouteHelper {
                     }
                     Route route = new Route(controllerClass, controllerKey, actionMethod);
                     String routeKey = route.getRequestMapping().getValue();
-                    if(!ToolsKit.isExist(routeKey, actionMapping)){
-                        actionMapping.put(routeKey, route);
+                    // 如果包含有{}的，则视为restful风格的URI
+                    if (routeKey.contains("{") && routeKey.contains("}")) {
+                        restfulRouteMap.put(routeKey, route);
+                    } else {
+                        routeMap.put(routeKey, route);
                     }
                 }
             }
@@ -68,7 +74,8 @@ public class RouteHelper {
     }
 
     private static void printRouteKey() {
-        List<String> keyList = new ArrayList<>(actionMapping.keySet());
+        List<String> keyList = new ArrayList<>(routeMap.keySet());
+        keyList.addAll(restfulRouteMap.keySet());
         Collections.sort(keyList);
         logger.warn("**************** Controller Mapper Key ****************");
         for (String key : keyList) {
@@ -79,7 +86,11 @@ public class RouteHelper {
         }
     }
 
-    public static Map<String, Route> getRouteMappings() {
-        return actionMapping;
+    public static Map<String, Route> getRouteMap() {
+        return routeMap;
+    }
+
+    public static Map<String, Route> getRestfulRouteMap() {
+        return restfulRouteMap;
     }
 }
