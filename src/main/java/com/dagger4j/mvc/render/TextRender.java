@@ -1,6 +1,7 @@
 package com.dagger4j.mvc.render;
 
 import com.dagger4j.exception.MvcException;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +14,15 @@ public class TextRender extends Render {
 	private static Logger logger = LoggerFactory.getLogger(TextRender.class);
 	
 	private static final long serialVersionUID = 4775148244778489992L;
-	private static final String defaultContentType = "text/plain;charset=" + ENCODING;
 	private String text;
 	
 	public TextRender(String text) {
-		this.text = text;
+		this(text, TEXT_PLAIN);
 	}
 	
-	private String contentType;
 	public TextRender(String text, String contentType) {
 		this.text = text;
-		this.contentType = contentType;
+		this.TEXT_PLAIN = contentType;
 	}
 	
 	@Override
@@ -32,15 +31,8 @@ public class TextRender extends Render {
 			logger.warn("request or response is null");
 			return;
 		}
-		setDefaultValue2Response();
+		setDefaultValue2Response(TEXT_PLAIN);
 		try {
-	        if (contentType == null) {
-	        	response.setContentType(defaultContentType);
-	        }
-	        else {
-	        	response.setContentType(contentType);
-				response.setCharacterEncoding(ENCODING);
-	        }
 	        response.write(text);
 		} catch (Exception e) {
 			throw new MvcException(e.getMessage(), e);

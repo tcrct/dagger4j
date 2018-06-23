@@ -1,11 +1,12 @@
 package com.dagger4j.mvc.render;
 
-
-import com.dagger4j.kit.PropKit;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.io.Serializable;
 
@@ -13,7 +14,9 @@ import java.io.Serializable;
 public abstract class Render implements Serializable {
 	
 	private static final long serialVersionUID = -8406693915721288408L;
-	protected  static final String ENCODING = PropKit.get("encoding","UTF-8");
+	protected  static final String ENCODING  = HttpConstants.DEFAULT_CHARSET.toString();
+    protected static String TEXT_PLAIN = HttpHeaderValues.TEXT_PLAIN.toString()+";charset=" + ENCODING;
+
 	protected IRequest request;
 	protected IResponse response;
 	protected Object obj;
@@ -50,12 +53,15 @@ public abstract class Render implements Serializable {
 		this.obj = obj;
 	}
 	
-	protected void setDefaultValue2Response() {
-		response.setHeader(HttpHeaderNames.PRAGMA.toString(), "no-cache");
-		response.setHeader(HttpHeaderNames.CACHE_CONTROL.toString(), "no-cache");
-		response.setHeader(HttpHeaderNames.EXPIRES.toString(), "0");
+	protected void setDefaultValue2Response(String contentType) {
+		response.setHeader(HttpHeaderNames.PRAGMA.toString(), HttpHeaderValues.NO_CACHE.toString());
+		response.setHeader(HttpHeaderNames.CACHE_CONTROL.toString(), HttpHeaderValues.NO_CACHE.toString());
+		response.setHeader(HttpHeaderNames.EXPIRES.toString(), HttpHeaderValues.ZERO.toString());
 		response.setHeader(ConstEnums.FRAMEWORK_OWNER_FILED.getValue(), ConstEnums.FRAMEWORK_OWNER.getValue());
-		response.setHeader(ConstEnums.RESPONSE_STATUS.getValue(), "200");
+		response.setHeader(ConstEnums.RESPONSE_STATUS.getValue(), HttpResponseStatus.OK.codeAsText().toString());
+		response.setStatus(HttpResponseStatus.OK.code());
+        response.setContentType(contentType);
+        response.setCharacterEncoding(ENCODING);
 	}
 
 	public abstract void render();

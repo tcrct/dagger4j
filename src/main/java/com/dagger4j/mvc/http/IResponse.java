@@ -12,13 +12,7 @@ import java.util.Map;
  */
 public interface IResponse {
 
-    /**
-     * 添加返回头信息
-     * @param key           名称
-     * @param value         值
-     */
-    void addHeader(String key, String value);
-
+    String getRequestId();
     /**
      * 添加返回头信息
      * @param key           名称
@@ -74,7 +68,7 @@ public interface IResponse {
      */
     void setContentType(String contentType);
 
-    /**
+      /**
      * 设置返回主体内容
      * @param returnObj     返回主体对象
      */
@@ -90,8 +84,14 @@ public interface IResponse {
     void setContentLength(int contentLength);
 
     /**
-     *
+     *  取需要下载的文件
      * @return
      */
-    File getDownloadFile();
+    File getFile();
+
+    /**
+     * 是否下载文件返回
+     * @return
+     */
+    boolean isFile();
 }

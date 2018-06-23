@@ -60,11 +60,12 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
             channelPipeline.addLast(new CorsHandler(corsConfig));
         }
         // 真正处理HTTP业务逻辑的地方,针对每个TCP连接创建一个新的ChannelHandler实例
-        channelPipeline.addLast(new HttpBaseHandler());
+        channelPipeline.addLast(new HttpBaseHandler(bootStrap));
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println("exceptionCaught");
         logger.warn(cause.getMessage(), cause);
         ctx.fireExceptionCaught(cause);
     }

@@ -10,26 +10,23 @@ import com.dagger4j.mvc.http.IResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 
+import java.util.concurrent.Callable;
+
 /**
  * 请求处理器，一线程一处理
  * Created by laotang on 2018/6/7.
  */
-public class RequestHandler implements Runnable {
+public class RequestTask implements Callable<IResponse> {
 
-    private final ChannelHandlerContext ctx;
-    private final FullHttpRequest fullHttpRequest;
-    public RequestHandler(ChannelHandlerContext ctx, FullHttpRequest request) {
+    private ChannelHandlerContext ctx;
+    private FullHttpRequest fullHttpRequest;
+    public RequestTask(ChannelHandlerContext ctx, FullHttpRequest request) {
         this.ctx = ctx;
         this.fullHttpRequest = request;
-        init();
-    }
-
-    private void init() {
-
     }
 
     @Override
-    public void run() {
+    public IResponse call() {
         IRequest  iRequest = HttpRequest.build(ctx, fullHttpRequest);
         IResponse iResponse = HttpResponse.build(iRequest);
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
@@ -37,5 +34,6 @@ public class RequestHandler implements Runnable {
         }
         // 执行请求任务
         MvcMain.doTask(iRequest, iResponse);
+        return iResponse;
     }
 }
