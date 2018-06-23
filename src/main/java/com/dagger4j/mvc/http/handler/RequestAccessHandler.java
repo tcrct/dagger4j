@@ -3,7 +3,7 @@ package com.dagger4j.mvc.http.handler;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.core.Controller;
+import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.mvc.core.helper.BeanHelper;
 import com.dagger4j.mvc.core.helper.IocHelper;
 import com.dagger4j.mvc.core.helper.RouteHelper;
@@ -43,11 +43,11 @@ final public class RequestAccessHandler{
         }
 
         Class<?> controllerClass = route.getControllerClass();
-        Controller controller = null;
+        BaseController controller = null;
         //是否单例
         RequestMapping requestMapping = route.getRequestMapping();
         if(route.isSingleton()){
-            controller = (Controller) BeanHelper.getBean(controllerClass);
+            controller = (BaseController) BeanHelper.getBean(controllerClass);
         } else {
             // 如果不是设置为单例模式的话就每次请求都创建一个新的Controller对象
             controller = ObjectKit.newInstance(controllerClass);

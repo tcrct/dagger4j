@@ -24,6 +24,8 @@ public enum ConstEnums {
     FRAMEWORK_OWNER_FILED("framework-x-owenr", ""),
     FRAMEWORK_OWNER("dagger", "框架名称"),
     RESPONSE_STATUS("status", "返回结果状态码"),
+    DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
+
     ;
 
 

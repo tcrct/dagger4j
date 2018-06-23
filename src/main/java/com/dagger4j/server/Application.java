@@ -53,9 +53,6 @@ public class Application {
     }
 
     public void run() {
-        System.out.println("beforeHandlerList: " + HandlerHelper.beforeHandlerList.get(0).getClass().getName());
-        System.out.println("afterHandlerList: " + HandlerHelper.afterHandlerList.get(0).getClass().getName());
-        System.out.println("plugin: " + PluginHelper.getPlugins().get(0).getClass().getName());
         BootStrap bootStrap = new BootStrap(host, port);
         new NettyServer(bootStrap).start();
     }

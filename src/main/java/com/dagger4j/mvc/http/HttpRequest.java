@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -43,12 +44,12 @@ public class HttpRequest implements IRequest{
     private Charset charset;
     private Map<String, String> headers;
     private Map<String, Object> params;
-    private Map<String, Cookie> cookies = new HashMap<>();
+    private Map<String, Cookie> cookies;
     private byte[] content;
     private Enumeration<String> paramKeyEnumeration;
-    protected static String[] EMPTY_ARRAYS = {};
+    protected static String[] EMPTY_ARRAYS = new String[0];
     private InetSocketAddress remoteAddress;
-    private LocalAddress localAddress;
+    private InetSocketAddress localAddress;
 
     private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         requestId = new DaggerId().toString();
@@ -63,14 +64,18 @@ public class HttpRequest implements IRequest{
 
     private void init() {
         try {
-            // 根据请求方式，解码请求参数
+            // request header
+            headers = new HashMap<>();
+
+            // reqeust body 根据请求方式，解码请求参数
             AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
             params = decoder.decoder();
-            // reqeust body
             if(ToolsKit.isNotEmpty(request.content())) {
                 content = Unpooled.copiedBuffer(request.content()).array();
             }
+
             // cookies
+            cookies = new HashMap<>();
             String cookie = getHeader(Cookie.COOKIE_FIELD);
             cookie = ToolsKit.isNotEmpty(cookie) ? cookie : getHeader(Cookie.COOKIE_FIELD.toLowerCase());
             if (ToolsKit.isNotEmpty(cookie)) {
@@ -82,7 +87,7 @@ public class HttpRequest implements IRequest{
                 }
             }
             remoteAddress = (InetSocketAddress)ctx.channel().remoteAddress();
-            localAddress = (LocalAddress)ctx.channel().localAddress();
+            localAddress = (InetSocketAddress)ctx.channel().localAddress();
         } catch (Exception e) {
             throw new HttpDecoderException(e.getMessage(), e);
         }
@@ -189,8 +194,8 @@ public class HttpRequest implements IRequest{
 
     @Override
     public int getServerPort() {
-        System.out.println(remoteAddress.getPort());
-        System.out.println(localAddress.toString());
+        System.out.println(remoteAddress.getHostName() +"          "+ remoteAddress.getPort());
+        System.out.println(localAddress.getHostName() +"          "+ localAddress.getPort());
         return 0;
     }
 

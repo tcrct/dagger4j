@@ -35,6 +35,37 @@ public class BeanHelper {
     private static Map<Class<?>, Object> iocBeanMap = new HashMap<>();
 
     /**
+     * 实例化bean用的临时任务集合
+     */
+    private static Map<String, FutureTask<List<Object>>> futureTaskMap = new HashMap<>();
+
+    static {
+        for (ConstEnums.ANNOTATION_CLASS annotationClass : ConstEnums.ANNOTATION_CLASS.values()) {
+            // 如果需要实例化
+            if (annotationClass.getInstance()) {
+                String key = annotationClass.getClazz().getName();
+                List<Object> beanList = beanMap.get(key);
+                if (ToolsKit.isEmpty(beanList)) {
+                    beanList = new ArrayList<>();
+                }
+                List<Class<?>> classList = ClassHelper.getClassList(annotationClass.getClazz());
+                if (ToolsKit.isNotEmpty(classList)) {
+                    FutureTask<List<Object>> futureTask = ThreadPoolKit.execute(new InstanceBeanTask(classList, beanList));
+                    futureTaskMap.put(key, futureTask);
+                }
+            }
+        }
+        try {
+            for( Iterator<Map.Entry<String, FutureTask<List<Object>>>> iterator = futureTaskMap.entrySet().iterator(); iterator.hasNext();){
+                Map.Entry<String, FutureTask<List<Object>>> entry = iterator.next();
+                beanMap.put(entry.getKey(), entry.getValue().get());
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
+    }
+
+    /**
      * 返回所有Bean，其中：</br>
      *          key为<p>ConstEnums.ANNOTATION_CLASS</p>里指定的Name,
      *          value为Bean的List集合
@@ -95,31 +126,13 @@ public class BeanHelper {
         return iocBeanMap;
     }
 
-    static {
-        for(ConstEnums.ANNOTATION_CLASS annotationClass : ConstEnums.ANNOTATION_CLASS.values()) {
-            // 如果需要实例化
-            if(annotationClass.getInstance()) {
-                String key = annotationClass.getName();
-                List<Object> beanList = beanMap.get(key);
-                if(ToolsKit.isEmpty(beanList)) {
-                    beanList = new ArrayList<Object>();
-                }
-                List<Class<?>> classList = ClassHelper.getClassList(annotationClass.getClazz());
-                if(ToolsKit.isNotEmpty(classList)) {
-                    ThreadPoolKit.execute(new InstanceBeanTask(classList, beanList));
-                }
-                beanMap.put(key, beanList);
-            }
-        }
-    }
-
     /**
      * 实例化对对象
      */
-    static class InstanceBeanTask implements Runnable {
+    static class InstanceBeanTask implements Callable<List<Object>> {
 
-        private volatile List<Class<?>> classList;
-        private volatile List<Object> beanList;
+        private List<Class<?>> classList;
+        private List<Object> beanList;
 
         public InstanceBeanTask(List<Class<?>> sourceClassList, List<Object> sourceBeanList) {
             classList = sourceClassList;
@@ -127,7 +140,7 @@ public class BeanHelper {
         }
 
         @Override
-        public void run() {
+        public List<Object> call() {
             for(Iterator<Class<?>> iterator = classList.iterator(); iterator.hasNext();) {
                 Class<?> clazz = iterator.next();
                 // 是接口或抽象类则退出本次循环
@@ -139,6 +152,7 @@ public class BeanHelper {
                     beanList.add(bean);
                 }
             }
+            return beanList;
         }
     }
 }

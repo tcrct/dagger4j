@@ -159,7 +159,10 @@ public class PropKit {
 
     public static Prop getProp() {
         if (prop == null) {
-            throw new IllegalStateException("Load propties file by invoking PropKit.use(String fileName) method first.");
+            prop = PropKit.use("dagger.properties");
+            if (prop == null) {
+                throw new IllegalStateException("Load propties file by invoking PropKit.use(String fileName) method first.");
+            }
         }
         return prop;
     }

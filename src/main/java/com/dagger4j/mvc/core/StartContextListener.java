@@ -62,7 +62,7 @@ public class StartContextListener {
      * @throws Exception
      */
     private void initCode() throws Exception {
-
+        logger.warn("init code");
     }
 
 }

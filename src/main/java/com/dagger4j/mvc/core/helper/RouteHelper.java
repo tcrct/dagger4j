@@ -5,6 +5,7 @@ import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Controller;
 import com.dagger4j.mvc.annotation.Mapping;
+import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.route.Route;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class RouteHelper {
     static {
         try {
             Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName();
-            Method[] baseControllerMethods = com.dagger4j.mvc.core.Controller.class.getMethods();
+            Method[] baseControllerMethods = BaseController.class.getMethods();
             for(Method method : baseControllerMethods) {
                 excludedMethodName.add(method.getName());
             }

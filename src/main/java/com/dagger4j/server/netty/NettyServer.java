@@ -2,6 +2,7 @@ package com.dagger4j.server.netty;
 
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.NettyStartUpException;
+import com.dagger4j.mvc.core.StartContextListener;
 import com.dagger4j.server.common.BootStrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
@@ -30,7 +31,7 @@ public class NettyServer extends AbstractNettyServer {
                 public void operationComplete(Future<Void> future) throws Exception {
                     if (future.isSuccess()) {
                         // 启动上下文监听器
-//                        StartContextListener.getInstance().start();
+                        StartContextListener.getInstance().start();
                         System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup in "+bootStrap.getStartTimeMillis()+" ms, God bless no bugs!");
                     } else {
                         System.out.println("INFO: ["+bootStrap.getAppName()+"] "+sdf.format(new Date())+" HttpServer["+bootStrap.getHost()+":"+bootStrap.getPort()+"] startup failed");

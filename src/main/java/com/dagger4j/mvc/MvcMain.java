@@ -6,6 +6,8 @@ import com.dagger4j.mvc.core.helper.HandlerHelper;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.handler.RequestAccessHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -14,6 +16,8 @@ import java.io.IOException;
  * @author laotang
  */
 public class MvcMain {
+
+    private static final Logger logger = LoggerFactory.getLogger(MvcMain.class);
 
      /**
      * 取得request所请求的资源路径。
@@ -66,6 +70,7 @@ public class MvcMain {
             //返回结果处理器链，可以对返回结果进行提交日志，二次包装等操作
             HandlerHelper.doAfterChain(target, request, response);
         } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
             response.setStatus(500);
         }
     }

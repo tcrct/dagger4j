@@ -83,9 +83,9 @@ public final class PathKit {
      * @return
      */
     public static Enumeration<URL> getPaths(String packagePath) {
-        packagePath = packagePath.contains(".") ? packagePath.replace(".", "/") : packagePath;
+        packagePath = packagePath.startsWith("/") ? packagePath.substring(1, packagePath.length()) : packagePath;
         try {
-            return ClassKit.getClassLoader().getResources(fixPath(packagePath));
+            return ClassKit.getClassLoader().getResources(packagePath.replace("." , "/"));
         } catch (IOException e) {
             throw new MvcException(e.getMessage(), e);
         }

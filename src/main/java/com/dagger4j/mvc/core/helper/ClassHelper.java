@@ -1,10 +1,11 @@
 package com.dagger4j.mvc.core.helper;
 
-import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.scan.ScanClassFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -18,9 +19,16 @@ import java.util.Map;
  */
 public class ClassHelper {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClassHelper.class);
+
+    /**
+     * 所有组件类[未实例]
+     */
+    private static final Map<String, List<Class<?>>> CLASS_MAP = new HashMap<>();
+
     /**
      *  加载所有类，包括接口类与抽象类，并按注解名作KEY分别缓存起来</br>
-     *  <p>Map<Controller, List<xxxController.class></p>
+     *  <p>Map<BaseController, List<xxxController.class></p>
      *
      */
     static {
@@ -37,10 +45,7 @@ public class ClassHelper {
         }
     }
 
-    /**
-     * 所有组件类[未实例]
-     */
-    private static final Map<String, List<Class<?>>> CLASS_MAP = new HashMap<>();
+
     public static void setClass2Map(String key, Class<?> clazz) {
         List<Class<?>> tmpList = CLASS_MAP.get(key);
         if(ToolsKit.isEmpty(tmpList)) {
@@ -95,7 +100,7 @@ public class ClassHelper {
      * @return
      */
     public static List<Class<?>> getClassList (Class<? extends Annotation> annotationClass) {
-        return CLASS_MAP.get(annotationClass.getSimpleName());
+        return CLASS_MAP.get(annotationClass.getName());
     }
 
 }

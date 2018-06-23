@@ -76,7 +76,7 @@ public final class ClassKit {
         if(Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers())) {
             return false;
         }
-//        Controller controller = clazz.getAnnotation(Controller.class);
+//        BaseController controller = clazz.getAnnotation(BaseController.class);
 //        if(null != controller && !controller.autowired()){
 //            return false;
 //        }
