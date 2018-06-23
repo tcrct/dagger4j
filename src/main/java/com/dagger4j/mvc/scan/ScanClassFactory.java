@@ -14,6 +14,12 @@ public class ScanClassFactory {
     private static final Logger logger = LoggerFactory.getLogger(ScanClassFactory.class);
 
 
+    /**
+     * 根据指定的包路径及jar文件名前缀(左匹配)取所有Class
+     * @param packagePath       包路径，在该路径下的所有Class会扫描
+     * @param jarNames              jar文件名前缀集合
+     * @return
+     */
     public static List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
         return new ClassTemplate(packagePath, jarNames){
             @Override

@@ -38,8 +38,8 @@ public class Application {
     }
 
     public Application handles(HandlerChain handlerChain) {
-        HandlerHelper.setBeforeHandlerList(handlerChain.getBeforeHandlerList());
-        HandlerHelper.setAfterHandlerList(handlerChain.getAfterHandlerList());
+        HandlerHelper.setBefores(handlerChain.getBeforeHandlerList());
+        HandlerHelper.setAfters(handlerChain.getAfterHandlerList());
         return application;
     }
 

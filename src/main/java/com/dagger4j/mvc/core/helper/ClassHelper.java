@@ -1,5 +1,6 @@
 package com.dagger4j.mvc.core.helper;
 
+import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
@@ -18,7 +19,9 @@ import java.util.Map;
 public class ClassHelper {
 
     /**
-     *  加载所有类，并按注解名作KEY分别缓存起来
+     *  加载所有类，包括接口类与抽象类，并按注解名作KEY分别缓存起来</br>
+     *  <p>Map<Controller, List<xxxController.class></p>
+     *
      */
     static {
         String packagePath = PropKit.get(ConstEnums.BASE_PACKAGE_PATH.getValue());

@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 插件辅助类
+ * 插件链辅助类
  * @author Created by laotang
  * @date createed in 2018/6/21.
  */

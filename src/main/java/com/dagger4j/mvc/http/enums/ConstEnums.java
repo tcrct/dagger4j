@@ -48,21 +48,25 @@ public enum ConstEnums {
 
     /**
      * 注解类枚举
+     * 注解类，是否需要实例化(BeanHelper时使用)，说明
      */
     public enum ANNOTATION_CLASS {
-        CONTROLLER_ANNOTATION(Controller.class, "所有Controller类的注解，必须在类添加该注解否则框架忽略扫描"),
-        SERVICE_ANNOTATION(Service.class, "所有Service类的注解，必须在类添加该注解否则框架忽略扫描"),
-        ENTITY_ANNOTATION(Entity.class, "所有Entity类的注解，必须在类添加该注解否则框架忽略扫描"),
-        PLUGIN_ANNOTATION(Plugin.class, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描"),
-        HANDLER_ANNOTATION(Handler.class, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描"),
+        CONTROLLER_ANNOTATION(Controller.class, true,"所有Controller类的注解，必须在类添加该注解否则框架忽略扫描"),
+        SERVICE_ANNOTATION(Service.class, true,"所有Service类的注解，必须在类添加该注解否则框架忽略扫描"),
+        ENTITY_ANNOTATION(Entity.class, true,"所有Entity类的注解，必须在类添加该注解否则框架忽略扫描"),
+        PLUGIN_ANNOTATION(Plugin.class, false, "所有Plugin类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
+        HANDLER_ANNOTATION(Handler.class, false, "所有Handler类的注解，必须在类添加该注解否则框架忽略扫描, 但不需要在BeanHelper里进行实例化"),
         ;
 
         Class<? extends Annotation> clazz;
         String name;
+        // 是否需要实例化， true为需要
+        boolean instance;
         String desc;
 
-        private ANNOTATION_CLASS(Class<? extends Annotation> clazz, String desc) {
+        private ANNOTATION_CLASS(Class<? extends Annotation> clazz, boolean instance, String desc) {
             this.clazz = clazz;
+            this.instance = instance;
             this.desc = desc;
         }
 
@@ -72,6 +76,14 @@ public enum ConstEnums {
 
         public String getName() {
             return clazz.getName();
+        }
+
+        /**
+         * 是否需要实例化， true为需要
+         * @return
+         */
+        public boolean getInstance() {
+            return instance;
         }
 
         public String desc() {

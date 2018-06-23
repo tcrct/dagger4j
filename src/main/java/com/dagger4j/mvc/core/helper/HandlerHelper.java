@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 处理器链工厂
+ * 处理器链辅助类
  * @author Created by laotang
  * @date createed in 2018/6/12.
  */
@@ -20,7 +20,7 @@ public class HandlerHelper {
      * 前置处理器集合
      */
     public static List<IHandler> beforeHandlerList = new ArrayList<>();
-    public static void setBeforeHandlerList(List<IHandler> beforeHandlerList) {
+    public static void setBefores(List<IHandler> beforeHandlerList) {
         HandlerHelper.beforeHandlerList .addAll(beforeHandlerList);
     }
 
@@ -28,7 +28,7 @@ public class HandlerHelper {
      * 后置处理器集合
      */
     public static List<IHandler> afterHandlerList = new ArrayList<>();
-    public static void setAfterHandlerList(List<IHandler> afterHandlerList) {
+    public static void setAfters(List<IHandler> afterHandlerList) {
         HandlerHelper.afterHandlerList .addAll(afterHandlerList);
     }
 
