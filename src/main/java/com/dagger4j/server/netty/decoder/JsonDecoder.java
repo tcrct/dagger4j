@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
+ *POST请求，内容格式为JSON的解码类
  * @author laotang
  * @date 2017/10/31
  */
@@ -34,9 +34,9 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
 //            parseArray(JSON.parseArray(json, ArrayList.class));
         }
         if(ToolsKit.isNotEmpty(json)) {
-            attributeMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
+            requestParamsMap.put(ConstEnums.INPUTSTREAM_STR_NAME.getValue(), json);
         }
-        return attributeMap;
+        return requestParamsMap;
     }
 
 
@@ -47,14 +47,14 @@ public class JsonDecoder extends AbstractDecoder<Map<String, Object>> {
         }
         String tokenid =  sourceMap.get(ReturnDto.TOKENID_FIELD)+"";
         if(ToolsKit.isNotEmpty(tokenid)) {
-            attributeMap.put(ReturnDto.TOKENID_FIELD, tokenid);
+            requestParamsMap.put(ReturnDto.TOKENID_FIELD, tokenid);
         }
         JSONObject dataObj = (JSONObject) sourceMap.get(ReturnDto.DATA_FIELD);
 
         if (ToolsKit.isNotEmpty(dataObj)) {		//自定义格式的
-            attributeMap.putAll(parseMapValue(dataObj));
+            requestParamsMap.putAll(parseMapValue(dataObj));
         } else {
-            attributeMap.putAll(parseMapValue(sourceMap));
+            requestParamsMap.putAll(parseMapValue(sourceMap));
         }
     }
 

@@ -97,6 +97,7 @@ public class HttpRequest implements IRequest{
     public String getRequestId() {
         return requestId;
     }
+
     @Override
     public Object getAttribute(String name) {
         return params.get(name);

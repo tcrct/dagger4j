@@ -6,11 +6,18 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.http.*;
 
 /**
+ * 解码工厂类
  * Created by laotang on 2017/10/31.
  */
 public class DecoderFactory {
-
-
+    /**
+     *  提交参数解码
+     * @param method             请求方式
+     * @param contentType     请求内容格式
+     * @param request              请求对象
+     * @return
+     * @throws Exception
+     */
     public static AbstractDecoder create(String method, String contentType, FullHttpRequest request)  throws Exception{
         if(ToolsKit.isEmpty(request)) {
             throw new DecoderException("request is null");
@@ -37,9 +44,7 @@ public class DecoderFactory {
         } else if (HttpMethod.OPTIONS.name().equalsIgnoreCase(method)) {
             decoder = new OptionsDecoder(request);
         }
-
         return decoder;
-
     }
 
 }

@@ -1,6 +1,5 @@
 package com.dagger4j.mvc.annotation;
 
-import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.proxy.IProxy;
 
 import java.lang.annotation.*;

@@ -6,7 +6,6 @@ import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpDataFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,13 +24,11 @@ public abstract class AbstractDecoder<T> {
     protected static String[] EMPTY_ARRAYS = {};
 
     protected FullHttpRequest request;
-    protected  Map<String,List<String>> paramsMap;
-    protected  Map<String,Object> attributeMap;
+    protected  Map<String,Object> requestParamsMap;
 
     public AbstractDecoder(FullHttpRequest request) {
         this.request = request;
-        paramsMap = new HashMap<>();
-        attributeMap = new ConcurrentHashMap<>();
+        requestParamsMap = new ConcurrentHashMap<>();
     }
 
     protected void parseValue2List(Map<String,List<String>> params, String key, String value) {

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * POST请求，内容格式为文件表单(multipart/form-data)的解码类
  * Created by laotang on 2017/10/31.
  */
 public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
@@ -49,12 +50,12 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
                             throw new MvcException("MultiPartPostDecoder Is Fail :  bytes is null... " );
                         }
                         fileItem = new FileItem(fileUpload.getName(), fileUpload.getContentTransferEncoding(), fileUpload.getFilename(), fileUpload.getContentType(), bytes.length, bytes);
-                        attributeMap.put(fileItem.getName(), fileItem);
+                        requestParamsMap.put(fileItem.getName(), fileItem);
                     }
                 }
             }
         }
-        return attributeMap;
+        return requestParamsMap;
     }
 
     private void setValue2ParamMap(InterfaceHttpData httpData) throws Exception {
@@ -62,7 +63,7 @@ public class MultiPartPostDecoder extends AbstractDecoder<Map<String,Object>> {
         String key = attribute.getName();
         String value = attribute.getValue();
         if(ToolsKit.isNotEmpty(value)) {
-            attributeMap.put(key, value);
+            requestParamsMap.put(key, value);
         }
     }
 }

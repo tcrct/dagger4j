@@ -74,6 +74,13 @@ public interface IResponse {
      */
     void write(Object returnObj);
 
+    /**
+     * 取返回主体内容
+     * 在返回到客户前，可以对返回值进行编辑
+     * @return
+     */
+    Object getBody();
+
     @Override
     String toString();
 

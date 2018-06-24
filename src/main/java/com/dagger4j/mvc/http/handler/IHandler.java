@@ -5,7 +5,7 @@ import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 
 /**
- * 处理器接口
+ * 处理器接口，抛出异常时中止流程
  * @author Created by laotang
  * @date createed in 2018/6/12.
  */

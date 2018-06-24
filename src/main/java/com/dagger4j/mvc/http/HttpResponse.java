@@ -89,6 +89,11 @@ public class HttpResponse implements IResponse {
     }
 
     @Override
+    public Object getBody() {
+        return returnObj;
+    }
+
+    @Override
     public void setContentLength(int contentLength) {
 
     }

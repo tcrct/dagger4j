@@ -19,23 +19,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ *POST请求，内容格式为XML的解码类
  * @author Created by laotang
  * @date createed in 2018/1/6.
  */
-public class XmlDecoder extends AbstractDecoder<Map<String, List<String>>> {
+public class XmlDecoder extends AbstractDecoder<Map<String, Object>> {
 
     public XmlDecoder(FullHttpRequest request) {
         super(request);
     }
 
     @Override
-    public Map<String, List<String>> decoder() throws Exception {
+    public Map<String, Object> decoder() throws Exception {
         String xml = request.content().toString(HttpConstants.DEFAULT_CHARSET);
         if (ToolsKit.isNotEmpty(xml)){
-            paramsMap.putAll(getMapFromXML(xml));
-            paramsMap.put(ConstEnums.DAGGER_INPUTSTREAM_STR_FIELD.getValue(), Collections.singletonList(xml));
+            requestParamsMap.putAll(getMapFromXML(xml));
+            requestParamsMap.put(ConstEnums.DAGGER_INPUTSTREAM_STR_FIELD.getValue(), Collections.singletonList(xml));
         }
-        return paramsMap;
+        return requestParamsMap;
     }
 
 
