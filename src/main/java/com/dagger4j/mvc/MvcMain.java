@@ -3,9 +3,11 @@ package com.dagger4j.mvc;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.core.helper.HandlerHelper;
+import com.dagger4j.mvc.core.helper.RouteHelper;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.handler.RequestAccessHandler;
+import com.dagger4j.utils.WebKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +35,9 @@ public class MvcMain {
         String target = request.getRequestURI();
         //  请求的URI是根路径或包含有.  则全部当作是静态文件的请求处理，直接返回
         if("/".equals(target) || target.contains(".")) {
-            return "";
+            throw new MvcException("not support static file access");
         }
+
         // 分号后的字符截断
         if(target.contains(";")){
             target = target.substring(0,target.indexOf(";"));
@@ -42,10 +45,12 @@ public class MvcMain {
         if(target.endsWith("/")) {
             target = target.substring(0, target.length()-1);
         }
+
         // 验证该请求URI是否存在
-//        if(!RouteFactory.verificationTarget(target)) {
-//            return "";
-//        }
+        if( !RouteHelper.getRouteMap().containsKey(target)) {
+            throw new MvcException("request uri["+target+"] is not exist!");
+        }
+
         return target;
     }
 
@@ -58,11 +63,8 @@ public class MvcMain {
      * @throws MvcException
      */
     public static void doTask(IRequest request, IResponse response) throws MvcException {
-        String target = getResourcePath(request);
-        if(ToolsKit.isEmpty(target)) {
-            return;
-        }
         try {
+            String target = getResourcePath(request);
             // 请求访问处理器前的处理器链，可以对请求进行过滤
             HandlerHelper.doBeforeChain(target, request, response);
             // 请求访问处理器
@@ -71,7 +73,7 @@ public class MvcMain {
             HandlerHelper.doAfterChain(target, request, response);
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            response.setStatus(500);
+            WebKit.builderExceptionResponse(request, response, e);
         }
     }
 

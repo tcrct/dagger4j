@@ -40,7 +40,7 @@ public interface IRequest {
 
     String[] getParameterValues(String name);
 
-    Map<String, String[]> getParameterMap();
+    Map<String, Object> getParameterMap();
 
     String getProtocol();
 

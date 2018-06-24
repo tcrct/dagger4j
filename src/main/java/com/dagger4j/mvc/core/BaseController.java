@@ -21,6 +21,7 @@ import java.util.*;
 public abstract class BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private static final Object[] NULL_ARGS = new Object[0];
 
     private IRequest request;
     private IResponse response;
@@ -66,19 +67,29 @@ public abstract class BaseController {
      * @return
      */
     private Map<String, Object> getAllParams() {
+        Map<String, Object> requestParams = request.getParameterMap();
+        requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.toString());
+        return requestParams;
+        /*
         Map<String, Object> params = new HashMap<>();
-        Map<String, String[]> requestParams = request.getParameterMap();
+        Map<String, Object> requestParams = request.getParameterMap();
         if (ToolsKit.isNotEmpty(requestParams)) {
             for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
                 String name = iter.next();
                 if(ConstEnums.INPUTSTREAM_STR_NAME.toString().equalsIgnoreCase(name)) {
                     continue;
                 }
-                String[] values = requestParams.get(name);
+                Object valueObj = requestParams.get(name);
                 String valueStr = "";
-                for (int i = 0; i < values.length; i++) {
-                    valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+                if(valueObj instanceof List) {
+                    List<String> values = (List)valueObj;
+                    for (int i = 0; i < values.size(); i++) {
+                        valueStr = (i == values.size() - 1) ? valueStr + values.get(i) : valueStr + values.get(i) + ",";
+                    }
+                } else {
+                    valueStr = (String)valueObj;
                 }
+
                 params.put(name, valueStr);
             }
         }
@@ -93,6 +104,7 @@ public abstract class BaseController {
             params.put(name, request.getAttribute(name));
         }
         return params;
+        */
     }
 
 

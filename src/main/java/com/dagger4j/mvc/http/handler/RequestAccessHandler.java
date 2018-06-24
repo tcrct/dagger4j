@@ -11,6 +11,8 @@ import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.route.RequestMapping;
 import com.dagger4j.mvc.route.Route;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ import java.util.Map;
  * Created by laotang on 2018/6/14.
  */
 final public class RequestAccessHandler{
+
+    private static final Logger logger = LoggerFactory.getLogger(RequestAccessHandler.class);
 
     private static final Object[] NULL_ARGS = new Object[0];
 

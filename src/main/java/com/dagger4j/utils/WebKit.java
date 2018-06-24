@@ -1,6 +1,9 @@
 package com.dagger4j.utils;
 
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.dto.HeadDto;
+import com.dagger4j.mvc.dto.ReturnDto;
+import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -47,8 +50,33 @@ public class WebKit {
         responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH.toString(), readableBytesLength);
     }
 
+    /**
+     * 文件流返回
+     * */
     private static void builderResponseStream() {
 
+    }
+
+    /**
+     *  构建返回对象，异常信息部份
+     * @param request
+     * @param response
+     * @param e
+     */
+    public static void builderExceptionResponse(IRequest request, IResponse response, Exception e) {
+        ReturnDto<String> returnDto = new ReturnDto<>();
+        HeadDto headDto = new HeadDto();
+        headDto.setClientId(request.getRemoteAddr());
+        headDto.setMethod(request.getMethod());
+        headDto.setRequestId(request.getRequestId());
+        headDto.setRet(1);
+        headDto.setUri(request.getRequestURI());
+        headDto.setTimestamp(System.currentTimeMillis());
+        headDto.setMsg(e.getMessage());
+        returnDto.setData("ERROR");
+        returnDto.setParams(request.getParameterMap());
+        returnDto.setHead(headDto);
+        response.write(returnDto);
     }
 
 }

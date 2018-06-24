@@ -163,19 +163,11 @@ public class HttpRequest implements IRequest{
     }
 
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String, Object> getParameterMap() {
         if(ToolsKit.isEmpty(params)) {
             return null;
         }
-        Map<String, String[]> paramMap = new HashMap<>();
-        for (Iterator<Map.Entry<String,Object>> it = params.entrySet().iterator(); it.hasNext();){
-            Map.Entry<String,Object> entry = it.next();
-            Object valueObj = entry.getValue();
-            if(valueObj instanceof  List) {
-                paramMap.put(entry.getKey(), ((List<String>)valueObj).toArray(EMPTY_ARRAYS));
-            }
-        }
-        return paramMap;
+        return params;
     }
 
     @Override
@@ -198,12 +190,12 @@ public class HttpRequest implements IRequest{
     public int getServerPort() {
         System.out.println(remoteAddress.getHostName() +"          "+ remoteAddress.getPort());
         System.out.println(localAddress.getHostName() +"          "+ localAddress.getPort());
-        return 0;
+        return localAddress.getPort();
     }
 
     @Override
     public String getRemoteAddr() {
-        return remoteAddress.toString();
+        return remoteAddress.getHostName() +":"+ remoteAddress.getPort();
     }
 
     @Override
