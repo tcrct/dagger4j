@@ -70,11 +70,11 @@ public abstract class BaseController {
         Map<String, String[]> requestParams = request.getParameterMap();
         if (ToolsKit.isNotEmpty(requestParams)) {
             for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
-                String name = (String) iter.next();
+                String name = iter.next();
                 if(ConstEnums.INPUTSTREAM_STR_NAME.toString().equalsIgnoreCase(name)) {
                     continue;
                 }
-                String[] values = (String[]) requestParams.get(name);
+                String[] values = requestParams.get(name);
                 String valueStr = "";
                 for (int i = 0; i < values.length; i++) {
                     valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
