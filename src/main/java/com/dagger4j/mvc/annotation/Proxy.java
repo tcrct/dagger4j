@@ -1,5 +1,8 @@
 package com.dagger4j.mvc.annotation;
 
+import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.proxy.IProxy;
+
 import java.lang.annotation.*;
 
 /**
@@ -11,5 +14,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Proxy {
-    Class<?> value() default Object.class;
+    Class<? extends IProxy>[] value();
+    // 执行顺序，数字越小，优先级越高
+    int index() default 0;
+    // 执行位置， 默认为执行方法体前
+//    ConstEnums.LOCATION location() default ConstEnums.LOCATION.BEFORE;
 }

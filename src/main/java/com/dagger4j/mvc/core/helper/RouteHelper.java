@@ -29,11 +29,7 @@ public class RouteHelper {
 
     static {
         try {
-            Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName();
-            Method[] baseControllerMethods = BaseController.class.getMethods();
-            for(Method method : baseControllerMethods) {
-                excludedMethodName.add(method.getName());
-            }
+            Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
             List<Class<?>> clontrllerClassList = ClassHelper.getClontrllerClassList();
             for (Class<?> controllerClass : clontrllerClassList) {
                 if (!controllerClass.isAnnotationPresent(Controller.class)) {
@@ -45,9 +41,8 @@ public class RouteHelper {
                 // 遍历Controller类所有的方法
                 Method[] actionMethods = controllerClass.getDeclaredMethods();
                 for (Method actionMethod : actionMethods) {
-                    String methodName = actionMethod.getName();
-                    //如果是Object, Controller公用方法名并且有参数的方法, 则退出本次循环
-                    if(excludedMethodName.contains(methodName) && actionMethod.getParameterTypes().length ==0 ) {
+                    //如果是Object, Controller公用方法名并且没有参数的方法, 则退出本次循环
+                    if(ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
                         continue;
                     }
                     Route route = new Route(controllerClass, controllerKey, actionMethod);

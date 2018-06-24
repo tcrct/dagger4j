@@ -17,12 +17,12 @@ public class IocHelper {
 
     static {
         try {
-            Map<Class<?>, Object> iocBeanMap = BeanHelper.getIocBeanMap();
+            Map<String, Object> iocBeanMap = BeanHelper.getIocBeanMap();
             if(ToolsKit.isNotEmpty(iocBeanMap)) {
-                for (Iterator<Class<?>> iterator = iocBeanMap.keySet().iterator(); iterator.hasNext(); ) {
-                    Class<?> beanClazz = iterator.next();
-                    if (null != beanClazz) {
-                        ioc(beanClazz);
+                for (Iterator<Map.Entry<String, Object>> iterator = iocBeanMap.entrySet().iterator(); iterator.hasNext(); ) {
+                    Object bean = iterator.next().getValue();
+                    if (null != bean) {
+                        ioc(bean.getClass());
                     }
                 }
             }

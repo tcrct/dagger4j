@@ -1,5 +1,6 @@
 package com.dagger4j.kit;
 
+import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.utils.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class ObjectKit {
 
     private static final Logger logger = LoggerFactory.getLogger(ObjectKit.class);
     private static final Map<String, Map<String, Object>> FIELD_MAP = new HashMap<>();
+    private static final Set<String> excludedMethodName = new HashSet<>();
     /**
      * 设置成员变量
      * @param obj       需要设置成员变量的对象
@@ -270,18 +272,44 @@ public class ObjectKit {
     }
 
     /**
-     * 构建所有Object类里公共方法
+     * 构建过滤方法名集合，默认包含Object类里公共方法
+     * @param excludeMethodClass  如果有指定，则添加指定类下所有方法名
      *
      * @return
      */
-    public static Set<String> buildExcludedMethodName() {
-        Set<String> excludedMethodName = new HashSet<String>();
-        Method[] methods = Object.class.getDeclaredMethods();
-        for (Method m : methods){
-            excludedMethodName.add(m.getName());
+    public static Set<String> buildExcludedMethodName(Class<?>... excludeMethodClass) {
+        if(excludedMethodName.isEmpty()) {
+            Method[] objectMethods = Object.class.getDeclaredMethods();
+            for (Method m : objectMethods) {
+                excludedMethodName.add(m.getName());
+            }
         }
-        return excludedMethodName;
+        Set<String> tmpExcludeMethodName = null;
+        if(null != excludeMethodClass) {
+            tmpExcludeMethodName = new HashSet<>();
+            for (Class excludeClass : excludeMethodClass) {
+                Method[] excludeMethods = excludeClass.getDeclaredMethods();
+                if (null != excludeMethods) {
+                    for (Method method : excludeMethods) {
+                        tmpExcludeMethodName.add(method.getName());
+                    }
+                }
+            }
+            tmpExcludeMethodName.addAll(excludedMethodName);
+        }
+        return (null == tmpExcludeMethodName) ? excludedMethodName : tmpExcludeMethodName;
     }
 
+    /**
+     *  过滤方法
+     *  @param method 需要过滤的Method
+     *  @param excludedMethodName 包含要过滤的方法名集合
+     *  @return boolean 如果包含则返回true
+     */
+    public static boolean isExcludeMethod(Method method, Set<String> excludedMethodName) {
+        return excludedMethodName.contains(method.getName());
+        //如果是Object, Controller公用方法名并且有参数的方法, 则返回true
+//        return (excludedMethodName.contains(method.getName()) && method.getParameterTypes().length ==0 );
+    }
 
 }

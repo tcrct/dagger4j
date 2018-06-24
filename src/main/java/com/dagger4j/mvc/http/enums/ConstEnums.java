@@ -97,7 +97,7 @@ public enum ConstEnums {
     }
 
 
-    public enum HANDLE {
+    public enum LOCATION {
         BEFORE, AFTER;
     }
 

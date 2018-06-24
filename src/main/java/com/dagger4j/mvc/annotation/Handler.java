@@ -19,10 +19,10 @@ import java.lang.annotation.Target;
 public @interface Handler {
     /**
      *  处理器位置，是在RequestAccessHandler前或后，
-     *  如果是前(ConstEnums.HANDLE.BEFORE)则对request进行处理
-     *  如果是后(ConstEnums.HANDLE.AFTER)则对response处理
+     *  如果是前(ConstEnums.LOCATION.BEFORE)则对request进行处理
+     *  如果是后(ConstEnums.LOCATION.AFTER)则对response处理
       */
-    ConstEnums.HANDLE location() default ConstEnums.HANDLE.BEFORE;
+    ConstEnums.LOCATION location() default ConstEnums.LOCATION.BEFORE;
 
     int index() default 0;
 }

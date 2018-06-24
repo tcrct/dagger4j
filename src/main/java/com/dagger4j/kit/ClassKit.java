@@ -87,16 +87,7 @@ public final class ClassKit {
         return true;
     }
 
-//    public static List<Class<?>> getAllClass(String packagePath, List<String> jarNames) {
-//        List<Class<?>> classList = allClassMap.get(packagePath);
-//        if(ToolsKit.isEmpty(classList)) {
-//           classList = ScanClassFactory.scanClass(packagePath, jarNames);
-//            if(ToolsKit.isNotEmpty(classList))  {
-//                allClassMap.put(packagePath, classList);
-//            }
-//        }
-//        return classList;
-//    }
+
 
 
 }
