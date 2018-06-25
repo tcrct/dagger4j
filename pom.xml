@@ -20,6 +20,7 @@
         <netty.version>4.1.21.Final</netty.version>
         <cglib.version>3.1</cglib.version>
         <configuration.version>1.10</configuration.version>
+        <mongodb.version>3.6.0</mongodb.version>
     </properties>
     <repositories>
         <repository>
@@ -88,6 +89,13 @@
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>${cglib.version}</version>
+        </dependency>
+
+        <!-- mongodb -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongodb.version}</version>
         </dependency>
 
         <!--<dependency>-->

@@ -1,4 +1,4 @@
-package com.dagger4j.db;
+package com.dagger4j.db.annotation;
 
 public enum IdType {
     OID,

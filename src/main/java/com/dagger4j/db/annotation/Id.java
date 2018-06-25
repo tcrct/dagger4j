@@ -1,4 +1,4 @@
-package com.dagger4j.db;
+package com.dagger4j.db.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

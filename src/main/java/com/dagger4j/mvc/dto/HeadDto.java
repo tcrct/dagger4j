@@ -13,7 +13,7 @@ public class HeadDto implements java.io.Serializable {
 	private String msg;
     private String uri;
     private String method;
-    private String clientId;
+    private String clientIp;
 	private String token;
 	private long timestamp = System.currentTimeMillis();
 	private String requestId;
@@ -41,12 +41,12 @@ public class HeadDto implements java.io.Serializable {
 		this.uri = uri;
 	}
 
-    public HeadDto(int ret, String msg, String uri, String method, String clientId, String token, long timestamp, String requestId, Map<String, String> headerMap) {
+    public HeadDto(int ret, String msg, String uri, String method, String clientIp, String token, long timestamp, String requestId, Map<String, String> headerMap) {
         this.ret = ret;
         this.msg = msg;
         this.uri = uri;
         this.method = method;
-        this.clientId = clientId;
+        this.clientIp = clientIp;
         this.token = token;
         this.timestamp = timestamp;
         this.requestId = requestId;
@@ -111,11 +111,11 @@ public class HeadDto implements java.io.Serializable {
         this.method = method;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getClientIp() {
+        return clientIp;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClientIp(String clientIp) {
+        this.clientIp = clientIp;
     }
 }

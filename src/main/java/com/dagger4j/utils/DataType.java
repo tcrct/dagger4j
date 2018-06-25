@@ -1,6 +1,6 @@
 package com.dagger4j.utils;
 
-import com.dagger4j.db.IdEntity;
+import com.dagger4j.db.annotation.IdEntity;
 
 import java.lang.reflect.Array;
 

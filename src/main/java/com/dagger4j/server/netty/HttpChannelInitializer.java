@@ -1,7 +1,6 @@
 package com.dagger4j.server.netty;
 
 import com.dagger4j.server.common.BootStrap;
-import com.dagger4j.server.netty.handler.HttpFilterRuleHandler;
 import com.dagger4j.server.netty.handler.HttpBaseHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;

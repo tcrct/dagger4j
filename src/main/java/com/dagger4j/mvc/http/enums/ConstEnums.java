@@ -1,6 +1,7 @@
 package com.dagger4j.mvc.http.enums;
 
 
+import com.dagger4j.db.annotation.Entity;
 import com.dagger4j.mvc.annotation.*;
 
 import java.lang.annotation.Annotation;

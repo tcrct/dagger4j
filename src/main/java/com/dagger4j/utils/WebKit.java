@@ -10,6 +10,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -17,6 +19,8 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * Created by laotang on 2018/6/23.
  */
 public class WebKit {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebKit.class);
 
     /**
      * 将请求结果返回到客户端
@@ -66,7 +70,7 @@ public class WebKit {
     public static void builderExceptionResponse(IRequest request, IResponse response, Exception e) {
         ReturnDto<String> returnDto = new ReturnDto<>();
         HeadDto headDto = new HeadDto();
-        headDto.setClientId(request.getRemoteAddr());
+        headDto.setClientIp(request.getRemoteIp());
         headDto.setMethod(request.getMethod());
         headDto.setRequestId(request.getRequestId());
         headDto.setRet(1);
@@ -78,5 +82,7 @@ public class WebKit {
         returnDto.setHead(headDto);
         response.write(returnDto);
     }
+
+
 
 }

@@ -1,6 +1,5 @@
 package com.dagger4j.server.netty.handler;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;
@@ -10,7 +9,7 @@ import io.netty.handler.codec.http.HttpRequest;
  */
 public class HttpFilterRuleHandler extends ChannelInboundHandlerAdapter {
 
-
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         if (msg instanceof HttpRequest) {
@@ -23,6 +22,7 @@ public class HttpFilterRuleHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelRead(msg);
     }
 
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if( ctx.channel().isActive() ) {
             ctx.channel().close();

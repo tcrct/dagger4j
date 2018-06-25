@@ -2,16 +2,15 @@ package com.dagger4j.mvc.http;
 
 import com.dagger4j.exception.HttpDecoderException;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.server.common.ServerConfig;
 import com.dagger4j.server.netty.decoder.AbstractDecoder;
 import com.dagger4j.server.netty.decoder.DecoderFactory;
 import com.dagger4j.utils.DaggerId;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.local.LocalAddress;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.multipart.DiskAttribute;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -50,6 +48,7 @@ public class HttpRequest implements IRequest{
     protected static String[] EMPTY_ARRAYS = new String[0];
     private InetSocketAddress remoteAddress;
     private InetSocketAddress localAddress;
+    private String clientIp = "127.0.0.1";
 
     private HttpRequest(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) {
         requestId = new DaggerId().toString();
@@ -177,8 +176,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getScheme() {
-        System.out.println(remoteAddress.toString());
-        return remoteAddress.getHostString();
+        return request.protocolVersion().protocolName().toString().toLowerCase();
     }
 
     @Override
@@ -188,19 +186,56 @@ public class HttpRequest implements IRequest{
 
     @Override
     public int getServerPort() {
-        System.out.println(remoteAddress.getHostName() +"          "+ remoteAddress.getPort());
-        System.out.println(localAddress.getHostName() +"          "+ localAddress.getPort());
-        return localAddress.getPort();
+        return localAddress.getPort(); //WebKit.getServerPort();
     }
 
     @Override
     public String getRemoteAddr() {
-        return remoteAddress.getHostName() +":"+ remoteAddress.getPort();
+        return getProtocol() + "://" + getRemoteHost() + getRequestURI();
     }
 
     @Override
     public String getRemoteHost() {
         return remoteAddress.getHostName();
+    }
+
+    /**
+     * 取客户端IP地址
+     */
+    @Override
+    public String getRemoteIp() {
+        if(ToolsKit.isEmpty(clientIp)) {
+            List<String> headerNameList = new ArrayList<String>() {
+                {
+                    this.add(ServerConfig.X_FORWARDED_FOR.toString());
+                    this.add(ServerConfig.X_REAL_IP.toString());
+                    this.add(HttpHeaderNames.HOST.toString());
+                    this.add(HttpHeaderNames.ORIGIN.toString());
+                }
+            };
+            for (String headerName : headerNameList) {
+                clientIp = getHeader(headerName);
+                if (ToolsKit.isNotEmpty(clientIp)) {
+                    clientIp = clientIp.split(",")[0];
+                    break;
+                }
+            }
+            clientIp = clientIp.toLowerCase().replace("https://", "").replace("http://", "");
+            if("0:0:0:0:0:0:0:1".equals(clientIp) || ToolsKit.isEmpty(clientIp)){
+                clientIp = "127.0.0.1";
+            }
+        }
+        return clientIp;
+    }
+
+    /**
+     * 取服务器P地址
+     * @return
+     */
+    @Override
+    public String getLocalAddr() {
+//        InetSocketAddress inetSocketAddress = BootStrap.getInstants().getSockerAddress();
+        return getScheme()+"://"+localAddress.getHostString() + ":" + localAddress.getPort();
     }
 
     @Override

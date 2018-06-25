@@ -120,7 +120,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
 //        headDto.setUri(asyncRequest.getRequestURI());
 //        headDto.setTimestamp(System.currentTimeMillis());
 //        headDto.setRequestId(requestId);
-//        headDto.setClientId(IpUtils.getLocalHostIP());
+//        headDto.setClientIp(IpUtils.getLocalHostIP());
 //        headDto.setMethod(asyncRequest.getMethod());
 //        returnDto.setHead(headDto);
 //        httpResponse.write(returnDto);
