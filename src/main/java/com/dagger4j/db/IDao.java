@@ -25,15 +25,15 @@ public interface IDao<Q, U> {
 
     /**
      * 根据Query查找对象
-     * @param key		属性字段
-     * @param value		值
+     * @param query		值
      * @return			对象
      */
     <T> T findOne(Q query) throws Exception;
 
 
     /**
-     *
+     * 根据Query查找对象集合
+     * @param query		值
      */
     <T> T findList(Q query) throws Exception;
 }
