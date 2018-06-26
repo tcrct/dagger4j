@@ -10,7 +10,6 @@ import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.proxy.IProxy;
 import com.dagger4j.mvc.proxy.ProxyManager;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +100,11 @@ public class BeanHelper {
             throw new MvcException(targetObj.getClass().getName() + " 无法根据类名获取实例: " + clazz + " , 请检查是否后缀名是否正确！");
         }
         return (T)iocBeanMap.get(key);
+    }
+
+    public static void setBean(Object targetObj) {
+        String key = getBeanClassName(targetObj.getClass());
+        iocBeanMap.put(key, targetObj);
     }
 
     /**

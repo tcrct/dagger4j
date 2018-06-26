@@ -3,6 +3,7 @@ package com.dagger4j.mvc.core.helper;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Import;
+import com.dagger4j.rpc.annotation.ImportRpc;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
@@ -39,7 +40,7 @@ public class IocHelper {
     public static void ioc(Class<?> beanClass) throws Exception {
         Field[] fields = beanClass.getDeclaredFields();
         for(Field field : fields) {
-            if (field.isAnnotationPresent(Import.class)) {
+            if (field.isAnnotationPresent(Import.class) || field.isAnnotationPresent(ImportRpc.class)) {
                 Class<?> fieldTypeClass = field.getType();
                 if (fieldTypeClass.equals(beanClass)) {
                     throw new MvcException(beanClass.getSimpleName() + " can't not already import " + fieldTypeClass.getSimpleName());

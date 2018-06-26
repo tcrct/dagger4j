@@ -167,7 +167,7 @@ public class MongoUtils {
         MongoDao<?> dao = MONGODAO_MAP.get(key);
         if(null == dao){
             try {
-                MongoClientAdapter clientAdapter = DbClientFactory.getDbClient(dbClientId);
+                MongoClientAdapter clientAdapter = DbClientFactory.getMongoDbClient(dbClientId);
                 MongoClient mongoClient = clientAdapter.getClient();
                 String dbName = clientAdapter.getDbConnect().getDatabase();
                 DB db = mongoClient.getDB(dbName);

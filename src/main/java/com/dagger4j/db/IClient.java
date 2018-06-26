@@ -25,5 +25,11 @@ public interface IClient<T> {
      * 取客户端实例
      * @return
      */
-    T getClient();
+    T getClient() throws Exception;
+
+    /**
+     * 关闭客户端实例
+     * @throws Exception
+     */
+    void close() throws Exception;
 }

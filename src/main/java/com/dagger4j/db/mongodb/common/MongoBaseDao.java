@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @author Created by laotang
  * @date createed in 2018/6/25.
  */
-public class MongoBaseDao<T> extends MongoAdapter<T> {
+public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
 
     private final static Logger logger = LoggerFactory.getLogger(MongoBaseDao.class);
 

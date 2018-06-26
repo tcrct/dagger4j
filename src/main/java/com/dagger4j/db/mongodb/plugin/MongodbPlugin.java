@@ -1,0 +1,106 @@
+package com.dagger4j.db.mongodb.plugin;
+
+import com.dagger4j.db.DbClientFactory;
+import com.dagger4j.db.mongodb.client.MongoClientAdapter;
+import com.dagger4j.db.mongodb.common.MongoDao;
+import com.dagger4j.db.mongodb.utils.MongoUtils;
+import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Import;
+import com.dagger4j.mvc.core.helper.BeanHelper;
+import com.dagger4j.mvc.plugin.IPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * MongoDB插件
+ * @author Created by laotang
+ * @date on 2017/11/20.
+ */
+public class MongodbPlugin implements IPlugin {
+
+    private final static Logger logger = LoggerFactory.getLogger(MongodbPlugin.class);
+
+
+    public MongodbPlugin(MongoClientAdapter clientAdapter) throws Exception {
+        DbClientFactory.setMongoClient(clientAdapter);
+    }
+
+
+
+    /**
+     * 多数据库时使用<br/>
+     * 如果没有设置默认db client的话，则用第一个client作为默认的client
+     * @param clientAdapterList
+     */
+    public MongodbPlugin (List<MongoClientAdapter> clientAdapterList) throws Exception {
+        String defaultClientId = "";
+        for(MongoClientAdapter clientAdapter : clientAdapterList) {
+            if(clientAdapter.isDefaultClient()) {
+                defaultClientId = clientAdapter.getId();
+            }
+            DbClientFactory.setMongoClient(clientAdapter);
+        }
+        if(ToolsKit.isEmpty(defaultClientId)) {
+            defaultClientId = clientAdapterList.get(0).getId();
+        }
+        DbClientFactory.setMongoDefaultClientId(defaultClientId);
+    }
+
+    /**
+     *  启动插件，先进行链接，再设置Dao Bean 到Ioc集合
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+        // 链接数据
+        for (Iterator<Map.Entry<String, MongoClientAdapter>> iterator = DbClientFactory.getMongoDbClients().entrySet().iterator(); iterator.hasNext();) {
+            iterator.next().getValue().getClient();
+        }
+        addBeanToIocMap();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        for (Iterator<Map.Entry<String, MongoClientAdapter>> iterator = DbClientFactory.getMongoDbClients().entrySet().iterator(); iterator.hasNext();) {
+            iterator.next().getValue().close();
+        }
+    }
+
+    /**
+     * 设置Dao Bean 到Ioc集合
+     * @throws Exception
+     */
+    private void addBeanToIocMap() throws Exception {
+    // 取出所有类对象
+    Map<String, Object> iocBeanMap = BeanHelper.getIocBeanMap();
+    for(Iterator<Map.Entry<String, Object>> it = iocBeanMap.entrySet().iterator(); it.hasNext();) {
+        Map.Entry<String, Object> entry = it.next();
+        Class<?> serviceClass = entry.getValue().getClass();
+        Field[] fields = serviceClass.getDeclaredFields();
+            for(Field field : fields) {
+                Import importAnnot = field.getAnnotation(Import.class);
+                if (ToolsKit.isNotEmpty(importAnnot) && MongoDao.class.equals(field.getType())) {
+                    ParameterizedType paramType = (ParameterizedType) field.getGenericType();
+                    Type[] types = paramType.getActualTypeArguments();
+                    if(ToolsKit.isNotEmpty(types)) {
+                        // <>里的泛型类
+                        Class<?> paramTypeClass = types[0].getClass();
+                        String key = ToolsKit.isEmpty(importAnnot.client()) ? DbClientFactory.getMongoDefaultClientId() : importAnnot.client();
+                        Object daoObj = MongoUtils.getMongoDao(key, paramTypeClass);
+                        // 设置到IOC集合里, 以供IocHelper进行IOC时使用
+                        if(null != daoObj) {
+                            BeanHelper.setBean(daoObj);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
