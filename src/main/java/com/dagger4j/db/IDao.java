@@ -9,7 +9,7 @@ public interface IDao<Q, U> {
     /**
      * 保存对象
      * @param  entity		待保存的对象
-     * @return		对象
+     * @return		成功返回true
      */
     <T> T save(T entity) throws Exception;
 
@@ -30,4 +30,10 @@ public interface IDao<Q, U> {
      * @return			对象
      */
     <T> T findOne(Q query) throws Exception;
+
+
+    /**
+     *
+     */
+    <T> T findList(Q query) throws Exception;
 }

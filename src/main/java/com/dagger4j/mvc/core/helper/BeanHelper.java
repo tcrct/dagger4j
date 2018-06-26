@@ -202,7 +202,7 @@ public class BeanHelper {
                         }
                     }
                 }
-//                System.out.println(proxyAnnotaionList.get(0).value()[0].getName());
+//                System.out.println(proxyAnnotaionList.get(0).value()[0].getId());
                 bean= buildProxyBean(clazz, proxyAnnotaionList);
             } else {
                 bean = ObjectKit.newInstance(clazz);

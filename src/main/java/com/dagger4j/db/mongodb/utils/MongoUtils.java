@@ -1,8 +1,12 @@
 package com.dagger4j.db.mongodb.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dagger4j.db.DbClientFactory;
 import com.dagger4j.db.annotation.IdEntity;
+import com.dagger4j.db.mongodb.client.MongoClientAdapter;
 import com.dagger4j.db.mongodb.common.MongoDao;
+import com.dagger4j.exception.MongodbException;
+import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
@@ -25,21 +29,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class MongoUtils {
 
-    private static ConcurrentMap<String, MongoDao<?>> MONGODAO_MAP = new ConcurrentHashMap<>();
-
-    private static ConcurrentMap<String, MongoClientExt> MONGO_CLIENT_EXT_MAP = new ConcurrentHashMap<>();
-
     private static Logger logger = LoggerFactory.getLogger(MongoUtils.class);
 
-    private static MongoClientExt mongoClientExt;
+    private static ConcurrentMap<String, MongoDao<?>> MONGODAO_MAP = new ConcurrentHashMap<>();
 
-    public static MongoClientExt getDefaultClientExt() {
-        return mongoClientExt;
-    }
-
-    public static void setDefaultClientExt(MongoClientExt defaultClient) {
-        MongoUtils.mongoClientExt = defaultClient;
-    }
 
     public static Object toObjectIds(Object values) {
         if(values instanceof Object[]){
@@ -47,7 +40,7 @@ public class MongoUtils {
             Object[] tmp = (Object[]) values;
             for (Object value : tmp) {
                 if (value != null) {
-                    boolean isObjectId = ToolsKit.isValidDuangId(value.toString());
+                    boolean isObjectId = ToolsKit.isValidDaggerId(value.toString());
                     if (isObjectId) {
                         ObjectId dbId = new ObjectId(value.toString());
                         idList.add(dbId);
@@ -56,20 +49,13 @@ public class MongoUtils {
             }
             return idList;
         } else {
-            boolean isObjectId = ToolsKit.isValidDuangId(values.toString());
+            boolean isObjectId = ToolsKit.isValidDaggerId(values.toString());
             if (isObjectId) {
                 return new ObjectId(values.toString());
             } else {
-                throw new IllegalArgumentException("toObjectIds is fail");
+                throw new MongodbException("toObjectId is Fail: ["+values+"] is not ObjectId or Empty");
             }
         }
-    }
-
-    public static ObjectId toObjectId(String objId) {
-        if (ToolsKit.isEmpty(objId) || !ObjectId.isValid(objId)) {
-            throw new MongodbException("toObjectId is Fail: ["+objId+"] is not ObjectId or Empty");
-        }
-        return new ObjectId(objId);
     }
 
     /**
@@ -101,7 +87,7 @@ public class MongoUtils {
 
     public static <T> T toBson(Object obj) {
         if(null == obj) {
-            throw new EmptyNullException("toBson is fail:  obj is null");
+            throw new MongodbException("toBson is fail:  obj is null");
         }
         try {
 //            MongodbEncodeValueFilter mongodbEncodeValueFilter =  new MongodbEncodeValueFilter();
@@ -110,31 +96,17 @@ public class MongoUtils {
 //            Document document = Document.parse(json);
 //            return (T)document;
 //            return (T)Document.parse(json);
-            return (T) EncodeConvetor.convetor(obj);
+//            return (T) EncodeConvetor.convetor(obj);
+            return null;
         } catch (Exception e) {
 //            com.mongodb.util.JSONSerializers.LegacyDateSerializer
             throw new MongodbException("toBson is fail: " + e.getMessage(), e);
         }
     }
 
-//    public static DBObject toDBObject(Object obj) {
-//        if (null == obj) {
-//            return null;
-//        }
-//        DBObject dbo = new BasicDBObject();
-//        Field[] fields = ClassUtils.getFields(obj.getClass());
-//        for (Field field : fields) {
-//            Encoder encoder = EncoderFactory.create(obj, field);
-//            if (encoder != null && !encoder.isNull()) {
-//                dbo.put(encoder.getFieldName(), encoder.getValue());
-//            }
-//        }
-//        return dbo;
-//    }
-
     public static <T> T toEntity(Document document, Class<?> clazz) {
         try {
-            String json = JSONObject.toJSONString(document, new MongodbDecodeValueFilter());
+            String json = JSONObject.toJSONString(document, new MongodbEncodeValueFilter());
             if(ToolsKit.isNotEmpty(json)) {
                 return (T) ToolsKit.jsonParseObject(json, clazz);
             } return null;
@@ -151,7 +123,7 @@ public class MongoUtils {
      */
     private static Document convert2EntityId(Document document) {
         try {
-            if (document == null || document.get(IdEntity.ID_FIELD) == null) {
+            if (ToolsKit.isEmpty(document) || ToolsKit.isEmpty(document.get(IdEntity.ID_FIELD))) {
                 return document;
             } else {
                 document.put(IdEntity.ENTITY_ID_FIELD, document.get(IdEntity.ID_FIELD).toString());
@@ -160,8 +132,6 @@ public class MongoUtils {
                 /*如果转换出错直接返回原本的值,不做任何处理*/
         }
         document.remove(IdEntity.ID_FIELD);
-        document.remove(IdEntity.CREATETIME_FIELD);
-        document.remove(IdEntity.UPDATETIME_FIELD);
         return document;
     }
 
@@ -179,34 +149,29 @@ public class MongoUtils {
             id = document.getString(IdEntity.ID_FIELD);
         }
         if (ToolsKit.isNotEmpty(id)) {
-            document.put(IdEntity.ID_FIELD, MongoUtils.toObjectId(id));
+            document.put(IdEntity.ID_FIELD, MongoUtils.toObjectIds(id));
         }
         return document;
     }
 
     /**
      * 根据Entity类取出MongoDao
-     *@param dbClientCode           多数据源时，指定的数据源客户端代号标识字符串
+     *@param dbClientId           多数据源时，指定的数据源客户端代号标识字符串
      * @param cls           继承了IdEntity的类
      * @param <T>
      * @return
      */
-    public static <T> MongoDao<T> getMongoDao(String dbClientCode, Class<T> cls){
-        String key = ClassUtils.getEntityName(cls);
-        key = ToolsKit.isNotEmpty(dbClientCode) ? dbClientCode+"_" + key : key;
+    public static <T> MongoDao<T> getMongoDao(String dbClientId, Class<T> cls){
+        String key = ClassKit.getEntityName(cls);
+        key = ToolsKit.isNotEmpty(dbClientId) ? dbClientId+"_" + key : key;
         MongoDao<?> dao = MONGODAO_MAP.get(key);
         if(null == dao){
             try {
-                MongoClientExt clientExt = null;
-                if(ToolsKit.isNotEmpty(dbClientCode)) {
-                    clientExt = MongoUtils.getMongoClientExtMap().get(dbClientCode);
-                } else {
-                    clientExt = MongoUtils.getDefaultClientExt();
-                }
-                MongoDbConnect dbConnect = clientExt.getConnect();
-                MongoClient mongoClient = clientExt.getClient();
-                DB db = mongoClient.getDB(dbConnect.getDataBase());
-                MongoDatabase database = mongoClient.getDatabase(dbConnect.getDataBase());
+                MongoClientAdapter clientAdapter = DbClientFactory.getDbClient(dbClientId);
+                MongoClient mongoClient = clientAdapter.getClient();
+                String dbName = clientAdapter.getDbConnect().getDatabase();
+                DB db = mongoClient.getDB(dbName);
+                MongoDatabase database = mongoClient.getDatabase(dbName);
                 dao = new MongoDao<T>(db, database, cls);
                 MONGODAO_MAP.put(key, dao);
             } catch (Exception e) {
@@ -233,16 +198,4 @@ public class MongoUtils {
         }
     }
 
-    public static ConcurrentMap<String, MongoClientExt> getMongoClientExtMap() {
-        return MONGO_CLIENT_EXT_MAP;
-    }
-
-    public static void setMongoClient(String key, MongoClientExt client) {
-        MONGO_CLIENT_EXT_MAP.put(key, client);
-    }
-
-    public static MongoClient getMongoClient(String key) {
-        MongoClientExt clientExt = MONGO_CLIENT_EXT_MAP.get(key);
-        return ToolsKit.isEmpty(clientExt) ? null : clientExt.getClient();
-    }
 }
