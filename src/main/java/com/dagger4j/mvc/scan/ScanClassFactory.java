@@ -1,8 +1,10 @@
 package com.dagger4j.mvc.scan;
 
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
@@ -25,6 +27,27 @@ public class ScanClassFactory {
             @Override
             public void checkAndAddClass(Class<?> clazz, List<Class<?>> classList) {
                 classList.add(clazz);
+            }
+        }.getList();
+    }
+
+    /**
+     * 根据指定的包路径及jar文件名前缀(左匹配)取所有ControllerClass
+     * @param packagePath       包路径，在该路径下的所有Class会扫描
+     * @param jarNames              jar文件名前缀集合
+     * @return
+     */
+    public static List<Class<?>> getAllClass(String packagePath, List<String> jarNames, final Class<? extends Annotation> annotation) {
+        return new ClassTemplate(packagePath, jarNames){
+            @Override
+            public void checkAndAddClass(Class<?> clazz, List<Class<?>> classList) {
+                for(ConstEnums.ANNOTATION_CLASS classEnums : ConstEnums.ANNOTATION_CLASS.values()) {
+                    Class<?> enumsClass = classEnums.getClazz();
+                    if (clazz.isAnnotationPresent(annotation) ) {
+                        classList.add(clazz);
+                        break;
+                    }
+                }
             }
         }.getList();
     }

@@ -1,7 +1,7 @@
 package com.dagger4j.db.mongodb.common;
 
-import com.duangframework.core.kit.ToolsKit;
-import com.duangframework.mongodb.utils.MongoUtils;
+import com.dagger4j.db.mongodb.utils.MongoUtils;
+import com.dagger4j.kit.ToolsKit;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 

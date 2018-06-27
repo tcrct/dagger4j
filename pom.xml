@@ -21,6 +21,8 @@
         <cglib.version>3.1</cglib.version>
         <configuration.version>1.10</configuration.version>
         <mongodb.version>3.6.0</mongodb.version>
+        <druid.version>1.0.29</druid.version>
+        <mysql.version>5.1.44</mysql.version>
     </properties>
     <repositories>
         <repository>
@@ -96,6 +98,17 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>${mongodb.version}</version>
+        </dependency>
+        <!-- mysql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
         </dependency>
 
         <!--<dependency>-->
