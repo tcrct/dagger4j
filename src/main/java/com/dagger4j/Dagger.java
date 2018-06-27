@@ -1,7 +1,5 @@
 package com.dagger4j;
 
-import com.dagger4j.doclet.DocletKit;
-
 /**
  * Hello world!
  *
@@ -9,8 +7,6 @@ import com.dagger4j.doclet.DocletKit;
 public final class Dagger {
 
     public static void main( String[] args ) {
-
-        DocletKit.duang().build();
 
 //        Application.duang().port(12345)
 //                .handles(new HandlerChain() {
