@@ -1,5 +1,6 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.route.Route;
 
@@ -59,13 +60,17 @@ public class ActionInvocation {
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {
                 String[] parameterNames = MethodParameterNameDiscoverer.getParameterNames(controller.getClass(), method);
-                System.out.println(ToolsKit.toJsonString(parameterNames));
-//                Annotation[] parameterAnnotations = actionParams.getAnnotations();
+                if(actionParams.length != parameterNames.length) {
+                    throw new MvcException("参数长度不一致!");
+                }
                 for(int i=0; i<actionParams.length; i++) {
-                    Parameter parameter = actionParams[i];
                     Class<?> parameterType = actionParams[i].getType();
                     Annotation[]   annotations = actionParams[i].getAnnotations();
-                    System.out.println(annotations[0].annotationType().getName() +"                      "+parameterType.getName()+"                  "+parameterNames[i]);
+                    if(ToolsKit.isNotEmpty(annotations)) {
+                        for(Annotation annotation : annotations) {
+                            System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + parameterNames[i]);
+                        }
+                    }
                 }
 
 

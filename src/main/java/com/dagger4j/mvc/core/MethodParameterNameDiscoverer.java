@@ -1,11 +1,15 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.http.IRequest;
+import com.dagger4j.utils.DataType;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -26,21 +30,9 @@ public class MethodParameterNameDiscoverer {
     private static final Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
     private static final Map<String, String[]> parameterNamePool = new ConcurrentHashMap<>();
 
-    public static String[]  builderParameterObject(Class<?> clazz, Method method) {
-        Parameter[] actionParams = method.getParameters();
-        if(ToolsKit.isEmpty(actionParams)) {
-            return null;
-        }
-        for(int i=0; i<actionParams.length; i++) {
-            Parameter parameter = actionParams[i];
-            // 参数类型
-            Class<?> parameterType = actionParams[i].getType();
-            String[] paramNameArray = getParameterNamesByAsm(clazz, method);
-        }
-    }
-
-    public static String[]  getParameterNames(Class<?> clazz, Method method) {
-        String[] parameters = parameterNamePool.get(buildParameterNamePoolKey(clazz, method));
+    public static String[]  getParameterNames(IRequest request, Class<?> clazz, Method method) {
+        String key = buildParameterNamePoolKey(clazz, method);
+        String[] parameters = parameterNamePool.get(key);
         if(ToolsKit.isEmpty(parameters)) {
             Method[] methodArray = clazz.getMethods();
             for (Method itemMethod : methodArray) {
@@ -50,23 +42,55 @@ public class MethodParameterNameDiscoverer {
                 }
                 String parameterKey = buildParameterNamePoolKey(clazz, itemMethod);
                 String[] paramNameArray = getParameterNamesByAsm(clazz, itemMethod);
+
+                Parameter[] actionParams = method.getParameters();
+                if (ToolsKit.isNotEmpty(actionParams)) {
+                    if(actionParams.length != paramNameArray.length) {
+                        throw new MvcException("参数长度不一致!");
+                    }
+                    Object[] requestParamValueObj = new Object[actionParams.length];
+                    for(int i=0; i<actionParams.length; i++) {
+                        Class<?> parameterType = actionParams[i].getType();
+                        Annotation[]   annotations = actionParams[i].getAnnotations();
+                        if(ToolsKit.isNotEmpty(annotations)) {
+                            for(Annotation annotation : annotations) {
+                                System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i]);
+                                String paramValue = request.getParameter(paramNameArray[i]);
+                                if(DataType.isString(parameterType)) {
+                                    requestParamValueObj[i] = paramValue;
+                                } else if(DataType.isInteger(parameterType) && DataType.isIntegerObject(parameterType)) {
+                                    requestParamValueObj[i] = Integer.parseInt(paramValue);
+                                } else if(DataType.isLong(parameterType) && DataType.isLongObject(parameterType)) {
+                                    requestParamValueObj[i] = Long.parseLong(paramValue);
+                                }
+
+
+                            }
+                        }
+                    }
+                }
+
                 if (ToolsKit.isNotEmpty(paramNameArray)) {
                     parameterNamePool.put(parameterKey, paramNameArray);
-                    parameters = paramNameArray;
                 }
             }
         }
-        return parameters;
+        if(!parameterNamePool.containsKey(key)) {
+            throw new MvcException("取方法参数体时异常，参数获取失败!");
+        }
+        return parameterNamePool.get(key);
     }
 
     /**
      * 创建缓存KEY， 类全路径+方法名，来标识唯一
+     * 因为请求API是唯一的，所以在Controller里不会出一致的方法名，所以就没做进一步的唯一性确定处理
+     * 如果需要加强唯一性，可以将方法体里的参数类型取出，再拼接字符串后MD5
      * @param clazz
      * @param method
      * @return
      */
     private static String buildParameterNamePoolKey(Class<?> clazz, Method method) {
-        return clazz.getName() +"."+ method.getName()+"#"+method.getReturnType().getName();
+        return clazz.getName() +"."+ method.getName(); //+"#"+method.getReturnType().getName();
     }
 
     /**
