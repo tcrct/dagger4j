@@ -26,6 +26,8 @@ public enum ConstEnums {
     FRAMEWORK_OWNER("dagger", "框架名称"),
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
+    PROPERTIES_NAME("dagger.properties", "框架配置文件名"),
+    PROPERTIES_ENV_NAME("use.env", "框架配置文件名"),
 
     ;
 
@@ -102,6 +104,34 @@ public enum ConstEnums {
         BEFORE, AFTER;
     }
 
+
+    public enum PROPERTIES {
+        FILE_NAME("dagger.properties", "框架配置文件名"),
+        USE_ENV("use.env", "框架配置文件名"),
+        ;
+
+        private final String value;
+        private final String desc;
+        /**
+         * Constructor.
+         */
+        private PROPERTIES(String value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
+        /**
+         * Get the value.
+         * @return the value
+         */
+        public String getValue() {
+            return value;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+    }
 
 
 }

@@ -1,6 +1,5 @@
 package com.dagger4j.mvc.core;
 
-import com.dagger4j.kit.Prop;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
@@ -9,11 +8,11 @@ import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.render.Render;
 import com.dagger4j.mvc.render.TextRender;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by laotang on 2018/6/15.
@@ -30,7 +29,7 @@ public abstract class BaseController {
     public void init(IRequest request, IResponse response) {
         this.request = request;
         this.response = response;
-        if(PropKit.getBoolean("debug")) {
+        if("dev".equalsIgnoreCase(PropKit.get(ConstEnums.PROPERTIES.USE_ENV.getValue()))) {
             printRequestInfo();
         }
     }
@@ -68,7 +67,9 @@ public abstract class BaseController {
      */
     private Map<String, Object> getAllParams() {
         Map<String, Object> requestParams = request.getParameterMap();
-        requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.toString());
+        if(ToolsKit.isNotEmpty(requestParams)) {
+            requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.toString());
+        }
         return requestParams;
         /*
         Map<String, Object> params = new HashMap<>();

@@ -1,6 +1,5 @@
 package com.dagger4j.kit;
 
-import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.utils.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -310,6 +309,16 @@ public class ObjectKit {
         return excludedMethodName.contains(method.getName());
         //如果是Object, Controller公用方法名并且有参数的方法, 则返回true
 //        return (excludedMethodName.contains(method.getId()) && method.getParameterTypes().length ==0 );
+    }
+
+    /**
+     * 是否正常的方法
+     * 正常方法是指， 不是抽像，静态，接口，Final的方法
+     * @param mod       Modifier的mod
+     * @return
+     */
+    public static boolean isNormalMethod(int mod) {
+        return !(Modifier.isAbstract(mod) || Modifier.isStatic(mod) || Modifier.isFinal(mod) || Modifier.isInterface(mod));
     }
 
 }

@@ -45,10 +45,10 @@ public class RouteHelper {
                     if(ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
                         continue;
                     }
-                    Route route = new Route(controllerClass, controllerKey, actionMethod);
+                    Route route = new Route(controllerClass, null, controllerKey, actionMethod);
                     String routeKey = route.getRequestMapping().getValue();
                     // 如果包含有{}的，则视为restful风格的URI
-                    if (routeKey.contains("{") && routeKey.contains("}")) {
+                    if (ToolsKit.isNotEmpty(routeKey) && routeKey.contains("{") && routeKey.contains("}")) {
                         restfulRouteMap.put(routeKey, route);
                     } else {
                         routeMap.put(routeKey, route);

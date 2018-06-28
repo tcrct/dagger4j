@@ -1,9 +1,8 @@
-package com.dagger4j.mvc.http.handler;
+package com.dagger4j.mvc.core;
 
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.core.BaseController;
 import com.dagger4j.mvc.core.helper.BeanHelper;
 import com.dagger4j.mvc.core.helper.IocHelper;
 import com.dagger4j.mvc.core.helper.RouteHelper;
@@ -11,8 +10,6 @@ import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.route.RequestMapping;
 import com.dagger4j.mvc.route.Route;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -24,10 +21,6 @@ import java.util.Map;
  * Created by laotang on 2018/6/14.
  */
 final public class RequestAccessHandler{
-
-    private static final Logger logger = LoggerFactory.getLogger(RequestAccessHandler.class);
-
-    private static final Object[] NULL_ARGS = new Object[0];
 
     /**
      *  执行请求处理器
@@ -64,8 +57,9 @@ final public class RequestAccessHandler{
         Method method = route.getActionMethod();
         // 取消类型安全检测（可提高反射性能）
         method.setAccessible(true);
+        //将请求参数生成数组对象注入
         // 反射执行方法
-        method.invoke(controller, NULL_ARGS);
+        new ActionInvocation(route, controller, method, target).invoke();    // 反射执行该方法
         // 返回结果
         controller.getRender().setContext(request, response).render();
 

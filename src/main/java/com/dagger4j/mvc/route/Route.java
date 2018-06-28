@@ -1,11 +1,14 @@
 package com.dagger4j.mvc.route;
 
 import com.dagger4j.kit.PathKit;
+import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Controller;
-import com.dagger4j.mvc.http.enums.HttpMethod;
 import com.dagger4j.mvc.annotation.Mapping;
 import com.dagger4j.mvc.annotation.Validation;
+import com.dagger4j.mvc.core.Interceptor;
+import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.http.enums.HttpMethod;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,12 +26,14 @@ public class Route {
     private Class<?> controllerClass;  //执行的控制器类
     private Method actionMethod;       // 执行的方法
     private HttpMethod[] httpMethod;  //请求类型
+    private Interceptor[] interceptors;   // 拦截器，用于Controller
     private List<ValidationParam> validationParamList; //
     private boolean singleton; //是否单例
 
-    public Route(Class<?> controllerClass, String controllerMappingKey, Method actionMethod) {
+    public Route(Class<?> controllerClass, Interceptor[] interceptors, String controllerMappingKey, Method actionMethod) {
         this.controllerClass = controllerClass;
         this.actionMethod = actionMethod;
+        this.interceptors = interceptors;
         builderMapping(controllerMappingKey, actionMethod);
     }
     public Class<?> getControllerClass() {
@@ -43,9 +48,17 @@ public class Route {
         return requestMapping;
     }
 
+    public Interceptor[] getInterceptors() {
+        return interceptors;
+    }
+
     public void builderMapping(String controllerKey, Method actionMethod) {
         Mapping methodMapping = actionMethod.getAnnotation(Mapping.class);
         if(ToolsKit.isEmpty(methodMapping)) {
+            controllerKey = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+            this.requestMapping = new RequestMapping("/"+controllerKey+"/"+actionMethod.getName().toLowerCase(),
+                    actionMethod.getName(),
+                    0, Integer.parseInt(ConstEnums.REQUEST_TIMEOUT.getValue()), new ArrayList<ValidationParam>());
             return;
         }
 
@@ -65,12 +78,18 @@ public class Route {
         }
 
         this.httpMethod = methodMapping.method();
-        String methodKey = PathKit.fixPath(methodMapping.value());
+        String methodKey = methodMapping.value();
+        if(ToolsKit.isNotEmpty(methodKey)) {
+            methodKey = PathKit.fixPath(methodKey);
+        } else{
+            methodKey = actionMethod.getName();
+        }
         String routeKey = methodKey;
         if(!controllerKey.equalsIgnoreCase(methodKey)) {
             routeKey = controllerKey + methodKey;
         }
         routeKey = PathKit.fixPath(routeKey);
+        System.out.println(controllerClass.getName() +"               "+routeKey);
         this.requestMapping = new RequestMapping(routeKey,
                 methodMapping.desc(),
                 methodMapping.order(),
