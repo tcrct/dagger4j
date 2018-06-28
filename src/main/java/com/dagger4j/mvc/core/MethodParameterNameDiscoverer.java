@@ -1,9 +1,11 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.db.annotation.Entity;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
 import org.objectweb.asm.*;
 
@@ -30,7 +32,7 @@ public class MethodParameterNameDiscoverer {
     private static final Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
     private static final Map<String, String[]> parameterNamePool = new ConcurrentHashMap<>();
 
-    public static String[]  getParameterNames(IRequest request, Class<?> clazz, Method method) {
+    public static String[]  getParameterNames(Class<?> clazz, Method method) {
         String key = buildParameterNamePoolKey(clazz, method);
         String[] parameters = parameterNamePool.get(key);
         if(ToolsKit.isEmpty(parameters)) {
@@ -42,34 +44,6 @@ public class MethodParameterNameDiscoverer {
                 }
                 String parameterKey = buildParameterNamePoolKey(clazz, itemMethod);
                 String[] paramNameArray = getParameterNamesByAsm(clazz, itemMethod);
-
-                Parameter[] actionParams = method.getParameters();
-                if (ToolsKit.isNotEmpty(actionParams)) {
-                    if(actionParams.length != paramNameArray.length) {
-                        throw new MvcException("参数长度不一致!");
-                    }
-                    Object[] requestParamValueObj = new Object[actionParams.length];
-                    for(int i=0; i<actionParams.length; i++) {
-                        Class<?> parameterType = actionParams[i].getType();
-                        Annotation[]   annotations = actionParams[i].getAnnotations();
-                        if(ToolsKit.isNotEmpty(annotations)) {
-                            for(Annotation annotation : annotations) {
-                                System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i]);
-                                String paramValue = request.getParameter(paramNameArray[i]);
-                                if(DataType.isString(parameterType)) {
-                                    requestParamValueObj[i] = paramValue;
-                                } else if(DataType.isInteger(parameterType) && DataType.isIntegerObject(parameterType)) {
-                                    requestParamValueObj[i] = Integer.parseInt(paramValue);
-                                } else if(DataType.isLong(parameterType) && DataType.isLongObject(parameterType)) {
-                                    requestParamValueObj[i] = Long.parseLong(paramValue);
-                                }
-
-
-                            }
-                        }
-                    }
-                }
-
                 if (ToolsKit.isNotEmpty(paramNameArray)) {
                     parameterNamePool.put(parameterKey, paramNameArray);
                 }
@@ -79,6 +53,53 @@ public class MethodParameterNameDiscoverer {
             throw new MvcException("取方法参数体时异常，参数获取失败!");
         }
         return parameterNamePool.get(key);
+    }
+
+    /**
+     * 将请求参数转换为Object[], 注入到Method里
+     * @param request       请求对象
+     * @param method       执行的方法
+     * @param paramNameArray        执行方法里的参数变量名
+     * @return
+     */
+    public static Object[] getParameterValues(IRequest request, Method method, String[] paramNameArray)  {
+        Parameter[] actionParams = method.getParameters();
+        Object[] requestParamValueObj = null;
+        if (ToolsKit.isNotEmpty(actionParams)) {
+            if(actionParams.length != paramNameArray.length) {
+                throw new MvcException("参数长度不一致!");
+            }
+            requestParamValueObj = new Object[actionParams.length];
+            for(int i=0; i<actionParams.length; i++) {
+                Class<?> parameterType = actionParams[i].getType();
+                Annotation[]   annotations = actionParams[i].getAnnotations();
+                if(ToolsKit.isNotEmpty(annotations)) {
+                    for(Annotation annotation : annotations) {
+                        System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i]);
+                        String paramValue = request.getParameter(paramNameArray[i]);
+                        if(DataType.isString(parameterType)) {
+                            requestParamValueObj[i] = paramValue;
+                        } else if(DataType.isInteger(parameterType) && DataType.isIntegerObject(parameterType)) {
+                            requestParamValueObj[i] = Integer.parseInt(paramValue);
+                        } else if(DataType.isLong(parameterType) && DataType.isLongObject(parameterType)) {
+                            requestParamValueObj[i] = Long.parseLong(paramValue);
+                        } else if(DataType.isDouble(parameterType) && DataType.isDoubleObject(parameterType)) {
+                            requestParamValueObj[i] = Double.parseDouble(paramValue);
+                        } else if(DataType.isDate(parameterType)) {
+                            requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+                        } else if(DataType.isTimestamp(parameterType)) {
+                            requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+                            // 如果是Entity注解，则认为是要转换为Bean对象
+                        } else if(Entity.class.equals(annotation.annotationType())){
+
+                        }
+                    }
+                }
+            }
+        }
+        //返回前，根据验证注解，进行参数数据验证
+
+        return requestParamValueObj;
     }
 
     /**

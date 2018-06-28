@@ -1,10 +1,8 @@
 package com.dagger4j.mvc.core;
 
-import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.route.Route;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -57,26 +55,12 @@ public class ActionInvocation {
 		if (inters != null && index < inters.length) {
 			inters[index++].intercept(this);
 		} else {
+			//如果方法体里有参数设置
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {
                 String[] parameterNames = MethodParameterNameDiscoverer.getParameterNames(controller.getClass(), method);
-                if(actionParams.length != parameterNames.length) {
-                    throw new MvcException("参数长度不一致!");
-                }
-                for(int i=0; i<actionParams.length; i++) {
-                    Class<?> parameterType = actionParams[i].getType();
-                    Annotation[]   annotations = actionParams[i].getAnnotations();
-                    if(ToolsKit.isNotEmpty(annotations)) {
-                        for(Annotation annotation : annotations) {
-                            System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + parameterNames[i]);
-                        }
-                    }
-                }
-
-
-
-//				method.invoke(controller, action.getMethod().getName(), methodParamList.toArray());
-				method.invoke(controller, NULL_ARGS);
+				Object[] argsObj =MethodParameterNameDiscoverer.getParameterValues(controller.getRequest(), method, parameterNames);
+				method.invoke(controller, argsObj);
 			} else {
 				method.invoke(controller, NULL_ARGS);
 			}

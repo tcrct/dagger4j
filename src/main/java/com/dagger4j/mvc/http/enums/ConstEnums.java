@@ -26,8 +26,7 @@ public enum ConstEnums {
     FRAMEWORK_OWNER("dagger", "框架名称"),
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
-    PROPERTIES_NAME("dagger.properties", "框架配置文件名"),
-    PROPERTIES_ENV_NAME("use.env", "框架配置文件名"),
+    DEFAULT_DATE_FORMAT_VALUE("yyyy-MM-dd HH:mm:ss", "默认的时间格式"),
 
     ;
 

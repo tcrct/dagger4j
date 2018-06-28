@@ -26,6 +26,14 @@ public abstract class BaseController {
     private IResponse response;
     private Render render;
 
+    public IRequest getRequest() {
+        return request;
+    }
+
+    public IResponse getResponse() {
+        return response;
+    }
+
     public void init(IRequest request, IResponse response) {
         this.request = request;
         this.response = response;
