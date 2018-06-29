@@ -113,11 +113,11 @@
             <version>${druid.version}</version>
         </dependency>
         <!-- javassist -->
-        <!--<dependency>-->
-            <!--<groupId>javassist</groupId>-->
-            <!--<artifactId>javassist</artifactId>-->
-            <!--<version>${javassist.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
         <dependency>
             <groupId>org.ow2.asm</groupId>

@@ -1,23 +1,19 @@
 package com.dagger4j.mvc.core;
 
-import com.dagger4j.db.annotation.Entity;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
+import com.dagger4j.vtor.VtorKit;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,7 +28,7 @@ public class MethodParameterNameDiscoverer {
     private static final Set<String> excludedMethodName = ObjectKit.buildExcludedMethodName(BaseController.class);
     private static final Map<String, String[]> parameterNamePool = new ConcurrentHashMap<>();
 
-    public static String[]  getParameterNames(Class<?> clazz, Method method) {
+    public static String[]  getParameterNames(Class<?> clazz, Method method) throws Exception{
         String key = buildParameterNamePoolKey(clazz, method);
         String[] parameters = parameterNamePool.get(key);
         if(ToolsKit.isEmpty(parameters)) {
@@ -43,7 +39,7 @@ public class MethodParameterNameDiscoverer {
                     continue;
                 }
                 String parameterKey = buildParameterNamePoolKey(clazz, itemMethod);
-                String[] paramNameArray = getParameterNamesByAsm(clazz, itemMethod);
+                String[] paramNameArray = getMethodParamNames(itemMethod);
                 if (ToolsKit.isNotEmpty(paramNameArray)) {
                     parameterNamePool.put(parameterKey, paramNameArray);
                 }
@@ -72,33 +68,35 @@ public class MethodParameterNameDiscoverer {
             requestParamValueObj = new Object[actionParams.length];
             for(int i=0; i<actionParams.length; i++) {
                 Class<?> parameterType = actionParams[i].getType();
+                String paramValue = request.getParameter(paramNameArray[i]);
+                if(DataType.isString(parameterType)) {
+                    requestParamValueObj[i] = paramValue;
+                } else if(DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
+                    requestParamValueObj[i] = Integer.parseInt(paramValue);
+                } else if(DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
+                    requestParamValueObj[i] = Long.parseLong(paramValue);
+                } else if(DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
+                    requestParamValueObj[i] = Double.parseDouble(paramValue);
+                } else if(DataType.isDate(parameterType)) {
+                    requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+                } else if(DataType.isTimestamp(parameterType)) {
+                    requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
+                    // 如果是Entity注解，则认为是要转换为Bean对象
+                }
+//                else if(Entity.class.equals(annotation.annotationType())){
+//                    System.out.println("没实现");
+//                }
+
                 Annotation[]   annotations = actionParams[i].getAnnotations();
                 if(ToolsKit.isNotEmpty(annotations)) {
                     for(Annotation annotation : annotations) {
                         System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i]);
-                        String paramValue = request.getParameter(paramNameArray[i]);
-                        if(DataType.isString(parameterType)) {
-                            requestParamValueObj[i] = paramValue;
-                        } else if(DataType.isInteger(parameterType) && DataType.isIntegerObject(parameterType)) {
-                            requestParamValueObj[i] = Integer.parseInt(paramValue);
-                        } else if(DataType.isLong(parameterType) && DataType.isLongObject(parameterType)) {
-                            requestParamValueObj[i] = Long.parseLong(paramValue);
-                        } else if(DataType.isDouble(parameterType) && DataType.isDoubleObject(parameterType)) {
-                            requestParamValueObj[i] = Double.parseDouble(paramValue);
-                        } else if(DataType.isDate(parameterType)) {
-                            requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-                        } else if(DataType.isTimestamp(parameterType)) {
-                            requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-                            // 如果是Entity注解，则认为是要转换为Bean对象
-                        } else if(Entity.class.equals(annotation.annotationType())){
-
-                        }
                     }
                 }
             }
         }
         //返回前，根据验证注解，进行参数数据验证
-
+//        VtorKit.validate(requestParamValueObj);
         return requestParamValueObj;
     }
 
@@ -114,70 +112,88 @@ public class MethodParameterNameDiscoverer {
         return clazz.getName() +"."+ method.getName(); //+"#"+method.getReturnType().getName();
     }
 
+
+
     /**
-     *
-     * @param clazz
-     * @param method
+     * 比较参数类型是否一致
+     * @param types
+     *            asm的类型({@link Type})
+     * @param clazzes
+     *            java 类型({@link Class})
      * @return
      */
-    private static String[] getParameterNamesByAsm(Class<?> clazz, final Method method) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        if (ToolsKit.isEmpty(parameterTypes)) {
-            return null;
+    private static boolean sameType(Type[] types, Class<?>[] clazzes) {
+        // 个数不同
+        if (types.length != clazzes.length) {
+            return false;
         }
-        final Type[] types = new Type[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            types[i] = Type.getType(parameterTypes[i]);
-        }
-        final String[] parameterNames = new String[parameterTypes.length];
 
-        String className = clazz.getName();
-        int lastDotIndex = className.lastIndexOf(".");
-        className = className.substring(lastDotIndex + 1) + ".class";
-        InputStream is = clazz.getResourceAsStream(className);
-        try {
-            ClassReader classReader = new ClassReader(is);
-            classReader.accept(new ClassVisitor(Opcodes.ASM4) {
-                @Override
-                public MethodVisitor visitMethod(int access, String name,
-                                                 String desc, String signature, String[] exceptions) {
-                    // 只处理指定的方法
-                    Type[] argumentTypes = Type.getArgumentTypes(desc);
-                    if (!method.getName().equals(name) || !Arrays.equals(argumentTypes, types)) {
-                        return super.visitMethod(access, name, desc, signature,
-                                exceptions);
-                    }
-                    return new MethodVisitor(Opcodes.ASM4) {
-                        @Override
-                        public void visitLocalVariable(String name, String desc,
-                                                       String signature, org.objectweb.asm.Label start,
-                                                       org.objectweb.asm.Label end, int index) {
-                            // 非静态成员方法的第一个参数是this
-                            if (Modifier.isStatic(method.getModifiers())) {
-                                parameterNames[index] = name;
-                            } else if (index > 0) {
-                                if(parameterNames.length == 1) {
-                                    // 如果是只有一个参数时，该index为2， name为e，ams的bug???
-                                    parameterNames[0] = name;
-                                } else {
-                                    parameterNames[index - 1] = name;
-                                }
-                            }
-                        }
-                    };
-                }
-            }, 0);
-        } catch (IOException e) {
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (Exception e2) {
+        for (int i = 0; i < types.length; i++) {
+            if (!Type.getType(clazzes[i]).equals(types[i])) {
+                return false;
             }
         }
-        return parameterNames;
+        return true;
     }
 
+    /**
+     * 获取方法的参数名
+     只取所需的参数值, 因为所取得的index是无序的，到目前简单测试，得出的排序规则是如果出现了this(一般对应的index是0)后，
+     后面顺延的索引位对应的值就是参数的名称，但这个顺延的索引数据有可能并不是按正序排序的，所以先存在TreeMap里排好序
+     再将排序后的位置去掉第一位元素后，再方法参数的总长度，从第二位元素顺开始顺延取出参数名。
+     如：
+             Controller里的方法save(String id, String name, String address)
+             ASM后，取出的内容可能是
+             name          index
+             e                 8
+             value           7
+             this            0
+             id              1
+             name         2
+             address     3
+             null           5
+     TreeMap排序后就是0123578，将0去掉，往后再取3位(方法参数长度是3)元素的值就是方法体参数对应的参数名
+     * @param m
+     * @return
+     */
+    public static String[] getMethodParamNames(final Method m) {
+        final String[] paramNames = new String[m.getParameterTypes().length];
+        final String n = m.getDeclaringClass().getName();
+        ClassReader cr = null;
+        try {
+            cr = new ClassReader(n);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        TreeMap<Integer, String> itemVisitorNameMap = new TreeMap<>();
+        cr.accept(new ClassVisitor(Opcodes.ASM4) {
+            @Override
+            public MethodVisitor visitMethod(final int access,
+                                             final String name, final String desc,
+                                             final String signature, final String[] exceptions) {
+                final Type[] args = Type.getArgumentTypes(desc);
+                // 方法名相同并且参数个数相同
+                if (!name.equals(m.getName())
+                        || !sameType(args, m.getParameterTypes())) {
+                    return super.visitMethod(access, name, desc, signature, exceptions);
+                }
 
+                MethodVisitor v = super.visitMethod(access, name, desc, signature, exceptions);
+                return new MethodVisitor(Opcodes.ASM4, v) {
+                    @Override
+                    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+                        itemVisitorNameMap.put(index, name);
+                        super.visitLocalVariable(name, desc, signature, start, end, index);
+                    }
+                };
+            }
+        }, 0);
+        Collection<String> nameList = itemVisitorNameMap.values();
+        String[] filertParamNames = nameList.toArray(new String[]{});
+        // i+1 : 如果是非静态方法，第一位的值就是this, 要将第一位元素过滤掉
+        for(int i=0; i<paramNames.length; i++){
+            paramNames[i] =  filertParamNames[i+1];
+        }
+        return paramNames;
+    }
 }

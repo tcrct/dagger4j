@@ -1,5 +1,6 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.route.Route;
 
@@ -59,6 +60,9 @@ public class ActionInvocation {
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {
                 String[] parameterNames = MethodParameterNameDiscoverer.getParameterNames(controller.getClass(), method);
+                if(ToolsKit.isEmpty(parameterNames)) {
+                	throw new MvcException("parameter name array is null");
+				}
 				Object[] argsObj =MethodParameterNameDiscoverer.getParameterValues(controller.getRequest(), method, parameterNames);
 				method.invoke(controller, argsObj);
 			} else {
