@@ -101,6 +101,24 @@ public class ApiDocument {
                             List<ParameterModle> parameterModleList = new ArrayList<>();
                             if(ToolsKit.isNotEmpty(parameters)) {
                                 for(Parameter parameter : parameters) {
+                                    /* 参数注解部份
+                                    for(AnnotationDesc annotationDesc : parameter.annotations()) {
+                                        AnnotationTypeDoc typeDoc = annotationDesc.annotationType();
+                                        if(ToolsKit.isEmpty(typeDoc)) {
+                                            continue;
+                                        }
+                                        System.out.println("################################: " + typeDoc.toString());
+                                        for(AnnotationTypeElementDoc elementDocs : typeDoc.elements()){
+                                            System.out.println("parameterName:  " +parameter.name());
+                                            System.out.println("elementName: " + elementDocs.name());
+                                            try {
+                                            // 要将Unicode转为中文
+                                                System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
+//                                            System.out.println("defaultValue:  " +new String(elementDocs.defaultValue().toString().getBytes(), "gb2312"));
+                                            } catch (Exception e) {}
+                                        }
+                                    }
+                                    */
                                     ParameterModle parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "");
                                     parameterModleList.add(parameterModle);
                                 }

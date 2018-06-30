@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Date {
     String format() default "yyyy-MM-dd HH:mm:ss";
-    String message() default "日期格式不正确！";
+    String message() default "日期格式不正确[yyyy-MM-dd HH:mm:ss]";
 }

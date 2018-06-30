@@ -11,6 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NotEmpty {
-    boolean value() default  true;
     String message() default "不能为空！";
 }

@@ -11,6 +11,6 @@ public final class ValidatorVo extends Validators{
 
 	@Override
 	public void validator() throws Exception {
-		VtorFactory.validator(getValue());
+		VtorFactory.validator2(getValue());
 	}
 }

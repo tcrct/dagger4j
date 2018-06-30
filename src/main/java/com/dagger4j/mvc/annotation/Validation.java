@@ -34,25 +34,25 @@ public @interface Validation {
 
 
 /**
-validator.assertFalse=assertion failed
+ValidatorHandler.assertFalse=assertion failed
 
-validator.assertTrue=assertion failed
+ValidatorHandler.assertTrue=assertion failed
 
-validator.future=must be a future date
+ValidatorHandler.future=must be a future date
 
-validator.length=length must be between {min} and {max}
+ValidatorHandler.length=length must be between {min} and {max}
 
-validator.max=must be less than or equal to {value}
+ValidatorHandler.max=must be less than or equal to {value}
 
-validator.min=must be greater than or equal to {value}
+ValidatorHandler.min=must be greater than or equal to {value}
 
-validator.notNull=may not be null
+ValidatorHandler.notNull=may not be null
 
-validator.past=must be a past date
+ValidatorHandler.past=must be a past date
 
-validator.pattern=must match "{regex}"
+ValidatorHandler.pattern=must match "{regex}"
 
-validator.range=must be between {min} and {max}
+ValidatorHandler.range=must be between {min} and {max}
 
-validator.size=size must be between {min} and {max}
+ValidatorHandler.size=size must be between {min} and {max}
 */

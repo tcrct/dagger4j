@@ -127,8 +127,8 @@
             <!--<version>${javassist.version}</version>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>org.hibernate.validator</groupId>-->
-            <!--<artifactId>hibernate-validator</artifactId>-->
+            <!--<groupId>org.hibernate.ValidatorHandler</groupId>-->
+            <!--<artifactId>hibernate-ValidatorHandler</artifactId>-->
             <!--<version>6.0.10.Final</version>-->
         <!--</dependency>-->
         <!--&lt;!&ndash; el &ndash;&gt;-->

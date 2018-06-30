@@ -32,6 +32,8 @@ public final class ToolsKit {
 
     private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+    public final static Map<String, String> HTML_CHAR = new HashMap<>();
+
     public static SerializerFeature[] serializerFeatureArray = {
             SerializerFeature.QuoteFieldNames,
             SerializerFeature.WriteNonStringKeyAsString,
@@ -51,6 +53,11 @@ public final class ToolsKit {
     };
 
     static {
+        HTML_CHAR.put("&", "&#38;");
+        HTML_CHAR.put("\"", "&#34;");
+        HTML_CHAR.put("<", "&#60;");
+        HTML_CHAR.put(">", "&#62;");
+        HTML_CHAR.put("'", "&#39;");
         jsonConfig.put(Date.class, new SimpleDateFormatSerializer("yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
@@ -287,6 +294,37 @@ public final class ToolsKit {
                 }
             }
         };
+    }
+
+
+    /**
+     * HTML字符转换表
+     */
+    public static final StringBuilder toHTMLChar(String str) {
+        if (str == null) {
+            return new StringBuilder();
+        }
+        StringBuilder sb = new StringBuilder(str);
+        char tempChar;
+        String tempStr;
+        for (int i = 0; i < sb.length(); i++) {
+            tempChar = sb.charAt(i);
+            if (HTML_CHAR.containsKey(Character.toString(tempChar))) {
+                tempStr = HTML_CHAR.get(Character.toString(tempChar));
+                sb.replace(i, i + 1, tempStr);
+                i += tempStr.length() - 1;
+            }
+        }
+        return sb;
+    }
+
+    public static final String htmlChar2String(String htmlChar) {
+        if (isEmpty(htmlChar)) return "";
+        for (Iterator<Map.Entry<String, String>> it = HTML_CHAR.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, String> entry = it.next();
+            htmlChar = htmlChar.replace(entry.getValue(), entry.getKey());
+        }
+        return htmlChar;
     }
 
 

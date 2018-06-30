@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Pattern {
-    String regexp();
-    String message() default "该Email地址不正确！";
+    String regexp() default "*";
+    String message() default "验证不通过";
 }

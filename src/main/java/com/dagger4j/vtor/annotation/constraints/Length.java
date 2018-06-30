@@ -11,9 +11,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Length {
-    int min() default 0;
 
-    int max() default 2147483647;
+    int value() default 200;
 
-    String message() default "{org.hibernate.validator.constraints.Length.message}";
+    String message() default "超出指定的长度[${value}]限制！";
 }

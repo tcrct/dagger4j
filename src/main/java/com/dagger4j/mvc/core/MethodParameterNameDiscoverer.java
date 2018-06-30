@@ -1,5 +1,6 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.db.annotation.IdEntity;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ObjectKit;
@@ -85,12 +86,20 @@ public class MethodParameterNameDiscoverer {
                     requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
                 } else if(DataType.isTimestamp(parameterType)) {
                     requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-                    // 如果是Entity注解，则认为是要转换为Bean对象
+
                 }
-//                else if(Entity.class.equals(annotation.annotationType())){
-//                    System.out.println("没实现");
-//
-//          }
+                // 如果是Entity，则认为是要转换为Bean对象
+                else if(DataType.isIdEntityType(parameterType)){
+                    String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
+                    IdEntity entity = (IdEntity)ToolsKit.jsonParseObject(json, parameterType);
+                    requestParamValueObj[i] = entity;
+                    // 如果Bean的话，无需在参数添加注解，遍历bean里的field进行判断是否需要验证
+                    try {
+                        VtorFactory.validator(entity);
+                    } catch (Exception e) {
+                        throw new ValidatorException(e.getMessage(), e);
+                    }
+                }
                 //返回前，根据验证注解，进行参数数据验证
                 Annotation[]   annotations = actionParams[i].getAnnotations();
                 if(ToolsKit.isNotEmpty(annotations)) {

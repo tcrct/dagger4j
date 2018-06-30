@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Max {
-    long value() default Long.MAX_VALUE;
-    String message() default "不能大于["+Long.MAX_VALUE+"]！";
+    double value() default Double.MAX_VALUE;
+    String message() default "不能大于[${value}]！";
 }

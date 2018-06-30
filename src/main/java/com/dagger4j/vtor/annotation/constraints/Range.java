@@ -12,8 +12,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface Range {
 
-    long min() default Long.MIN_VALUE;
-    long max() default Long.MAX_VALUE;
-    String message() default "不能小于["+Long.MIN_VALUE+"]且大于["+Long.MAX_VALUE+"]";
+    double min() default Double.MIN_VALUE;
+    double max() default Double.MAX_VALUE;
+    String message() default "不能小于[${min}]或大于[${max}]";
 
 }

@@ -11,12 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface URL {
+    String regexp() default "*";
+    String message() default "不是一个正确的URL地址 ";
 
-    String message() default "url地址不正确";
-
-    String protocol() default "";
-
-    String host() default "";
-
-    int port() default -1;
 }

@@ -38,7 +38,7 @@ public final class ValidatorVoColl extends Validators{
 		for(Iterator it = coll.iterator(); it.hasNext();){
 			Object obj = it.next();
 			if(null != obj){
-				VtorFactory.validator(obj);		
+				VtorFactory.validator2(obj);
 			}
 		}
 	}
@@ -50,7 +50,7 @@ public final class ValidatorVoColl extends Validators{
 			Entry<String, Object> entry = it.next();
 			Object obj = entry.getValue();
 			if(null != obj){
-				VtorFactory.validator(obj);
+				VtorFactory.validator2(obj);
 			}
 		}
 	}
