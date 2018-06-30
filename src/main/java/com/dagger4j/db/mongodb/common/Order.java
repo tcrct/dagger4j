@@ -20,7 +20,7 @@ public class Order {
 
 	private LinkedHashMap<String, String> orderLinkedMap = null;
 	public final static String ASC = "asc";
-	public final static String DESC = "desc";
+	public final static String DESC = "message";
 	
 	
 	public Order() {

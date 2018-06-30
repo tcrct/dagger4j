@@ -7,7 +7,7 @@ package com.dagger4j.db.mongodb.enums;
  */
 public enum OrderByEnum {
 	ASC(1,"asc"),
-	DESC(-1, "desc");
+	DESC(-1, "message");
 
 	private final int value;
 	private final String key;

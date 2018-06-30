@@ -1,19 +1,23 @@
 package com.dagger4j.mvc.core;
 
 import com.dagger4j.exception.MvcException;
+import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
-import com.dagger4j.vtor.VtorKit;
+import com.dagger4j.vtor.core.VtorFactory;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -85,18 +89,25 @@ public class MethodParameterNameDiscoverer {
                 }
 //                else if(Entity.class.equals(annotation.annotationType())){
 //                    System.out.println("没实现");
-//                }
-
+//
+//          }
+                //返回前，根据验证注解，进行参数数据验证
                 Annotation[]   annotations = actionParams[i].getAnnotations();
                 if(ToolsKit.isNotEmpty(annotations)) {
-                    for(Annotation annotation : annotations) {
-                        System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i]);
+                    try {
+                        for (Annotation annotation : annotations) {
+                            System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i] + "              " + paramValue);
+                            VtorFactory.validator(annotation, parameterType, paramNameArray[i], paramValue);
+                        }
+                    } catch (Exception e) {
+                        throw new ValidatorException(e.getMessage(), e);
                     }
                 }
             }
         }
-        //返回前，根据验证注解，进行参数数据验证
-//        VtorKit.validate(requestParamValueObj);
+//        System.out.println(requestParamValueObj);
+
+//        VtorKit.validate(requestaramValueObj);
         return requestParamValueObj;
     }
 

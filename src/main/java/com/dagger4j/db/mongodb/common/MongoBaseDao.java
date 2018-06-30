@@ -393,7 +393,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
      * @return
      */
     public List<Map>  group(String key, MongoQuery query){
-        return group(key, query, "desc");
+        return group(key, query, "message");
     }
     /**
      * 分组查询
@@ -440,7 +440,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
             public int compare(Object dbo1, Object dbo2) {
                 double count1 = (Double)((Map)dbo1).get("count");
                 double count2 = (Double)((Map)dbo2).get("count");
-                if("desc".equals(sort)) {
+                if("message".equals(sort)) {
                     return (count1 > count2) ? 0 : 1;
                 } else {
                     return (count1 > count2) ? 1 : 0;

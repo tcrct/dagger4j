@@ -23,7 +23,7 @@
         <mongodb.version>3.6.0</mongodb.version>
         <druid.version>1.0.29</druid.version>
         <mysql.version>5.1.44</mysql.version>
-        <javassist.version>3.12.1.GA</javassist.version>
+        <!--<javassist.version>3.12.1.GA</javassist.version>-->
         <asm.version>6.2</asm.version>
     </properties>
     <repositories>
@@ -112,23 +112,31 @@
             <artifactId>druid</artifactId>
             <version>${druid.version}</version>
         </dependency>
-        <!-- javassist -->
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${javassist.version}</version>
-        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>${asm.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>6.0.10.Final</version>
-        </dependency>
+
+        <!-- javassist -->
+        <!--<dependency>-->
+            <!--<groupId>javassist</groupId>-->
+            <!--<artifactId>javassist</artifactId>-->
+            <!--<version>${javassist.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.hibernate.validator</groupId>-->
+            <!--<artifactId>hibernate-validator</artifactId>-->
+            <!--<version>6.0.10.Final</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; el &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>javax.el</groupId>-->
+            <!--<artifactId>javax.el-api</artifactId>-->
+            <!--<version>3.0.0</version>-->
+        <!--</dependency>-->
         <!--<dependency>-->
             <!--<groupId>cn.hutool</groupId>-->
             <!--<artifactId>hutool-all</artifactId>-->

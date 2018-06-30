@@ -1,6 +1,6 @@
 package com.dagger4j.server.netty.handler;
 
-import com.dagger4j.exception.VerificationException;
+import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ThreadPoolKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.core.helper.RouteHelper;
@@ -54,7 +54,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
             response = buildExceptionResponse("request time out");
             // 中止线程，参数为true时，会中止正在运行的线程，为false时，如果线程未开始，则停止运行
             futureTask.cancel(true);
-        } catch (VerificationException ve) {
+        } catch (ValidatorException ve) {
             logger.warn(ve.getMessage());
             response = buildExceptionResponse(ve.getMessage());
         } catch (Exception e) {
@@ -74,20 +74,20 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
 
         // 保证解析结果正确,否则直接退出
         if (!request.decoderResult().isSuccess()) {
-            throw new VerificationException("request decoderParams is not success, so exit...");
+            throw new ValidatorException("request decoderParams is not success, so exit...");
         }
 
         // 支持的的请求方式
         String method = request.method().toString();
         HttpMethod httpMethod = HttpMethod.valueOf(method);
         if(ToolsKit.isEmpty(httpMethod)) {
-            throw new VerificationException("request method["+ httpMethod.toString() +"] is not support, so exit...");
+            throw new ValidatorException("request method["+ httpMethod.toString() +"] is not support, so exit...");
         }
 
         // uri是有长度的
         String uri = request.uri();
         if (uri == null || uri.trim().length() == 0) {
-            throw new VerificationException("request uri length is 0 , so exit...");
+            throw new ValidatorException("request uri length is 0 , so exit...");
         } else {
             // 判断是否有参数，有参数则先截掉参数
             if(uri.contains("?")) {
@@ -95,7 +95,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
             }
             // 如果包含有.则视为静态文件访问
             if(uri.contains(".")) {
-                throw new VerificationException("not support static file access, so exit...");
+                throw new ValidatorException("not support static file access, so exit...");
             }
         }
     }
