@@ -23,14 +23,6 @@ public class ActionInvocation {
 	private static final Object[] NULL_ARGS = new Object[0];		// 默认参数
 	private String target;				// URI
 
-
-	/**
-	 * 构造函数
-	 */
-	protected ActionInvocation() {
-
-	}
-
 	/**
 	 * 构造函数
 	 * @param route			Route对象
@@ -59,11 +51,13 @@ public class ActionInvocation {
 			//如果方法体里有参数设置
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {
+				// 先通过asm取出方法体里的参数名
                 String[] parameterNames = MethodParameterNameDiscoverer.getParameterNames(controller.getClass(), method);
                 if(ToolsKit.isEmpty(parameterNames)) {
                 	throw new MvcException("parameter name array is null");
 				}
-				Object[] argsObj =MethodParameterNameDiscoverer.getParameterValues(controller.getRequest(), method, parameterNames);
+				// 再根据参数名取出request里的value，然后再根据验证注解验证，通过后再注入到方法体内
+				Object[] argsObj =ParameterInvokeMethod.getParameterValues(controller, method, parameterNames);
 				method.invoke(controller, argsObj);
 			} else {
 				method.invoke(controller, NULL_ARGS);
@@ -73,5 +67,21 @@ public class ActionInvocation {
 
 	public BaseController getController() {
 		return controller;
+	}
+
+	public Route getRoute() {
+		return route;
+	}
+
+	public Interceptor[] getInterceptors() {
+		return inters;
+	}
+
+	public Method getMethod() {
+		return method;
+	}
+
+	public String getTarget() {
+		return target;
 	}
 }

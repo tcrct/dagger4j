@@ -21,7 +21,7 @@ public class NotEmptyValidator extends AbstractValidatorTemplate<NotEmpty> {
     @Override
     public void handle(NotEmpty annonation, Class<?> parameterType, String paramName, Object paramValue) throws ValidatorException {
         if(ToolsKit.isEmpty(paramValue)) {
-            throw new ValidatorException(paramName + annonation.message());
+            throw new ValidatorException(paramName+"["+paramValue+"]"+ annonation.message());
         }
     }
 }

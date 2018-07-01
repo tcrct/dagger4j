@@ -25,14 +25,22 @@ public class RangeValidator extends AbstractValidatorTemplate<Range> {
             throw new ValidatorException(paramName + "不能为空");
         }
         Double value =Double.parseDouble(paramValue.toString());
-        if( value > annonation.max() || value< annonation.min() ) {
-            String maxString = annonation.max()+"";
-            String minString = annonation.min()+"";
+
+        double max = annonation.max();
+        double min = annonation.min();
+        double[] annonValues = annonation.value();
+        if(annonValues[0] !=-1d && annonValues[1] != -1d) {
+            min = annonValues[0];
+            max = annonValues[1];
+        }
+        if( value > max || value< min ) {
+            String maxString = max+"";
+            String minString = min+"";
             if(DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
-                maxString = Double.valueOf(annonation.max()).intValue()+"";
-                minString = Double.valueOf(annonation.min()).intValue()+"";
+                maxString = Double.valueOf(max).intValue()+"";
+                minString = Double.valueOf(min).intValue()+"";
             }
-            String message = paramName+annonation.message().replace("${min}", minString).replace("${max}", maxString);
+            String message = paramName+"["+paramValue+"]"+annonation.message().replace("${min}", minString).replace("${max}", maxString);
             throw new ValidatorException(message);
         }
     }

@@ -89,7 +89,6 @@ public class Route {
             routeKey = controllerKey + methodKey;
         }
         routeKey = PathKit.fixPath(routeKey);
-        System.out.println(controllerClass.getName() +"               "+routeKey);
         this.requestMapping = new RequestMapping(routeKey,
                 methodMapping.desc(),
                 methodMapping.order(),

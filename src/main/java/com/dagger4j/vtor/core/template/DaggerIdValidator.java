@@ -25,7 +25,7 @@ public class DaggerIdValidator extends AbstractValidatorTemplate<DaggerId> {
             throw new ValidatorException(paramName + "不能为空");
         }
         if(!ToolsKit.isValidDaggerId(paramValue.toString())) {
-            throw new ValidatorException(paramName+annonation.message());
+            throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message());
         }
     }
 }

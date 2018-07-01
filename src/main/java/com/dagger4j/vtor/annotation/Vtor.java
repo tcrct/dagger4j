@@ -1,5 +1,7 @@
 package com.dagger4j.vtor.annotation;
 
+import com.dagger4j.vtor.annotation.constraints.*;
+
 import java.lang.annotation.*;
 
 //@Target({ElementType.FIELD,ElementType.METHOD})
@@ -8,19 +10,19 @@ import java.lang.annotation.*;
 @Documented
 public @interface Vtor {
 	
-	 boolean isEmpty() default true;		// 是否允许值为null或空字串符 默认为允许
+	NotEmpty notEmpty();		// 是否允许值为null或空字串符 默认为允许
 	 
-	 int length() default 0;	 			// 长度，限制字符串长度
+	Length length();	 			// 长度，限制字符串长度
 	 
-	 double[] range() default 0;			// 取值范围，如[0,100] 则限制该值在0-100之间
+	Range range();			// 取值范围，如[0,100] 则限制该值在0-100之间
+
+	Max max();				// 最大值
+
+	Min min();				// 最小值
 	 
-	 String message() default "";				// 设置字段名, 用于发生异常抛出时，中文说明该变量名称
+	Ymd date();		// 格式化日期(24小时制)
 	 
-	 String value() default "";				// 默认值
-	 
-	 String formatDate() default "yyyy-MM-dd HH:mm:ss";		// 格式化日期(24小时制)
-	 
-	 boolean oid() default false;					// 是否是mongodb objectId，主要用于验证id
+	DaggerId daggerId();					// 是否是mongodb objectId，主要用于验证id
 
 }
 

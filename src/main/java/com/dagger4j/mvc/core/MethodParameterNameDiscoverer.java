@@ -1,32 +1,31 @@
 package com.dagger4j.mvc.core;
 
-import com.dagger4j.db.annotation.IdEntity;
 import com.dagger4j.exception.MvcException;
-import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.http.IRequest;
-import com.dagger4j.mvc.http.enums.ConstEnums;
-import com.dagger4j.utils.DataType;
-import com.dagger4j.vtor.core.VtorFactory;
+
+import jdk.internal.org.objectweb.asm.tree.ClassNode;
+import jdk.internal.org.objectweb.asm.tree.LocalVariableNode;
+import jdk.internal.org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.objectweb.asm.Opcodes.ASM4;
+
 /**
+ * 方法参数名称发现类
+ * 通过ASM字节码技术，取得该类下的所有公共方法里包含了参数，则返回参数名数组，如果没有包含参数，则返回null
+ *
  * @author Created by laotang
  * @date createed in 2018/6/28.
  */
 public class MethodParameterNameDiscoverer {
-
     /**
      * 要过滤的方法(Object自带方法及BaseController里的方法)
      */
@@ -34,12 +33,16 @@ public class MethodParameterNameDiscoverer {
     private static final Map<String, String[]> parameterNamePool = new ConcurrentHashMap<>();
 
     public static String[]  getParameterNames(Class<?> clazz, Method method) throws Exception{
+        Parameter[] actionParams = method.getParameters();
+        if (ToolsKit.isEmpty(actionParams)) {
+            return  null;
+        }
         String key = buildParameterNamePoolKey(clazz, method);
         String[] parameters = parameterNamePool.get(key);
         if(ToolsKit.isEmpty(parameters)) {
             Method[] methodArray = clazz.getMethods();
             for (Method itemMethod : methodArray) {
-                if (!ObjectKit.isNormalMethod(itemMethod.getModifiers()) ||
+                if (!ObjectKit.isNormalApiMethod(itemMethod.getModifiers()) ||
                         excludedMethodName.contains(itemMethod.getName())) {
                     continue;
                 }
@@ -57,82 +60,16 @@ public class MethodParameterNameDiscoverer {
     }
 
     /**
-     * 将请求参数转换为Object[], 注入到Method里
-     * @param request       请求对象
-     * @param method       执行的方法
-     * @param paramNameArray        执行方法里的参数变量名
-     * @return
-     */
-    public static Object[] getParameterValues(IRequest request, Method method, String[] paramNameArray)  {
-        Parameter[] actionParams = method.getParameters();
-        Object[] requestParamValueObj = null;
-        if (ToolsKit.isNotEmpty(actionParams)) {
-            if(actionParams.length != paramNameArray.length) {
-                throw new MvcException("参数长度不一致!");
-            }
-            requestParamValueObj = new Object[actionParams.length];
-            for(int i=0; i<actionParams.length; i++) {
-                Class<?> parameterType = actionParams[i].getType();
-                String paramValue = request.getParameter(paramNameArray[i]);
-                if(DataType.isString(parameterType)) {
-                    requestParamValueObj[i] = paramValue;
-                } else if(DataType.isInteger(parameterType) || DataType.isIntegerObject(parameterType)) {
-                    requestParamValueObj[i] = Integer.parseInt(paramValue);
-                } else if(DataType.isLong(parameterType) || DataType.isLongObject(parameterType)) {
-                    requestParamValueObj[i] = Long.parseLong(paramValue);
-                } else if(DataType.isDouble(parameterType) || DataType.isDoubleObject(parameterType)) {
-                    requestParamValueObj[i] = Double.parseDouble(paramValue);
-                } else if(DataType.isDate(parameterType)) {
-                    requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-                } else if(DataType.isTimestamp(parameterType)) {
-                    requestParamValueObj[i] = ToolsKit.parseDate(paramValue, ConstEnums.DEFAULT_DATE_FORMAT_VALUE.getValue());
-
-                }
-                // 如果是Entity，则认为是要转换为Bean对象
-                else if(DataType.isIdEntityType(parameterType)){
-                    String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
-                    IdEntity entity = (IdEntity)ToolsKit.jsonParseObject(json, parameterType);
-                    requestParamValueObj[i] = entity;
-                    // 如果Bean的话，无需在参数添加注解，遍历bean里的field进行判断是否需要验证
-                    try {
-                        VtorFactory.validator(entity);
-                    } catch (Exception e) {
-                        throw new ValidatorException(e.getMessage(), e);
-                    }
-                }
-                //返回前，根据验证注解，进行参数数据验证
-                Annotation[]   annotations = actionParams[i].getAnnotations();
-                if(ToolsKit.isNotEmpty(annotations)) {
-                    try {
-                        for (Annotation annotation : annotations) {
-                            System.out.println(annotation.annotationType() + "                      " + parameterType.getName() + "                  " + paramNameArray[i] + "              " + paramValue);
-                            VtorFactory.validator(annotation, parameterType, paramNameArray[i], paramValue);
-                        }
-                    } catch (Exception e) {
-                        throw new ValidatorException(e.getMessage(), e);
-                    }
-                }
-            }
-        }
-//        System.out.println(requestParamValueObj);
-
-//        VtorKit.validate(requestaramValueObj);
-        return requestParamValueObj;
-    }
-
-    /**
      * 创建缓存KEY， 类全路径+方法名，来标识唯一
-     * 因为请求API是唯一的，所以在Controller里不会出一致的方法名，所以就没做进一步的唯一性确定处理
+     * 因为请求API是唯一的，所以在Controller里应不要出一致的方法名，所以就没做进一步的唯一性确定处理
      * 如果需要加强唯一性，可以将方法体里的参数类型取出，再拼接字符串后MD5
      * @param clazz
      * @param method
      * @return
      */
     private static String buildParameterNamePoolKey(Class<?> clazz, Method method) {
-        return clazz.getName() +"."+ method.getName(); //+"#"+method.getReturnType().getName();
+        return clazz.getName() + "." + method.getName();
     }
-
-
 
     /**
      * 比较参数类型是否一致
@@ -186,7 +123,8 @@ public class MethodParameterNameDiscoverer {
             throw new RuntimeException(e);
         }
         TreeMap<Integer, String> itemVisitorNameMap = new TreeMap<>();
-        cr.accept(new ClassVisitor(Opcodes.ASM4) {
+
+        cr.accept(new ClassVisitor(ASM4) {
             @Override
             public MethodVisitor visitMethod(final int access,
                                              final String name, final String desc,
@@ -199,7 +137,7 @@ public class MethodParameterNameDiscoverer {
                 }
 
                 MethodVisitor v = super.visitMethod(access, name, desc, signature, exceptions);
-                return new MethodVisitor(Opcodes.ASM4, v) {
+                return new MethodVisitor(ASM4, v) {
                     @Override
                     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
                         itemVisitorNameMap.put(index, name);
@@ -210,10 +148,11 @@ public class MethodParameterNameDiscoverer {
         }, 0);
         Collection<String> nameList = itemVisitorNameMap.values();
         String[] filertParamNames = nameList.toArray(new String[]{});
-        // i+1 : 如果是非静态方法，第一位的值就是this, 要将第一位元素过滤掉
+        // i+1 : 如果是非静态方法，第一位的值就是this, 要将第一位元素过滤掉，由于在上层已经控制只遍历public的非静态，非private的方法才会取出参数名称
         for(int i=0; i<paramNames.length; i++){
             paramNames[i] =  filertParamNames[i+1];
         }
         return paramNames;
     }
+
 }

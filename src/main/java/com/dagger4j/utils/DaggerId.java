@@ -314,9 +314,9 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
 
     /**
-     * Gets the timestamp as a {@code Date} instance.
+     * Gets the timestamp as a {@code Ymd} instance.
      *
-     * @return the Date
+     * @return the Ymd
      */
     public Date getDate() {
         return new Date(timestamp * 1000L);

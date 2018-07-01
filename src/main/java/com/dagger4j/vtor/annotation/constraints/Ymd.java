@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Date {
+public @interface Ymd {
     String format() default "yyyy-MM-dd HH:mm:ss";
     String message() default "日期格式不正确[yyyy-MM-dd HH:mm:ss]";
 }

@@ -2,7 +2,7 @@ package com.dagger4j.db.mongodb.utils;
 
 import com.alibaba.fastjson.serializer.BeanContext;
 import com.alibaba.fastjson.serializer.ContextValueFilter;
-import com.dagger4j.db.annotation.IdEntity;
+import com.dagger4j.db.IdEntity;
 import com.dagger4j.utils.DataType;
 import org.bson.types.ObjectId;
 

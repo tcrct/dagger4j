@@ -14,7 +14,7 @@ public enum MongodbDataTypeEnum {
 	UNDEFINED(6, "Undefined"),
 	OBJECTID(7, "ObjectId"),	 
 	BOOLEAN(8, "Boolean"),
-	DATE(9, "Date"),	 
+	DATE(9, "Ymd"),
 	NULL(10, "Null"),	 
 	REGULAR_EXPRESSION(11, "Regex"),	 
 	DBPOINTER(12, "dbPointer"),

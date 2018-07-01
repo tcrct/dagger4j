@@ -31,7 +31,7 @@ public class UrlValidator extends AbstractValidatorTemplate<URL> {
             isUrl = PatternKit.isMatch(annonation.regexp(), paramValue+"");
         }
         if(!isUrl) {
-            throw new ValidatorException(paramName+annonation.message());
+            throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message());
         }
     }
 }

@@ -1,7 +1,8 @@
-package com.dagger4j.db.annotation;
+package com.dagger4j.db;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.dagger4j.db.annotation.Id;
 import com.dagger4j.kit.ToolsKit;
 
 import java.util.Date;

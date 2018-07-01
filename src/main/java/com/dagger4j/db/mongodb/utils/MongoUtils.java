@@ -2,7 +2,7 @@ package com.dagger4j.db.mongodb.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dagger4j.db.DbClientFactory;
-import com.dagger4j.db.annotation.IdEntity;
+import com.dagger4j.db.IdEntity;
 import com.dagger4j.db.mongodb.client.MongoClientAdapter;
 import com.dagger4j.db.mongodb.common.MongoDao;
 import com.dagger4j.exception.MongodbException;

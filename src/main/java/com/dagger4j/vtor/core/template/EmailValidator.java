@@ -33,7 +33,7 @@ public class EmailValidator extends AbstractValidatorTemplate<Email> {
             isEmail = PatternKit.isEmail(paramValue.toString());
         }
         if(!isEmail) {
-            throw new ValidatorException(paramName + annonation.message());
+            throw new ValidatorException(paramName +"["+paramValue+"]"+ annonation.message());
         }
     }
 }

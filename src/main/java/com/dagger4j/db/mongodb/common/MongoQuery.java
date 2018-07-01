@@ -1,6 +1,6 @@
 package com.dagger4j.db.mongodb.common;
 
-import com.dagger4j.db.annotation.IdEntity;
+import com.dagger4j.db.IdEntity;
 import com.dagger4j.db.mongodb.enums.OrderByEnum;
 import com.dagger4j.db.mongodb.utils.MongoUtils;
 import com.dagger4j.exception.MongodbException;

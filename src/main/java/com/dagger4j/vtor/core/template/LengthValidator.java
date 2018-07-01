@@ -24,7 +24,7 @@ public class LengthValidator extends AbstractValidatorTemplate<Length> {
             throw new ValidatorException(paramName + "不能为空");
         }
         if(paramValue.toString().length() > annonation.value()) {
-            throw new ValidatorException(paramName+annonation.message().replace("${value}", annonation.value()+""));
+            throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message().replace("${value}", annonation.value()+""));
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.dagger4j.db.mongodb.common;
 
-import com.dagger4j.db.annotation.IdEntity;
+import com.dagger4j.db.IdEntity;
 import com.dagger4j.db.mongodb.enums.MongodbDataTypeEnum;
 import com.dagger4j.db.mongodb.utils.MongoIndexUtils;
 import com.dagger4j.db.mongodb.utils.MongoUtils;

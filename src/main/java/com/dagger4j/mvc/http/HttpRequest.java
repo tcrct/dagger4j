@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by laotang on 2018/6/9.
@@ -64,8 +65,13 @@ public class HttpRequest implements IRequest{
     private void init() {
         try {
             // request header
-            headers = new HashMap<>();
-
+            headers = new HashMap<>(request.headers().size());
+            request.headers().iteratorAsString().forEachRemaining(new Consumer<Map.Entry<String, String>>() {
+                @Override
+                public void accept(Map.Entry<String, String> stringStringEntry) {
+                    headers.put(stringStringEntry.getKey().toLowerCase(), stringStringEntry.getValue());
+                }
+            });
             // reqeust body 根据请求方式，解码请求参数
             AbstractDecoder<Map<String, Object>> decoder = DecoderFactory.create(getMethod(), getContentType(), request);
             params = decoder.decoder();
@@ -135,7 +141,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getContentType() {
-        return headers.get(HttpHeaderNames.CONTENT_TYPE);
+        return headers.get(HttpHeaderNames.CONTENT_TYPE.toString());
     }
 
     @Override

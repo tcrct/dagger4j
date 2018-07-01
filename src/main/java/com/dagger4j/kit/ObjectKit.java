@@ -312,13 +312,13 @@ public class ObjectKit {
     }
 
     /**
-     * 是否正常的方法
-     * 正常方法是指， 不是抽像，静态，接口，Final的方法
+     * 是否正常公用的API方法
+     * 正常方法是指访问权限是public的且不是抽像，静态，接口，Final的方法
      * @param mod       Modifier的mod
      * @return
      */
-    public static boolean isNormalMethod(int mod) {
-        return !(Modifier.isAbstract(mod) || Modifier.isStatic(mod) || Modifier.isFinal(mod) || Modifier.isInterface(mod));
+    public static boolean isNormalApiMethod(int mod) {
+        return !(Modifier.isAbstract(mod) || Modifier.isStatic(mod) || Modifier.isFinal(mod) || Modifier.isInterface(mod) || Modifier.isPrivate(mod) || Modifier.isProtected(mod));
     }
 
 }

@@ -25,7 +25,7 @@ public class MinValidator extends AbstractValidatorTemplate<Min> {
         }
         try {
           if(Double.parseDouble(paramValue+"") < annonation.value()){
-              throw new ValidatorException(paramName+annonation.message().replace("${value}", annonation.value()+""));
+              throw new ValidatorException(paramName+"["+paramValue+"]"+annonation.message().replace("${value}", annonation.value()+""));
           }
         } catch (Exception e) {
             throw new ValidatorException(e.getMessage());
