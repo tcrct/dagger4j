@@ -85,6 +85,12 @@ public class ParameterInvokeMethod {
         return requestParamValueObj;
     }
 
+    /**
+     * List, Set, Queue类型验证
+     * @param request
+     * @param parameterType
+     * @return
+     */
     private static Object invokeCollention(IRequest request, Class<?> parameterType) {
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         List entityList = ToolsKit.jsonParseArray(json, parameterType);
@@ -96,6 +102,11 @@ public class ParameterInvokeMethod {
         return entityList;
     }
 
+    /**
+     * Map类型验证
+     * @param request
+     * @return
+     */
     private static Object invokeMap(IRequest request) {
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         Map entityMap = ToolsKit.jsonParseObject(json, Map.class);
@@ -107,6 +118,14 @@ public class ParameterInvokeMethod {
         return entityMap;
     }
 
+    /**
+     * Bean类型验证
+     * @param request   请求对象
+     * @param parameterType     参数类型
+     * @param annotation            注解对象
+     * @param index                     索引位置
+     * @return
+     */
     private static Object invokeBean(IRequest request, Class<?> parameterType, Annotation[] annotation, int index) {
         // 如果是继承了IdEntity或对象有设置VtorBean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
         boolean isBean = parameterType.isAnnotationPresent(Bean.class)
