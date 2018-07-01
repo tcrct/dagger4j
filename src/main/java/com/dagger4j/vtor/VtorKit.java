@@ -23,7 +23,7 @@ public class VtorKit {
      */
     public static <T> T validate(T obj) throws Exception{
 
-        if(obj instanceof IdEntity || obj.getClass().isAnnotationPresent(Bean.class)) {
+        if(obj instanceof IdEntity || obj instanceof java.io.Serializable || obj.getClass().isAnnotationPresent(Bean.class)) {
             VtorFactory.validator(obj);
         } else if(obj instanceof Map){
             VtorFactory.validator((Map)obj);

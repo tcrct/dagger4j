@@ -1,16 +1,19 @@
 package com.dagger4j.mvc.core;
 
 import com.dagger4j.annotation.Bean;
-import com.dagger4j.db.IdEntity;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Param;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
 import com.dagger4j.vtor.VtorKit;
 import com.dagger4j.vtor.core.VtorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -26,6 +29,8 @@ import java.util.Map;
  */
 public class ParameterInvokeMethod {
 
+    private static final Logger logger = LoggerFactory.getLogger(ParameterInvokeMethod.class);
+
     /**
      * 将请求参数转换为Object[], 注入到Method里
      *
@@ -35,19 +40,19 @@ public class ParameterInvokeMethod {
      * @return
      */
     public static Object[] getParameterValues(BaseController controller, Method method, String[] paramNameArray) {
-        Parameter[] actionParams = method.getParameters();
-        if (ToolsKit.isEmpty(actionParams)) {
+        Parameter[] methodParams = method.getParameters();
+        if (ToolsKit.isEmpty(methodParams)) {
             return  null;
         }
         Object[] requestParamValueObj = null;
-        if (actionParams.length != paramNameArray.length) {
+        if (methodParams.length != paramNameArray.length) {
             throw new MvcException("参数长度不一致!");
         }
         IRequest request = controller.getRequest();
-        requestParamValueObj = new Object[actionParams.length];
-        for (int i = 0; i < actionParams.length; i++) {
-            Class<?> parameterType = actionParams[i].getType();
-            Annotation[] annotations = actionParams[i].getAnnotations();
+        requestParamValueObj = new Object[methodParams.length];
+        for (int i = 0; i < methodParams.length; i++) {
+            Class<?> parameterType = methodParams[i].getType();
+            Annotation[] annotations = methodParams[i].getAnnotations();
             String paramValue = request.getParameter(paramNameArray[i]);
             if (DataType.isString(parameterType)) {
                 requestParamValueObj[i] = paramValue;
@@ -128,14 +133,22 @@ public class ParameterInvokeMethod {
      */
     private static Object invokeBean(IRequest request, Class<?> parameterType, Annotation[] annotation, int index) {
         // 如果是继承了IdEntity或对象有设置VtorBean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
-        boolean isBean = parameterType.isAnnotationPresent(Bean.class)
-                || DataType.isIdEntityType(parameterType)
-                || (ToolsKit.isNotEmpty(annotation) && Bean.class.equals(annotation[index].annotationType()));
-        if(!isBean) {
-            return null;
-        }
+
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         Object entity = ToolsKit.jsonParseObject(json, parameterType);
+        if(ToolsKit.isEmpty(entity)) {
+            logger.warn("json字符串转换为Object时出错，返回null退出...");
+            return null;
+        }
+        boolean isBean = DataType.isIdEntityType(parameterType)
+                || entity instanceof Serializable
+                ||  parameterType.isAnnotationPresent(Bean.class)
+                || (ToolsKit.isNotEmpty(annotation) && Bean.class.equals(annotation[index].annotationType()));
+        if(!isBean) {
+            logger.warn("请注意对象或集合元素是否实现[ java.io.Serializable ]接口及设置了[ @Bean ]注解");
+            return null;
+        }
+
         // 如果Bean的话，无需在参数添加注解，遍历bean里的field进行判断是否需要验证
         try {
             if(isBean&& ToolsKit.isNotEmpty(entity)) {VtorKit.validate(entity);}
