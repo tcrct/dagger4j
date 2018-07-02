@@ -1,5 +1,6 @@
 package com.dagger4j.db.mongodb.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dagger4j.db.DbClientFactory;
 import com.dagger4j.db.IdEntity;
@@ -90,14 +91,13 @@ public class MongoUtils {
             throw new MongodbException("toBson is fail:  obj is null");
         }
         try {
-//            MongodbEncodeValueFilter mongodbEncodeValueFilter =  new MongodbEncodeValueFilter();
-//            String json = JSON.toJSONString(obj, mongodbEncodeValueFilter);
-//            System.out.println(json);
-//            Document document = Document.parse(json);
-//            return (T)document;
+            String json = JSON.toJSONString(obj, new MongodbEncodeValueFilter());
+            System.out.println(json);
+            Document document = Document.parse(json);
+            return (T)document;
 //            return (T)Document.parse(json);
 //            return (T) EncodeConvetor.convetor(obj);
-            return null;
+//            return null;
         } catch (Exception e) {
 //            com.mongodb.util.JSONSerializers.LegacyDateSerializer
             throw new MongodbException("toBson is fail: " + e.getMessage(), e);
@@ -106,14 +106,14 @@ public class MongoUtils {
 
     public static <T> T toEntity(Document document, Class<?> clazz) {
         try {
-            String json = JSONObject.toJSONString(document, new MongodbEncodeValueFilter());
+            String json = JSONObject.toJSONString(document, new MongodbDecodeValueFilter());
             if(ToolsKit.isNotEmpty(json)) {
                 return (T) ToolsKit.jsonParseObject(json, clazz);
-            } return null;
+            }
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
-            return null;
+            throw new MongodbException("toBson is fail: " + e.getMessage(), e);
         }
+        return null;
     }
 
     /**
