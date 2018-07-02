@@ -267,8 +267,8 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
             throw new MongodbException("index document is fail: id is null");
         }
         Document document = MongoUtils.toBson(idEntity);
-        if(ToolsKit.isNotEmpty(document)) {
-            document = MongoUtils.convert2ObjectId(document);
+        if(ToolsKit.isEmpty(document) && ToolsKit.isEmpty(document.getObjectId(idEntity.getId()))) {
+            throw new MongodbException("index document is fail: document is null");
         }
         try {
             collection.insertOne(document);
