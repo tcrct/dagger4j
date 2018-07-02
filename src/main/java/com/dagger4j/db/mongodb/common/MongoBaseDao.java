@@ -285,7 +285,7 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
         Document query = new Document(IdEntity.ID_FIELD, new ObjectId(id));
         //查询记录不存在时，不新增记录
         UpdateOptions options = new UpdateOptions();
-        options.upsert(false);
+        options.upsert(false); //为true则新增记录
         document.remove(IdEntity.ENTITY_ID_FIELD);
         BasicDBObject updateDbo = new BasicDBObject(Operator.SET, document);
         return collection.updateOne(query, updateDbo, options).isModifiedCountAvailable();
