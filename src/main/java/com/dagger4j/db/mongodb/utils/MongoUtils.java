@@ -144,9 +144,16 @@ public class MongoUtils {
         if(ToolsKit.isEmpty(document)) {
             throw  new MongodbException("convert2ObjectId is fail: document is null");
         }
-        String id = document.getObjectId(IdEntity.ENTITY_ID_FIELD).toString();
-        if (ToolsKit.isEmpty(id)) {
-            id = document.getObjectId(IdEntity.ID_FIELD).toString();
+
+        Object objId = document.get(IdEntity.ENTITY_ID_FIELD);
+        if(ToolsKit.isEmpty(objId)) {
+            objId = document.get(IdEntity.ID_FIELD);
+        }
+        String id = "";
+        if(objId instanceof ObjectId) {
+            id = ((ObjectId)objId).toString();
+        } else {
+            id = objId.toString();
         }
         if (ToolsKit.isNotEmpty(id)) {
             document.put(IdEntity.ID_FIELD, MongoUtils.toObjectIds(id));
