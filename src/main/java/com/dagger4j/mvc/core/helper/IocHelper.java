@@ -23,7 +23,7 @@ public class IocHelper {
                 for (Iterator<Map.Entry<String, Object>> iterator = iocBeanMap.entrySet().iterator(); iterator.hasNext(); ) {
                     Object bean = iterator.next().getValue();
                     if (null != bean) {
-                        ioc(bean.getClass());
+                        ioc(bean);
                     }
                 }
             }
@@ -37,7 +37,8 @@ public class IocHelper {
      * @param beanClass     需要对属性值注入对象的Class
      * @throws Exception
      */
-    public static void ioc(Class<?> beanClass) throws Exception {
+    public static void ioc(Object bean) throws Exception {
+        Class<?> beanClass = bean.getClass();
         Field[] fields = beanClass.getDeclaredFields();
         for(Field field : fields) {
             if (field.isAnnotationPresent(Import.class) || field.isAnnotationPresent(ImportRpc.class)) {
@@ -48,7 +49,7 @@ public class IocHelper {
                 Object iocObj = BeanHelper.getBean(fieldTypeClass, beanClass);
                 if(ToolsKit.isNotEmpty(iocObj)) {
                     field.setAccessible(true);
-                    field.set(BeanHelper.getBean(beanClass), iocObj);
+                    field.set(bean, iocObj);
                 }
             }
         }

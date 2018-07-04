@@ -4,7 +4,6 @@ import com.dagger4j.annotation.Bean;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.mvc.annotation.Param;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
@@ -132,7 +131,7 @@ public class ParameterInvokeMethod {
      * @return
      */
     private static Object invokeBean(IRequest request, Class<?> parameterType, Annotation[] annotation, int index) {
-        // 如果是继承了IdEntity或对象有设置VtorBean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
+        // 如果是继承了IdEntity或对象有设置Bean注解或在参数前设置了Bean注解， 则认为是要转换为Bean对象并验证
 
         String json = request.getParameter(ConstEnums.INPUTSTREAM_STR_NAME.getValue());
         Object entity = ToolsKit.jsonParseObject(json, parameterType);

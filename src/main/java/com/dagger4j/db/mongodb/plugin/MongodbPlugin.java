@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -86,11 +85,10 @@ public class MongodbPlugin implements IPlugin {
     if(ToolsKit.isEmpty(iocBeanMap)) {
         return;
     }
-    Map<String, Object> tmpIocBeanMap = new HashMap<>(iocBeanMap.size());
-    tmpIocBeanMap.putAll(iocBeanMap);
-    for(Iterator<Map.Entry<String, Object>> it = tmpIocBeanMap.entrySet().iterator(); it.hasNext();) {
+    for(Iterator<Map.Entry<String, Object>> it = iocBeanMap.entrySet().iterator(); it.hasNext();) {
         Map.Entry<String, Object> entry = it.next();
-        Class<?> serviceClass = entry.getValue().getClass();
+        Object beanObj = entry.getValue();
+        Class<?> serviceClass = beanObj.getClass();
         Field[] fields = serviceClass.getDeclaredFields();
             for(Field field : fields) {
                 Import importAnnot = field.getAnnotation(Import.class);
@@ -102,9 +100,9 @@ public class MongodbPlugin implements IPlugin {
                         Class<?> paramTypeClass = ClassKit.loadClass(types[0].getTypeName());
                         String key = ToolsKit.isEmpty(importAnnot.client()) ? DbClientFactory.getMongoDefaultClientId() : importAnnot.client();
                         Object daoObj = MongoUtils.getMongoDao(key, paramTypeClass);
-                        // 设置到IOC集合里, 以供IocHelper进行IOC时使用
                         if(null != daoObj) {
-                            BeanHelper.setBean(daoObj);
+                            field.setAccessible(true);
+                            field.set(beanObj, daoObj);
                         }
                     }
                 }

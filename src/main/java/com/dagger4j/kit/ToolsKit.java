@@ -38,7 +38,8 @@ public final class ToolsKit {
             SerializerFeature.QuoteFieldNames,
             SerializerFeature.WriteNonStringKeyAsString,
             SerializerFeature.DisableCircularReferenceDetect,
-            SerializerFeature.NotWriteRootClassName
+            SerializerFeature.NotWriteRootClassName,
+            SerializerFeature.WriteDateUseDateFormat
     };
 
     private static SerializerFeature[] serializerFeatureArray2 = {

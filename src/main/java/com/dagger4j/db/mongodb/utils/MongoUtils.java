@@ -5,9 +5,11 @@ import com.dagger4j.db.DbClientFactory;
 import com.dagger4j.db.IdEntity;
 import com.dagger4j.db.mongodb.client.MongoClientAdapter;
 import com.dagger4j.db.mongodb.common.MongoDao;
+import com.dagger4j.db.mongodb.convert.EncodeConvetor;
 import com.dagger4j.exception.MongodbException;
 import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.utils.DataType;
 import com.mongodb.*;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -90,16 +92,8 @@ public class MongoUtils {
             throw new MongodbException("toBson is fail:  obj is null");
         }
         try {
-            MongodbEncodeValueFilter mongodbEncodeValueFilter =  new MongodbEncodeValueFilter();
-            String json = JSON.toJSONString(obj, mongodbEncodeValueFilter);
-            System.out.println(json);
-//            Document document = Document.parse(json);
-//            return (T)document;
-//            return (T)Document.parse(json);
-//            return (T) EncodeConvetor.convetor(obj);
-            return null;
+            return DataType.isBaseType(obj.getClass()) ? (T)obj : (T) EncodeConvetor.convetor(obj);
         } catch (Exception e) {
-//            com.mongodb.util.JSONSerializers.LegacyDateSerializer
             throw new MongodbException("toBson is fail: " + e.getMessage(), e);
         }
     }

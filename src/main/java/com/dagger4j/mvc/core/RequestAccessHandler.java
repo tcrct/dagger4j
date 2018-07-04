@@ -49,7 +49,7 @@ final public class RequestAccessHandler{
             // 如果不是设置为单例模式的话就每次请求都创建一个新的Controller对象
             controller = ObjectKit.newInstance(controllerClass);
             // 还要重新执行Ioc注入
-            IocHelper.ioc(controller.getClass());
+            IocHelper.ioc(controller);
         }
         // 传入request, response到请求的Controller
         controller.init(request, response);
