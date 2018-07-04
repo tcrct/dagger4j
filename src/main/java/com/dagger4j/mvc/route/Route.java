@@ -55,7 +55,8 @@ public class Route {
     public void builderMapping(String controllerKey, Method actionMethod) {
         Mapping methodMapping = actionMethod.getAnnotation(Mapping.class);
         if(ToolsKit.isEmpty(methodMapping)) {
-            controllerKey = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+            String productCode = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+            controllerKey = productCode + "/" +controllerKey;
             this.requestMapping = new RequestMapping("/"+controllerKey+"/"+actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
                     0, Integer.parseInt(ConstEnums.REQUEST_TIMEOUT.getValue()), new ArrayList<ValidationParam>());

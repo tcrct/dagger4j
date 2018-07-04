@@ -14,7 +14,6 @@ public class MongoDao<T> extends MongoBaseDao<T> {
     }
 
     public MongoDao(DB db, MongoDatabase database, Class<T> clazz) {
-
         super(db, database, clazz);
     }
 }

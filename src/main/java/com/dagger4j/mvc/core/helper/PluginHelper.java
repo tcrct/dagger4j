@@ -31,11 +31,11 @@ public class PluginHelper {
         plugins.add(plugin);
     }
 
-    /**
+   /**
      *  加载插件
      * @throws Exception
      */
-    static {
+    public static void start(){
         for(Iterator<IPlugin> it = getPlugins().iterator(); it.hasNext();){
             IPlugin plugin = it.next();
             if(null != plugin){

@@ -10,9 +10,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -26,14 +24,26 @@ public final class ClassKit {
 
     private static final ConcurrentMap<String, Field[]> FIELD_MAPPING_MAP = new ConcurrentHashMap<String, Field[]>();
 
-    // entity class pool
-    private static final Map<String, Class<?>> entityClassMap = new HashMap<>();
-    // othor class pool
-    private static final Map<String, Class<?>> othorClassMap = new HashMap<>();
-
     public static ClassLoader getClassLoader() {
         ClassLoader ret = Thread.currentThread().getContextClassLoader();
         return ret != null ? ret : ClassKit.class.getClassLoader();
+    }
+
+    /**
+     * 实例化类文件, 默认实例化
+     * @param className  类文件，包括包路径
+     * @return
+     */
+    public static Class<?> loadClass(String className) {
+        if (ToolsKit.isEmpty(className)) {
+            return null;
+        }
+        try {
+            return getClassLoader().loadClass(className);
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+            return null;
+        }
     }
 
     /**

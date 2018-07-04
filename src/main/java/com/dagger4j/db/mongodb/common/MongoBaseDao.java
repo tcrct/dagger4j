@@ -132,12 +132,11 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
         if(ToolsKit.isEmpty(mongoQuery)) {
             throw new MongodbException("Mongodb findOne is Fail: mongoQuery is null");
         }
-        Bson queryDoc = mongoQuery.getQueryBson();
-        Document document = collection.find(queryDoc).first();
-        if(ToolsKit.isEmpty(document)) {
+        List<T> resultList = findAll(mongoQuery);
+        if(ToolsKit.isEmpty(resultList)) {
             return null;
         }
-        return MongoUtils.toEntity(document, cls);
+        return resultList.get(0);
     }
 
     /**
@@ -175,10 +174,22 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
             throw new MongodbException("Mongodb findList is Fail: mongoQuery is null");
         }
         Bson queryDoc = mongoQuery.getQueryBson();
+        FindIterable<Document> documents = collection.find(queryDoc);
+        documents = builderQueryDoc(documents, mongoQuery);
+        final List<T> resultList = new ArrayList();
+        documents.forEach(new Block<Document>() {
+            @Override
+            public void apply(Document document) {
+                resultList.add((T)MongoUtils.toEntity(document, cls));
+            }
+        });
+        return resultList;
+    }
+
+    private FindIterable<Document> builderQueryDoc(FindIterable<Document> documents, MongoQuery mongoQuery) {
         PageDto<T> page = mongoQuery.getPage();
         int pageNo = page.getPageNo();
         int pageSize = page.getPageSize();
-        FindIterable<Document> documents = collection.find(queryDoc);
         BasicDBObject fieldDbo = (BasicDBObject)mongoQuery.getDBFields();
         if(ToolsKit.isNotEmpty(fieldDbo) && !fieldDbo.isEmpty()) {
             documents.projection(fieldDbo);
@@ -196,16 +207,9 @@ public class MongoBaseDao<T> extends MongoDaoAdapter<T> {
             documents.hint(hintDbo);
         }
         if(ToolsKit.isEmpty(documents)) {
-            return null;
+            throw new NullPointerException("ducuments is null");
         }
-        final List<T> resultList = new ArrayList();
-        documents.forEach(new Block<Document>() {
-            @Override
-            public void apply(Document document) {
-                resultList.add((T)MongoUtils.toEntity(document, cls));
-            }
-        });
-        return resultList;
+        return documents;
     }
 
     /**

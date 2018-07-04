@@ -6,11 +6,15 @@ import com.dagger4j.mvc.http.handler.HandlerChain;
 import com.dagger4j.mvc.plugin.PluginChain;
 import com.dagger4j.server.common.BootStrap;
 import com.dagger4j.server.netty.NettyServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by laotang on 2018/6/12.
  */
 public class Application {
+
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     private String host;
     private int port;
@@ -44,7 +48,11 @@ public class Application {
     }
 
     public Application plugins(PluginChain pluginChain) {
-        PluginHelper.setPluginList(pluginChain.getPluginList());
+        try {
+            PluginHelper.setPluginList(pluginChain.getPluginList());
+        } catch (Exception e){
+            logger.warn(e.getMessage(), e);
+        }
         return application;
     }
 

@@ -49,7 +49,12 @@ public class StartContextListener {
     public void start() {
         try {
             for(Iterator<Class<?>> it = APP_CONTEXT_LISTENER.iterator(); it.hasNext();) {
-                ClassKit.loadClass(it.next());
+                Class<?> clazz = it.next();
+                if(PluginHelper.class.equals(clazz)) {
+                    PluginHelper.start();
+                } else {
+                    ClassKit.loadClass(clazz);
+                }
             }
             initCode();
         } catch (Exception e) {

@@ -65,6 +65,10 @@ public class RouteHelper {
     private static String buildMappingKey(Mapping mapping, String mappingKey) {
         if(ToolsKit.isNotEmpty(mapping) && ToolsKit.isNotEmpty(mapping.value())) {
             mappingKey = mapping.value();
+        } else {
+            if(mappingKey.toLowerCase().endsWith("controller")) {
+                mappingKey = mappingKey.substring(0, mappingKey.length() - "controller".length());
+            }
         }
         return mappingKey.endsWith("/") ? mappingKey.substring(0, mappingKey.length()-1).toLowerCase() : mappingKey.toLowerCase();
     }

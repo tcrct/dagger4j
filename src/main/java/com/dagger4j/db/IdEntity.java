@@ -3,7 +3,6 @@ package com.dagger4j.db;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dagger4j.db.annotation.Id;
-import com.dagger4j.kit.ToolsKit;
 
 import java.util.Date;
 
@@ -57,14 +56,6 @@ public class IdEntity implements java.io.Serializable {
 	public String getId() {
 		return id;
 	}
-
-    @JSONField(serialize = false, deserialize = false)
-    public int getMysqlId() {
-        if(ToolsKit.isNotEmpty(getId())) {
-            return Integer.parseInt(getId());
-        }
-        return -1;
-    }
 
 	public void setId(String id) {
 		this.id = id;

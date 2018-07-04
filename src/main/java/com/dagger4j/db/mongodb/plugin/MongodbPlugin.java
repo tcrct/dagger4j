@@ -4,6 +4,7 @@ import com.dagger4j.db.DbClientFactory;
 import com.dagger4j.db.mongodb.client.MongoClientAdapter;
 import com.dagger4j.db.mongodb.common.MongoDao;
 import com.dagger4j.db.mongodb.utils.MongoUtils;
+import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Import;
 import com.dagger4j.mvc.core.helper.BeanHelper;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class MongodbPlugin implements IPlugin {
 
     public MongodbPlugin(MongoClientAdapter clientAdapter) throws Exception {
         DbClientFactory.setMongoClient(clientAdapter);
+        DbClientFactory.setMongoDefaultClientId(clientAdapter.getId());
     }
 
 
@@ -80,7 +83,12 @@ public class MongodbPlugin implements IPlugin {
     private void addBeanToIocMap() throws Exception {
     // 取出所有类对象
     Map<String, Object> iocBeanMap = BeanHelper.getIocBeanMap();
-    for(Iterator<Map.Entry<String, Object>> it = iocBeanMap.entrySet().iterator(); it.hasNext();) {
+    if(ToolsKit.isEmpty(iocBeanMap)) {
+        return;
+    }
+    Map<String, Object> tmpIocBeanMap = new HashMap<>(iocBeanMap.size());
+    tmpIocBeanMap.putAll(iocBeanMap);
+    for(Iterator<Map.Entry<String, Object>> it = tmpIocBeanMap.entrySet().iterator(); it.hasNext();) {
         Map.Entry<String, Object> entry = it.next();
         Class<?> serviceClass = entry.getValue().getClass();
         Field[] fields = serviceClass.getDeclaredFields();
@@ -91,7 +99,7 @@ public class MongodbPlugin implements IPlugin {
                     Type[] types = paramType.getActualTypeArguments();
                     if(ToolsKit.isNotEmpty(types)) {
                         // <>里的泛型类
-                        Class<?> paramTypeClass = types[0].getClass();
+                        Class<?> paramTypeClass = ClassKit.loadClass(types[0].getTypeName());
                         String key = ToolsKit.isEmpty(importAnnot.client()) ? DbClientFactory.getMongoDefaultClientId() : importAnnot.client();
                         Object daoObj = MongoUtils.getMongoDao(key, paramTypeClass);
                         // 设置到IOC集合里, 以供IocHelper进行IOC时使用

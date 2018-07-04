@@ -8,9 +8,9 @@ import java.util.List;
  */
 public abstract class PluginChain {
 
-    public abstract void addPlugin(List<IPlugin> pluginList);
+    public abstract void addPlugin(List<IPlugin> pluginList) throws Exception;
 
-    public List<IPlugin> getPluginList() {
+    public List<IPlugin> getPluginList() throws Exception {
         List<IPlugin> pluginList = new ArrayList();
         addPlugin(pluginList);
         return pluginList;

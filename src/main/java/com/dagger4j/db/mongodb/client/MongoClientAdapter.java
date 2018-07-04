@@ -28,7 +28,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
      */
     private String id;
 
-    private MongoClientAdapter(MongoConnect mongoConnect){
+    public MongoClientAdapter(MongoConnect mongoConnect){
         this.mongoConnect = mongoConnect;
     }
 
@@ -66,7 +66,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             if (ToolsKit.isEmpty(mongoConnect.getUrl())) {
                 try {
                     MongoClientOptions options = MongoClientOptions.builder().readPreference(ReadPreference.secondaryPreferred()).build();
-                    mongoClient = new MongoClient(hosts(), auth(), options);
+                    mongoClient = ToolsKit.isEmpty(auth()) ? new MongoClient(hosts(), options) :  new MongoClient(hosts(), auth(), options);
                 } catch (Exception e) {
                     throw new MongodbException("Can't connect mongodb: " + e.getMessage(), e);
                 }
@@ -141,9 +141,9 @@ public class MongoClientAdapter implements IClient<MongoClient> {
 
 
     public static class Builder {
-        private String host;
-        private int port;
-        private String database;
+        private String host = "127.0.0.1";
+        private int port = 27017;
+        private String database = "local";
         private String username;
         private String password;
         private String url;

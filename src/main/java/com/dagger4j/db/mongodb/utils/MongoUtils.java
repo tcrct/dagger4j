@@ -1,5 +1,6 @@
 package com.dagger4j.db.mongodb.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dagger4j.db.DbClientFactory;
 import com.dagger4j.db.IdEntity;
@@ -90,9 +91,9 @@ public class MongoUtils {
             throw new MongodbException("toBson is fail:  obj is null");
         }
         try {
-//            MongodbEncodeValueFilter mongodbEncodeValueFilter =  new MongodbEncodeValueFilter();
-//            String json = JSON.toJSONString(obj, mongodbEncodeValueFilter);
-//            System.out.println(json);
+            MongodbEncodeValueFilter mongodbEncodeValueFilter =  new MongodbEncodeValueFilter();
+            String json = JSON.toJSONString(obj, mongodbEncodeValueFilter);
+            System.out.println(json);
 //            Document document = Document.parse(json);
 //            return (T)document;
 //            return (T)Document.parse(json);
