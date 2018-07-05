@@ -2,7 +2,7 @@ package com.dagger4j.vtor.core.template;
 
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
-import com.dagger4j.vtor.annotation.constraints.Min;
+import com.dagger4j.vtor.annotation.Min;
 
 import java.lang.annotation.Annotation;
 

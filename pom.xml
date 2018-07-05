@@ -23,6 +23,7 @@
         <mongodb.version>3.6.0</mongodb.version>
         <druid.version>1.0.29</druid.version>
         <mysql.version>5.1.44</mysql.version>
+        <jedis.version>2.9.0</jedis.version>
         <!--<javassist.version>3.12.1.GA</javassist.version>-->
         <asm.version>6.2</asm.version>
     </properties>
@@ -118,6 +119,13 @@
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>${asm.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedisPool -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
         </dependency>
 
         <!-- javassist -->

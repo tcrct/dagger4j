@@ -4,7 +4,7 @@ import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
-import com.dagger4j.vtor.annotation.constraints.Ymd;
+import com.dagger4j.vtor.annotation.Ymd;
 
 import java.lang.annotation.Annotation;
 

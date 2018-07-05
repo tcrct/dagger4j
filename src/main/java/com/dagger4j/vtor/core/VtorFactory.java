@@ -5,7 +5,7 @@ import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.scan.ScanClassFactory;
-import com.dagger4j.annotation.Bean;
+import com.dagger4j.mvc.annotation.Bean;
 import com.dagger4j.vtor.core.template.AbstractValidatorTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

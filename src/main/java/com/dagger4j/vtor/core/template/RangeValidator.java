@@ -3,7 +3,7 @@ package com.dagger4j.vtor.core.template;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.utils.DataType;
-import com.dagger4j.vtor.annotation.constraints.Range;
+import com.dagger4j.vtor.annotation.Range;
 
 import java.lang.annotation.Annotation;
 

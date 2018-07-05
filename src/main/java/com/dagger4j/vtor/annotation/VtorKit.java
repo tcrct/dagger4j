@@ -1,6 +1,6 @@
-package com.dagger4j.vtor;
+package com.dagger4j.vtor.annotation;
 
-import com.dagger4j.annotation.Bean;
+import com.dagger4j.mvc.annotation.Bean;
 import com.dagger4j.db.IdEntity;
 import com.dagger4j.vtor.core.VtorFactory;
 

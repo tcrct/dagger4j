@@ -15,9 +15,9 @@ import java.util.Date;
 public class MongodbEncodeValueFilter implements ContextValueFilter {
     @Override
     public Object process(BeanContext context, Object object, String name, Object value) {
-        if(object != null && null != value) {
-            System.out.println(object + "           " + name + "           " + value + "      " + value.getClass());
-        }
+//        if(object != null && null != value) {
+//            System.out.println(object + "           " + name + "           " + value + "      " + value.getClass());
+//        }
         if(null == value) {
            return value;
         }

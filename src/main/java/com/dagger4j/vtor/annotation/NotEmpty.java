@@ -1,16 +1,15 @@
-package com.dagger4j.annotation;
+package com.dagger4j.vtor.annotation;
 
 import java.lang.annotation.*;
 
 /**
- * bean对象， 如果设置了，说明要转换或验证
+ * 不能为空验证注解
  * @author Created by laotang
  * @date createed in 2018/6/30.
  */
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Bean {
-
+public @interface NotEmpty {
+    String message() default "不能为空！";
 }
-

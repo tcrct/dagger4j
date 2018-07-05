@@ -1,12 +1,17 @@
 package com.dagger4j.server.netty.handler;
 
+import com.dagger4j.exception.AbstractDaggerException;
+import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ThreadPoolKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.core.helper.RouteHelper;
+import com.dagger4j.mvc.dto.HeadDto;
+import com.dagger4j.mvc.dto.ReturnDto;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.route.Route;
 import com.dagger4j.server.common.BootStrap;
+import com.dagger4j.utils.IpUtils;
 import com.dagger4j.utils.WebKit;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -37,10 +42,11 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     public void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
+        RequestTask requestTask = null;
         try {
             FullHttpRequest httpRequest = request.copy();
             verificationRequest(httpRequest);
-            RequestTask requestTask = new RequestTask(ctx, httpRequest);
+            requestTask = new RequestTask(ctx, httpRequest);
             futureTask = ThreadPoolKit.execute(requestTask);
             // 是否开发模式，如果是则不指定超时
             if(bootStrap.isDevModel()) {
@@ -51,14 +57,14 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
             }
         } catch (TimeoutException e) {
             // 超时时，会执行该异常
-            response = buildExceptionResponse("request time out");
+            response = buildExceptionResponse(requestTask.getResponse(), new com.dagger4j.exception.TimeoutException(e.getMessage()));
             // 中止线程，参数为true时，会中止正在运行的线程，为false时，如果线程未开始，则停止运行
             futureTask.cancel(true);
         } catch (ValidatorException ve) {
             logger.warn(ve.getMessage());
-            response = buildExceptionResponse(ve.getMessage());
+            response = buildExceptionResponse(requestTask.getResponse(), ve);
         } catch (Exception e) {
-            response = buildExceptionResponse(e.getMessage());
+            response = buildExceptionResponse(requestTask.getResponse(), new MvcException(e.getMessage(), e));
         } finally {
             if(null != request && null != response) {
                 WebKit.recoverClient(ctx, request, response);
@@ -103,29 +109,27 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     private long getTimeout(String target) {
         Route route = RouteHelper.getRouteMap().get(target);
         if(ToolsKit.isEmpty(route)) {
-            route = RouteHelper.getRestfulRouteMap().get(target);
+            // TODO... restful风格的URI确定不了，暂不能支持timeout设置，按默认值3秒
+            route = null; //RouteHelper.getRestfulRouteMap().get(target);
         }
         return null != route ? route.getRequestMapping().getTimeout() : 3000L;
     }
 
 
-    private IResponse buildExceptionResponse(String message) {
-//        HttpResponse httpResponse = new HttpResponse(asyncResponse.getHeaders(), asyncResponse.getCharacterEncoding(), asyncRequest.getContentType());
-//        ReturnDto<String> returnDto = new ReturnDto<>();
-//        returnDto.setData(null);
-//        HeadDto headDto = new HeadDto();
-//        int index = message.indexOf(":");
-//        headDto.setMsg((index>-1) ? message.substring(index+1, message.length()) : message);
-//        headDto.setRet(1);
-//        headDto.setUri(asyncRequest.getRequestURI());
-//        headDto.setTimestamp(System.currentTimeMillis());
-//        headDto.setRequestId(requestId);
-//        headDto.setClientIp(IpUtils.getLocalHostIP());
-//        headDto.setMethod(asyncRequest.getMethod());
-//        returnDto.setHead(headDto);
-//        httpResponse.write(returnDto);
-//        httpResponse.setHeader("status", (headDto.getRet() == 0) ? "200" : "500");
-//        return httpResponse;
-        return null;
+    private IResponse buildExceptionResponse(IResponse httpResponse, AbstractDaggerException daggerException) {
+        int code = daggerException.getCode();
+        String message = daggerException.getMessage();
+        ReturnDto<String> returnDto = new ReturnDto<>();
+        returnDto.setData(null);
+        HeadDto headDto = new HeadDto();
+        headDto.setMsg(message);
+        headDto.setRet(code);
+        headDto.setTimestamp(System.currentTimeMillis());
+        headDto.setRequestId(httpResponse.getRequestId());
+        headDto.setClientIp(IpUtils.getLocalHostIP());
+        returnDto.setHead(headDto);
+        httpResponse.write(returnDto);
+        httpResponse.setHeader("status", "200");
+        return httpResponse;
     }
 }

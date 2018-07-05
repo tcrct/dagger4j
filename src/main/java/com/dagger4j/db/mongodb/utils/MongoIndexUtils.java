@@ -2,7 +2,7 @@ package com.dagger4j.db.mongodb.utils;
 
 import com.dagger4j.db.annotation.Vo;
 import com.dagger4j.db.annotation.VoColl;
-import com.dagger4j.db.mongodb.annotation.Index;
+import com.dagger4j.db.annotation.Index;
 import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
 import com.mongodb.BasicDBObject;

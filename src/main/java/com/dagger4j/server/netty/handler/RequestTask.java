@@ -20,6 +20,9 @@ public class RequestTask implements Callable<IResponse> {
 
     private ChannelHandlerContext ctx;
     private FullHttpRequest fullHttpRequest;
+    private IRequest  iRequest;
+    private IResponse iResponse;
+
     public RequestTask(ChannelHandlerContext ctx, FullHttpRequest request) {
         this.ctx = ctx;
         this.fullHttpRequest = request;
@@ -27,13 +30,21 @@ public class RequestTask implements Callable<IResponse> {
 
     @Override
     public IResponse call() {
-        IRequest  iRequest = HttpRequest.build(ctx, fullHttpRequest);
-        IResponse iResponse = HttpResponse.build(iRequest);
+        iRequest = HttpRequest.build(ctx, fullHttpRequest);
+        iResponse = HttpResponse.build(iRequest);
         if(ToolsKit.isEmpty(iRequest) || ToolsKit.isEmpty(iResponse)) {
             throw new NettyStartUpException("build dagger4j request or response fail");
         }
         // 执行请求任务
         MvcMain.doTask(iRequest, iResponse);
+        return iResponse;
+    }
+
+    public IRequest getRequest() {
+        return iRequest;
+    }
+
+    public IResponse getResponse() {
         return iResponse;
     }
 }

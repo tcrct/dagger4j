@@ -1,11 +1,13 @@
 package com.dagger4j.exception;
 
+import com.dagger4j.kit.ToolsKit;
+
 /**
- *  Dagger4j框架启动时异常
+ *  mvc组件运行异常
  * @author laotang
  * @date 2017/11/2
  */
-public class MvcException extends RuntimeException {
+public class MvcException extends AbstractDaggerException implements IException {
 
     public MvcException() {
         super();
@@ -19,4 +21,17 @@ public class MvcException extends RuntimeException {
         super(msg, cause);
     }
 
+    @Override
+    public int getCode() {
+        return ExceptionEnums.MVC_ERROR.getCode();
+    }
+
+    @Override
+    public String getMessage() {
+        if(ToolsKit.isEmpty(super.getMessage())) {
+            return ExceptionEnums.MVC_ERROR.getMessage();
+        } else {
+            return ExceptionEnums.MVC_ERROR.getMessage() + ": " + super.getMessage();
+        }
+    }
 }

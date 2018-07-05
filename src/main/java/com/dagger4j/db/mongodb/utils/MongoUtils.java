@@ -6,6 +6,7 @@ import com.dagger4j.db.IdEntity;
 import com.dagger4j.db.mongodb.client.MongoClientAdapter;
 import com.dagger4j.db.mongodb.common.MongoDao;
 import com.dagger4j.db.mongodb.convert.EncodeConvetor;
+import com.dagger4j.db.mongodb.convert.decode.MongodbDecodeValueFilter;
 import com.dagger4j.exception.MongodbException;
 import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
@@ -100,7 +101,7 @@ public class MongoUtils {
 
     public static <T> T toEntity(Document document, Class<?> clazz) {
         try {
-            String json = JSONObject.toJSONString(document, new MongodbEncodeValueFilter());
+            String json = JSONObject.toJSONString(document, new MongodbDecodeValueFilter());
             if(ToolsKit.isNotEmpty(json)) {
                 return (T) ToolsKit.jsonParseObject(json, clazz);
             } return null;

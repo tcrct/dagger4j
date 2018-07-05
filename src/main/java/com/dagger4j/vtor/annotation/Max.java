@@ -1,4 +1,4 @@
-package com.dagger4j.vtor.annotation.constraints;
+package com.dagger4j.vtor.annotation;
 
 import java.lang.annotation.*;
 
@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Min {
-    double value() default 0;
-    String message() default "不能小于[${value}]！";
+public @interface Max {
+    double value() default Double.MAX_VALUE;
+    String message() default "不能大于[${value}]！";
 }

@@ -1,13 +1,13 @@
 package com.dagger4j.mvc.core;
 
-import com.dagger4j.annotation.Bean;
+import com.dagger4j.mvc.annotation.Bean;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.exception.ValidatorException;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.utils.DataType;
-import com.dagger4j.vtor.VtorKit;
+import com.dagger4j.vtor.annotation.VtorKit;
 import com.dagger4j.vtor.core.VtorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

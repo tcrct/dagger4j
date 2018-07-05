@@ -2,6 +2,8 @@ package com.dagger4j.db.mongodb.convert.encode;
 
 
 import com.dagger4j.db.annotation.Id;
+import com.dagger4j.db.annotation.IdType;
+import com.dagger4j.db.mongodb.common.Operator;
 import com.dagger4j.exception.MongodbException;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -23,7 +25,11 @@ public class IdEncoder extends Encoder {
 
 	@Override
 	public String getFieldName() {
-		return field.getName();
+		if(IdType.OID.equals(id.type())) {
+			return Operator.ID;
+		} else {
+			return field.getName();
+		}
 	}
 
 

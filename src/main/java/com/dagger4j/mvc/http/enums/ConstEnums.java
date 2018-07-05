@@ -110,6 +110,12 @@ public enum ConstEnums {
     public enum PROPERTIES {
         FILE_NAME("dagger.properties", "框架配置文件名"),
         USE_ENV("use.env", "框架配置文件名"),
+        REDIS_DATABASE("redis.database", "redis默认数据库"),
+        REDIS_HOST("redis.host", "redis地址"),
+        REDIS_PWD("redis.password", "redis密码"),
+        REDIS_PORT("redis.port", "redis端口"),
+        REDIS_TIMEOUT("redis.timeout", "redis超时时间，秒作单位"),
+
         ;
 
         private final String value;
