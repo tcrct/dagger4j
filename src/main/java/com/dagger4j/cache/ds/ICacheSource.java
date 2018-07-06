@@ -1,6 +1,7 @@
 package com.dagger4j.cache.ds;
 
 /**
+ * 第三方缓存客户端数据源接口
  * @author Created by laotang
  * @date createed in 2018/7/5.
  */
