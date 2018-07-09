@@ -1,5 +1,6 @@
-package com.dagger4j.cache.client;
+package com.dagger4j.cache.client.eh;
 
+import com.dagger4j.cache.client.AbstractCacheClient;
 import com.dagger4j.cache.ds.EhCacheSource;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;

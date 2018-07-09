@@ -1,4 +1,6 @@
-package com.dagger4j.cache.client;
+package com.dagger4j.cache.client.redis;
+
+import redis.clients.jedis.Jedis;
 
 /**
  * 缓存的执行方法接口
