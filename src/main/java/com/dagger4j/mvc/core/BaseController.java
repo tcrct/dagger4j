@@ -124,6 +124,18 @@ public abstract class BaseController {
         return render;
     }
 
+    /**
+     * 是否local环境的请求
+     * @return
+     */
+    public Boolean isLocalRequest() {
+        String url = request.getRequestURL();
+        if (url.contains("http://local") || url.contains("https://local")) {
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * 返回文本格式

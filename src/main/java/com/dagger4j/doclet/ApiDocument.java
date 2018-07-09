@@ -6,6 +6,8 @@ import com.dagger4j.doclet.modle.MethodDocModle;
 import com.dagger4j.doclet.modle.ParameterModle;
 import com.dagger4j.doclet.modle.TagModle;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Mapping;
+import com.dagger4j.mvc.route.RequestMapping;
 import com.sun.javadoc.*;
 
 import java.io.File;
@@ -21,7 +23,7 @@ import java.util.List;
 public class ApiDocument {
 
     // 组装完成的List，返回到调用者
-    private List<ClassDocModle> classDocModleList = new ArrayList<>();
+    private static List<ClassDocModle> classDocModleList = new ArrayList<>();
     // 源文件所有的第一级目录路径
     private String sourceDir;
 
@@ -30,9 +32,16 @@ public class ApiDocument {
         this.sourceDir = sourceDir;
     }
 
-    public String document() {
+
+    public static List<ClassDocModle> getClassDocModleList() {
+        return classDocModleList;
+    }
+
+
+    public List<ClassDocModle> document() {
+        classDocModleList.clear();
         scanSourceFile(sourceDir);
-        return ToolsKit.toJsonString(classDocModleList);
+        return classDocModleList;
     }
 
     private void scanSourceFile(String folderPath) {
@@ -59,6 +68,7 @@ public class ApiDocument {
                             || classDoc.isStatic() || classDoc.isAbstract() || classDoc.isInterface()) {
                         continue;
                     }
+
                     List<TagModle> tagModleList = null;
                     List<MethodDocModle> methodDocModleList = null;
                     Tag[] tagsArray = classDoc.tags();
@@ -71,6 +81,10 @@ public class ApiDocument {
                             }
                         }
                     }
+                    // Controller Mapping注解部份
+                    RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
+                    String name = ToolsKit.isEmpty(mappingModle.getValue()) ? classDoc.name() : mappingModle.getValue();
+
                     MethodDoc[]  methodDocs =  classDoc.methods();
                     if(ToolsKit.isNotEmpty(methodDocs)) {
                         methodDocModleList = new ArrayList<>(methodDocs.length);
@@ -137,7 +151,7 @@ public class ApiDocument {
                             methodDocModleList.add(methodDocModle);
                         }
                     }
-                    classDocModleList.add(new ClassDocModle(classDoc.toString(), classDoc.commentText().trim(), tagModleList, methodDocModleList));
+                    classDocModleList.add(new ClassDocModle(name, mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
                 }
             }
         }
@@ -173,6 +187,61 @@ public class ApiDocument {
             }
         }
         return false;
+    }
+
+    /**
+     * 取得controller里的mapping注解信息
+     * @param annotatedDescArray
+     * @return
+     */
+    private RequestMapping buildRequestMapping(AnnotationDesc[] annotatedDescArray) {
+        RequestMapping requestMapping = new RequestMapping();
+        if(ToolsKit.isNotEmpty(annotatedDescArray)) {
+            for(AnnotationDesc annotation : annotatedDescArray) {
+                // 这里注解能拿出注解里的值，名称，返回类型等信息
+                if(annotation.annotationType().toString().equalsIgnoreCase(Mapping.class.getName())) {
+                    AnnotationDesc.ElementValuePair[] elementValuePairs = annotation.elementValues();
+                    for(AnnotationDesc.ElementValuePair pair : elementValuePairs) {
+                        AnnotationTypeElementDoc elementDoc = pair.element();
+                        AnnotationValue annotationValue = pair.value();
+                        Object valueObj = annotationValue.value();
+                        System.out.println(valueObj.toString());
+                        if(RequestMapping.VALUE_FIELD.equalsIgnoreCase(elementDoc.name())) {
+                            requestMapping.setValue(valueObj.toString());
+                        }
+                        if(RequestMapping.DESC_FIELD.equalsIgnoreCase(elementDoc.name())) {
+                            requestMapping.setDesc(valueObj.toString());
+                        }
+                        if(RequestMapping.METHOD_FIELD.equalsIgnoreCase(elementDoc.name())) {
+                            requestMapping.setMethod(valueObj.toString());
+                        }
+
+                        if(RequestMapping.ORDER_FIELD.equalsIgnoreCase(elementDoc.name())) {
+                            int order = 3000;
+                            try {
+                                if(ToolsKit.isNotEmpty(valueObj)) {
+                                    order = Integer.parseInt(valueObj.toString());
+                                }
+                            } catch (Exception e) {}
+                            requestMapping.setOrder(order);
+                        }
+                        if(RequestMapping.TIMEOUT_FIELD.equalsIgnoreCase(elementDoc.name())) {
+                            int timeout = 3000;
+                            try {
+                                if(ToolsKit.isNotEmpty(valueObj)) {
+                                    timeout = Integer.parseInt(valueObj.toString());
+                                }
+                            } catch (Exception e) {}
+                            requestMapping.setTimeout(timeout);
+                        }
+                    }
+//                    System.out.println(annotation.elementValues()[0].element().returnType().toString()+"             "+annotation.elementValues()[0].value());
+//                    System.out.println(annotation.annotationType().toString()+"                 "+Mapping.class.getName());
+//                    System.out.println(requestMapping.getValue()+"                 "+requestMapping.getDesc());
+                }
+            }
+        }
+        return requestMapping;
     }
 
 }

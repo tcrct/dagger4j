@@ -56,7 +56,8 @@ public class Application {
         return application;
     }
 
-    public Application plugins() {
+    public Application init() {
+
         return application;
     }
 

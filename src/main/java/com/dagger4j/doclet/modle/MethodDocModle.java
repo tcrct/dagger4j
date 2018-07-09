@@ -1,5 +1,7 @@
 package com.dagger4j.doclet.modle;
 
+import com.dagger4j.mvc.route.RequestMapping;
+
 import java.util.List;
 
 /**
@@ -21,13 +23,16 @@ public class MethodDocModle implements java.io.Serializable {
     private List<TagModle> tagModles;
     //参数体
     private List<ParameterModle> paramModles;
+    // 注解
+    private RequestMapping mappingModle;
 
     public MethodDocModle() {
 
     }
 
-    public MethodDocModle(String name, String commentText, List<String> exception, String returnType, List<TagModle> tagModles, List<ParameterModle> paramModles) {
+    public MethodDocModle(String name, RequestMapping mappingModle, String commentText, List<String> exception, String returnType, List<TagModle> tagModles, List<ParameterModle> paramModles) {
         this.name = name;
+        this.mappingModle = mappingModle;
         this.commentText = commentText;
         this.exception = exception;
         this.returnType = returnType;
@@ -83,10 +88,19 @@ public class MethodDocModle implements java.io.Serializable {
         this.paramModles = paramModles;
     }
 
+    public RequestMapping getMappingModle() {
+        return mappingModle;
+    }
+
+    public void setMappingModle(RequestMapping mappingModle) {
+        this.mappingModle = mappingModle;
+    }
+
     @Override
     public String toString() {
         return "MethodDocModle{" +
                 "name='" + name + '\'' +
+                "mappingModle='" + mappingModle + '\'' +
                 ", exception=" + exception +
                 ", returnType='" + returnType + '\'' +
                 ", tagModles=" + tagModles +
