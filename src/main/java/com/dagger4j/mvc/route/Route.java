@@ -54,12 +54,18 @@ public class Route {
 
     public void builderMapping(String controllerKey, Method actionMethod) {
         Mapping methodMapping = actionMethod.getAnnotation(Mapping.class);
+        String httpMethodString = getHttpMethodString(methodMapping);
         if(ToolsKit.isEmpty(methodMapping)) {
-            String productCode = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
-            controllerKey = productCode + "/" +controllerKey;
-            this.requestMapping = new RequestMapping("/"+controllerKey+"/"+actionMethod.getName().toLowerCase(),
+            if(ToolsKit.isEmpty(controllerKey)) {
+                String productCode = PropKit.get(ConstEnums.PRODUCT_CODE.getValue()).toLowerCase().replace("-","").replace("_","");
+                controllerKey = "/"+productCode + (controllerKey.startsWith("/") ? controllerKey : "/" + controllerKey);
+            }
+            this.requestMapping = new RequestMapping(controllerKey+"/"+actionMethod.getName().toLowerCase(),
                     actionMethod.getName(),
-                    0, Integer.parseInt(ConstEnums.REQUEST_TIMEOUT.getValue()), new ArrayList<ValidationParam>());
+                    0,
+                    Integer.parseInt(ConstEnums.REQUEST_TIMEOUT.getValue()),
+                    httpMethodString,
+                    new ArrayList<ValidationParam>());
             return;
         }
 
@@ -94,6 +100,7 @@ public class Route {
                 methodMapping.desc(),
                 methodMapping.order(),
                 methodMapping.timeout(),
+                httpMethodString,
                 validationParamList);
 
         // 是否单例
@@ -130,6 +137,23 @@ public class Route {
 
     public void setSingleton(boolean singleton) {
         this.singleton = singleton;
+    }
+
+    private String getHttpMethodString(Mapping mapping) {
+        if(ToolsKit.isEmpty(mapping)) {
+            return "";
+        }
+        HttpMethod[] methods = mapping.method();
+        StringBuilder httpMethod = new StringBuilder();
+        if(ToolsKit.isNotEmpty(methods)) {
+            for(HttpMethod method : methods) {
+                httpMethod.append(method.name()).append(",");
+            }
+            if(httpMethod.length()>1) {
+                httpMethod.deleteCharAt(httpMethod.length()-1);
+            }
+        }
+        return httpMethod.toString();
     }
 }
 

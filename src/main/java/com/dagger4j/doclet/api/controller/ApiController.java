@@ -14,7 +14,7 @@ import com.dagger4j.vtor.annotation.NotEmpty;
  * @date createed in 2018/7/9.
  */
 @Controller
-@Mapping(value = "/dagger/api/{product}", desc="api接口")
+@Mapping(value = "/dagger/api", desc="api接口")
 public class ApiController extends BaseController {
 
     @Import
@@ -23,18 +23,16 @@ public class ApiController extends BaseController {
 
     /**
      *  取Controller列表
-     * @param product
      */
-    @Mapping(value = "/list", method = HttpMethod.GET)
-    public void list(@NotEmpty String product) {
+    @Mapping(value = "/list", desc = "controller列表")
+    public void list() {
         if(!isLocalRequest()) {
             throw new MvcException("仅支持local环境请求!");
         }
-
         try {
-            apiService.list(product);
+            returnSuccessJson(apiService.list());
         } catch (Exception e) {
-
+            returnFailJson(e, e.getMessage());
         }
     }
 
@@ -47,11 +45,10 @@ public class ApiController extends BaseController {
         if(!isLocalRequest()) {
             throw new MvcException("仅支持local环境请求!");
         }
-
         try {
-            apiService.methodList(key);
+            returnSuccessJson(apiService.methodList(key));
         } catch (Exception e) {
-
+            returnFailJson(e, e.getMessage());
         }
     }
 
@@ -64,12 +61,10 @@ public class ApiController extends BaseController {
         if(!isLocalRequest()) {
             throw new MvcException("仅支持local环境请求!");
         }
-
         try {
-            apiService.methodDetail(key);
+            returnSuccessJson(apiService.methodDetail(key));
         } catch (Exception e) {
-
+            returnFailJson(e, e.getMessage());
         }
     }
-
 }

@@ -1,10 +1,12 @@
 package com.dagger4j.mvc.core;
 
+import com.dagger4j.exception.IException;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.render.JsonRender;
 import com.dagger4j.mvc.render.Render;
 import com.dagger4j.mvc.render.TextRender;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by laotang on 2018/6/15.
@@ -37,6 +40,7 @@ public abstract class BaseController {
     public void init(IRequest request, IResponse response) {
         this.request = request;
         this.response = response;
+        this.render = null;     //防止Controller没写returnXXXX方法时，返回上一次请求结果到到客户端
         if("dev".equalsIgnoreCase(PropKit.get(ConstEnums.PROPERTIES.USE_ENV.getValue()))) {
             printRequestInfo();
         }
@@ -119,7 +123,7 @@ public abstract class BaseController {
 
     public Render getRender() {
         if(null == render) {
-            render = new TextRender("request is not set render");
+            render = new JsonRender("request is not set render");
         }
         return render;
     }
@@ -130,7 +134,8 @@ public abstract class BaseController {
      */
     public Boolean isLocalRequest() {
         String url = request.getRequestURL();
-        if (url.contains("http://local") || url.contains("https://local")) {
+        if (url.contains("http://local") || url.contains("https://local")
+                || url.contains("127.0") || url.contains("192.168") ) {
             return true;
         }
         return false;
@@ -143,5 +148,32 @@ public abstract class BaseController {
      */
     public void returnText(String text) {
         render = new TextRender(text);
+    }
+
+
+    /**
+     * 返回请求成功json
+     * @param obj
+     */
+    protected void returnSuccessJson(Object obj) {
+        returnFailJson(null, obj );
+    }
+
+    /**
+     * 返回请求失败json
+     * @param exception
+     * @param obj
+     */
+    protected void returnFailJson(Exception exception, Object obj) {
+        returnJson(ToolsKit.buildReturnDto((IException) exception, obj), null);
+    }
+
+    /**
+     * 返回JSON格式字符串
+     *
+     * @param obj
+     */
+    private void returnJson(Object obj, Set<String> fieldSet) {
+        render = new JsonRender(obj, fieldSet);
     }
 }

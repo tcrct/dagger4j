@@ -83,7 +83,6 @@ public class ApiDocument {
                     }
                     // Controller Mapping注解部份
                     RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
-                    String name = ToolsKit.isEmpty(mappingModle.getValue()) ? classDoc.name() : mappingModle.getValue();
 
                     MethodDoc[]  methodDocs =  classDoc.methods();
                     if(ToolsKit.isNotEmpty(methodDocs)) {
@@ -148,10 +147,14 @@ public class ApiDocument {
                                 }
                                 methodDocModle.setTagModles(modlesTagList);
                             }
+                            // 注解部份
+                            RequestMapping methodMapping = buildRequestMapping(methodDoc.annotations());
+                            methodDocModle.setMappingModle(methodMapping);
+
                             methodDocModleList.add(methodDocModle);
                         }
                     }
-                    classDocModleList.add(new ClassDocModle(name, mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
+                    classDocModleList.add(new ClassDocModle(classDoc.toString(), mappingModle, classDoc.commentText().trim(), tagModleList, methodDocModleList));
                 }
             }
         }

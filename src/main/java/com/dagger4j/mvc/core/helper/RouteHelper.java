@@ -79,7 +79,7 @@ public class RouteHelper {
         Collections.sort(keyList);
         logger.warn("**************** Controller Mapper Key ****************");
         for (String key : keyList) {
-            if(key.contains(ConstEnums.REPORT_MAPPING_KEY.getValue())) {
+            if(key.startsWith(ConstEnums.FRAMEWORK_MAPPING_KEY.getValue())) {
                 continue;
             }
             logger.warn(key);

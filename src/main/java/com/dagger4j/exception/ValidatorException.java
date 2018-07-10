@@ -31,7 +31,7 @@ public class ValidatorException extends AbstractDaggerException implements IExce
         if(ToolsKit.isEmpty(super.getMessage())) {
             return ExceptionEnums.PARAM_ERROR.getMessage();
         } else {
-            return ExceptionEnums.PARAM_ERROR.getMessage() + ": " + super.getMessage();
+            return super.getMessage();
         }
     }
 

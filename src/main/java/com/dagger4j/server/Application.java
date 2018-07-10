@@ -1,5 +1,7 @@
 package com.dagger4j.server;
 
+import com.dagger4j.mvc.core.CustomInitRun;
+import com.dagger4j.mvc.core.InitRun;
 import com.dagger4j.mvc.core.helper.HandlerHelper;
 import com.dagger4j.mvc.core.helper.PluginHelper;
 import com.dagger4j.mvc.http.handler.HandlerChain;
@@ -56,8 +58,8 @@ public class Application {
         return application;
     }
 
-    public Application init() {
-
+    public Application init(InitRun initRunObj) {
+        CustomInitRun.getInstance().addRun(initRunObj);
         return application;
     }
 

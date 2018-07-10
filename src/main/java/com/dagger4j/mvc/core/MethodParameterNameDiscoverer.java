@@ -3,20 +3,18 @@ package com.dagger4j.mvc.core;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
-
-import jdk.internal.org.objectweb.asm.tree.ClassNode;
-import jdk.internal.org.objectweb.asm.tree.LocalVariableNode;
-import jdk.internal.org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.objectweb.asm.Opcodes.ASM4;
+import static org.objectweb.asm.Opcodes.ASM5;
 
 /**
  * 方法参数名称发现类
@@ -124,7 +122,7 @@ public class MethodParameterNameDiscoverer {
         }
         TreeMap<Integer, String> itemVisitorNameMap = new TreeMap<>();
 
-        cr.accept(new ClassVisitor(ASM4) {
+        cr.accept(new ClassVisitor(ASM5) {
             @Override
             public MethodVisitor visitMethod(final int access,
                                              final String name, final String desc,
@@ -137,7 +135,7 @@ public class MethodParameterNameDiscoverer {
                 }
 
                 MethodVisitor v = super.visitMethod(access, name, desc, signature, exceptions);
-                return new MethodVisitor(ASM4, v) {
+                return new MethodVisitor(ASM5, v) {
                     @Override
                     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
                         itemVisitorNameMap.put(index, name);

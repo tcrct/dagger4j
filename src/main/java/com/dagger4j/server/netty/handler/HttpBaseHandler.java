@@ -39,7 +39,7 @@ public class HttpBaseHandler extends SimpleChannelInboundHandler<FullHttpRequest
     }
 
     @Override
-    public void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) throws Exception {
+    public void channelRead0(final ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         IResponse response = null;
         FutureTask<IResponse> futureTask = null;
         RequestTask requestTask = null;

@@ -62,7 +62,6 @@ final public class RequestAccessHandler{
         new ActionInvocation(route, controller, method, target).invoke();    // 反射执行该方法
         // 返回结果
         controller.getRender().setContext(request, response).render();
-
     }
 
     /**

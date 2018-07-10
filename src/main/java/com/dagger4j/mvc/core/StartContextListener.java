@@ -67,7 +67,8 @@ public class StartContextListener {
      * @throws Exception
      */
     private void initCode() throws Exception {
-        logger.warn("init code");
+        CustomInitRun.getInstance().start();
+        logger.warn("init code success");
     }
 
 }

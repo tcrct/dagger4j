@@ -7,6 +7,9 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
+import com.dagger4j.exception.IException;
+import com.dagger4j.mvc.dto.HeadDto;
+import com.dagger4j.mvc.dto.ReturnDto;
 import com.dagger4j.utils.DaggerId;
 import com.dagger4j.utils.XmlHelper;
 import org.slf4j.Logger;
@@ -326,6 +329,30 @@ public final class ToolsKit {
             htmlChar = htmlChar.replace(entry.getValue(), entry.getKey());
         }
         return htmlChar;
+    }
+
+    /**
+     *
+     * @param exception
+     * @param obj
+     * @return
+     */
+    public static ReturnDto<Object> buildReturnDto(IException exception, Object obj) {
+        ReturnDto<Object> dto = new ReturnDto<Object>();
+        HeadDto head = new HeadDto();
+        if(isEmpty(head)) {
+            head = new HeadDto();
+        }
+        if (ToolsKit.isEmpty(exception)) {
+            head.setRet(IException.SUCCESS_CODE);
+            head.setMsg(IException.SUCCESS_MESSAGE);
+        } else {
+            head.setRet(exception.getCode());
+            head.setMsg(exception.getMessage());
+        }
+        dto.setHead(head);
+        dto.setData(obj);
+        return dto;
     }
 
 

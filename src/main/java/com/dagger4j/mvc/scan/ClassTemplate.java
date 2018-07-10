@@ -30,23 +30,26 @@ public abstract class ClassTemplate {
 
     protected ClassTemplate(String packageName, List<String> jarNames) {
         this.packageName = packageName;
-        this.jarNames = jarNames;
+        this.jarNames = ToolsKit.isEmpty(jarNames) ? new ArrayList<String>(1) : jarNames;
     }
 
     /**
      * 根据指定路径及jar文件前缀包名下的类对象集合
      * 如果类是抽象类或接口则不扫描到集合
-     * @param packagePath       包路径
-     * @param jarNames              jar包名前经集合
      * @return
      */
     public List<Class<?>> getList() {
-        List<Class<?>> classList = allClassMap.get(packageName);
-        if(ToolsKit.isEmpty(classList)) {
-            classList = scanClass(packageName, jarNames);
-            if(ToolsKit.isNotEmpty(classList))  {
-                allClassMap.put(packageName, classList);
+        String[] packagePathArray = packageName.split(",");
+        List<Class<?>> classList = new ArrayList<>();
+        for (String packagePathItem : packagePathArray) {
+            List<Class<?>> classListItem = allClassMap.get(packagePathItem);
+            if (ToolsKit.isEmpty(classListItem)) {
+                classListItem = scanClass(packagePathItem, jarNames);
+                if (ToolsKit.isNotEmpty(classListItem)) {
+                    allClassMap.put(packagePathItem, classListItem);
+                }
             }
+            classList.addAll(classListItem);
         }
         return classList;
     }

@@ -177,7 +177,7 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getProtocol() {
-        return request.protocolVersion().text();
+        return request.protocolVersion().protocolName().toLowerCase();
     }
 
     @Override
@@ -197,12 +197,12 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRemoteAddr() {
-        return getProtocol() + "://" + getRemoteHost() + getRequestURI();
+        return getProtocol() + "://" + getRemoteHost() + ":" + getServerPort() + getRequestURI();
     }
 
     @Override
     public String getRemoteHost() {
-        return remoteAddress.getHostName();
+        return remoteAddress.getHostString();
     }
 
     /**
@@ -285,14 +285,14 @@ public class HttpRequest implements IRequest{
 
     @Override
     public String getRequestURI() {
-        String url = getRequestURL();
+        String url =  request.uri();
         int pathEndPos = url.indexOf('?');
         return (pathEndPos < 0) ? url : url.substring(0, pathEndPos);
     }
 
     @Override
     public String getRequestURL() {
-        return request.uri();
+        return getRemoteAddr();
     }
 
     @Override

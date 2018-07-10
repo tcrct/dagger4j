@@ -1,6 +1,7 @@
 package com.dagger4j.mvc.http;
 
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.http.enums.ConstEnums;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -19,13 +20,14 @@ public class HttpResponse implements IResponse {
     private int status;
     private String contentType;
     private String charset;
-    private Object returnObj;
+    private Object returnObj = null;
 
     private HttpResponse(IRequest iRequest){
         request = iRequest;
         headers = new HashMap<>();
         charset = HttpConstants.DEFAULT_CHARSET.toString();
         status = HttpResponseStatus.OK.code();
+        returnObj = null;
     }
 
     public static HttpResponse build(IRequest request) {
@@ -102,8 +104,11 @@ public class HttpResponse implements IResponse {
     public String toString() {
         if(null != returnObj) {
             return ToolsKit.toJsonString(returnObj);
+        } else{
+            Map<String, String> map = new HashMap<>();
+            map.put("hello", ConstEnums.FRAMEWORK_OWNER.getValue());
+            return ToolsKit.toJsonString(ToolsKit.buildReturnDto(null, map));
         }
-        return "{\"hello\" : \"dagger\"}";
     }
 
     @Override

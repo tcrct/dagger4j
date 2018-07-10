@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
  */
 public enum ConstEnums {
 
+
     INPUTSTREAM_STR_NAME("dagger4j_inputstream_str", "以JSON或XML方式提交参数时，暂存在Request里的key"),
     REQUEST_TIMEOUT("3000", "默认的请求过期时间毫秒"),
     CLASS_URL_PROTOCOL_FILE_FIELD("file", "calss类文件URL对象的类型"),
@@ -23,9 +24,9 @@ public enum ConstEnums {
     PRODUCT_APPID("product.appid", "项目APPID"),
     PRODUCT_CODE("product.code", "项目简单称"),
     JAR_PREFIX("jar.prefix", "是扫描的jar包文件名前缀"),
-    REPORT_MAPPING_KEY("/dagger/report", "框架报告映射路径前缀"),
     DAGGER_INPUTSTREAM_STR_FIELD("dagger_inputstream_str", "框架报告映射路径前缀"),
     FRAMEWORK_OWNER_FILED("framework-x-owenr", ""),
+    FRAMEWORK_MAPPING_KEY("/dagger", "以框架名称作前缀的映射路径不在控制台打印，一般都是作特殊用途"),
     FRAMEWORK_OWNER("dagger", "框架名称"),
     RESPONSE_STATUS("status", "返回结果状态码"),
     DEFAULT_DATE_FORMAT("default.date.format", "返回结果状态码"),
