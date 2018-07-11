@@ -4,7 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.dagger4j.cache.CacheModelOptions;
 import com.dagger4j.cache.SerializableUtils;
 import com.dagger4j.cache.client.AbstractCacheClient;
-import com.dagger4j.cache.ds.RedisCacheSource;
+import com.dagger4j.cache.ds.RedisAdapter;
 import com.dagger4j.kit.ThreadPoolKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
@@ -28,14 +28,23 @@ public class RedisClient extends AbstractCacheClient<Jedis> {
     private static final Logger logger = LoggerFactory.getLogger(RedisClient.class);
 
     private JedisPool jedisPool = null;
+    private RedisAdapter redisAdapter;
 
-    public RedisClient() {
-        jedisPool = new RedisCacheSource.Builder().build().getSource();
+    public RedisClient(RedisAdapter adapter) {
+        this.redisAdapter = adapter;
+    }
+
+    @Override
+    public  String getId() {
+        return redisAdapter.getId();
     }
 
     @Override
     public Jedis getClient()  {
         try {
+            if(null == jedisPool) {
+                jedisPool = redisAdapter.getSource();
+            }
             return jedisPool.getResource();
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);

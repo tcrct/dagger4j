@@ -8,5 +8,4 @@ package com.dagger4j.cache.ds;
 public interface ICacheSource<T> {
 
     T getSource();
-
 }
