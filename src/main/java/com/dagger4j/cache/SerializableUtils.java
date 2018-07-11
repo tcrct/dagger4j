@@ -8,6 +8,9 @@ import redis.clients.util.SafeEncoder;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+/**
+ * 缓存序列化工具
+ */
 public class SerializableUtils {
 
 	private SerializableUtils() {
