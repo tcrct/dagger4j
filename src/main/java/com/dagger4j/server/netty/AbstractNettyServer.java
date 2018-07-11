@@ -151,12 +151,21 @@ public abstract class AbstractNettyServer implements IServer {
             File bash = new File("/bin/sh");
             if(bash.exists()) {
                 ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c","echo $PPID");
+                BufferedReader rd = null;
                 try {
                     Process p = pb.start();
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    rd = new BufferedReader(new InputStreamReader(p.getInputStream()));
                     pid = rd.readLine();
                 } catch(IOException e) {
                     pid = String.valueOf(Thread.currentThread().getId());
+                }  finally {
+                    try {
+                        if(null!= rd) {
+                            rd.close();
+                        }
+                    } catch (Exception e){
+                        logger.warn(e.getMessage(), e);
+                    }
                 }
             }
         } else {
