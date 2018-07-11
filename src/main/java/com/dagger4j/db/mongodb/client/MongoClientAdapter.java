@@ -147,6 +147,7 @@ public class MongoClientAdapter implements IClient<MongoClient> {
         private String username;
         private String password;
         private String url;
+        private boolean isDefault;
 
         public Builder host(String host) {
             this.host = host;
@@ -173,8 +174,15 @@ public class MongoClientAdapter implements IClient<MongoClient> {
             return this;
         }
 
+        public Builder isDefault(boolean isDefault) {
+            this.isDefault = isDefault;
+            return this;
+        }
+
         public MongoClientAdapter build() {
-            return new MongoClientAdapter(new MongoConnect(host, port, database, username, password, url));
+            MongoClientAdapter adapter =  new MongoClientAdapter(new MongoConnect(host, port, database, username, password, url));
+            adapter.setDefaultClient(isDefault);
+            return adapter;
         }
     }
 }

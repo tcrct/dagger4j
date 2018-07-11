@@ -10,10 +10,7 @@ import com.dagger4j.utils.DaggerId;
  */
 public abstract class AbstractCacheClient<T> implements IClient<T> {
 
-    @Override
-    public String getId() {
-        return new DaggerId().toString();
-    }
+    public abstract String getId();
 
     @Override
     public DBConnect getDbConnect() {

@@ -1,22 +1,26 @@
 package com.dagger4j.cache.ds;
 
+import com.dagger4j.db.DBConnect;
+import com.dagger4j.db.IClient;
+import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.utils.MD5;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.core.Ehcache;
 import redis.clients.jedis.exceptions.JedisException;
 
 /**
  * @author Created by laotang
  * @date createed in 2018/7/5.
  */
-public class EhCacheSource extends AbstractCacheSource<ResourcePoolsBuilder> {
+public class EhCacheAdapter extends AbstractCacheSource<ResourcePoolsBuilder> implements IClient<ResourcePoolsBuilder> {
 
     private String alias = "dagger_ehcache";       //别名
     private int heap;            // 堆内存大少？？？
 
-    public EhCacheSource(String alias, int heap) {
+    public EhCacheAdapter(String alias, int heap) {
         this.alias = alias;
         this.heap = heap;
     }
-
 
     public String getAlias() {
         return alias;
@@ -24,6 +28,26 @@ public class EhCacheSource extends AbstractCacheSource<ResourcePoolsBuilder> {
 
     public int getHeap() {
         return heap;
+    }
+
+    @Override
+    public String getId() {
+        return ToolsKit.isEmpty(alias) ?  MD5.MD5Encode(toString()) : alias;
+    }
+
+    @Override
+    public DBConnect getDbConnect() {
+        return null;
+    }
+
+    @Override
+    public ResourcePoolsBuilder getClient() throws Exception {
+        return getSource();
+    }
+
+    @Override
+    public void close() throws Exception {
+
     }
 
     public static class Builder {
@@ -43,8 +67,8 @@ public class EhCacheSource extends AbstractCacheSource<ResourcePoolsBuilder> {
             return this;
         }
 
-        public EhCacheSource build() {
-            return new EhCacheSource(alias, heap);
+        public EhCacheAdapter build() {
+            return new EhCacheAdapter(alias, heap);
         }
     }
 
@@ -58,4 +82,11 @@ public class EhCacheSource extends AbstractCacheSource<ResourcePoolsBuilder> {
         }
     }
 
+    @Override
+    public String toString() {
+        return "EhCacheAdapter{" +
+                "alias='" + alias + '\'' +
+                ", heap=" + heap +
+                '}';
+    }
 }

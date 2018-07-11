@@ -1,8 +1,11 @@
 package com.dagger4j.cache.ds;
 
+import com.dagger4j.db.DBConnect;
+import com.dagger4j.db.IClient;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.utils.MD5;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
@@ -11,28 +14,39 @@ import redis.clients.jedis.exceptions.JedisException;
  * @author Created by laotang
  * @date createed in 2018/7/5.
  */
-public class RedisCacheSource extends AbstractCacheSource<JedisPool> {
+public class RedisAdapter extends AbstractCacheSource<JedisPool> implements IClient<JedisPool> {
 
+    private String id;
     private int database;
     private String host;
+    private String username;
     private String password;
     private int port;
     private int timeout;
+    private String url;
+    private RedisConnect redisConnect;
 
-    private RedisCacheSource(int database, String host, String password, int port, int timeout) {
+    private RedisAdapter(String id, int database, String host, String username, String password, int port, int timeout, String url) {
+        this.id = id;
         this.database = database;
         this.host = host;
+        this.username = username;
         this.password = password;
         this.port = port;
         this.timeout = timeout;
+        this.url = url;
+        redisConnect = new RedisConnect(host, port, database+"", username, password, url);
     }
 
     public static class Builder {
         private int database;
         private String host;
+        private String username;
         private String password;
         private int port;
+        private String url;
         private int timeout;
+        private String id;
 
         public Builder() {
 
@@ -44,6 +58,10 @@ public class RedisCacheSource extends AbstractCacheSource<JedisPool> {
         }
         public Builder host(String host) {
             this.host = host;
+            return this;
+        }
+        public Builder username(String username) {
+            this.username = username;
             return this;
         }
         public Builder password(String password) {
@@ -58,9 +76,17 @@ public class RedisCacheSource extends AbstractCacheSource<JedisPool> {
             this.timeout = timeout;
             return this;
         }
+        public Builder url(String url) {
+            this.url = url;
+            return this;
+        }
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
 
-        public RedisCacheSource build() {
-            return new RedisCacheSource(database, host, password, port, timeout);
+        public RedisAdapter build() {
+            return new RedisAdapter(id, database, host, username, password, port, timeout, url);
         }
     }
 
@@ -115,4 +141,34 @@ public class RedisCacheSource extends AbstractCacheSource<JedisPool> {
         }
     }
 
+    @Override
+    public String getId() {
+        return ToolsKit.isEmpty(id) ? MD5.MD5Encode(toString()) : id;
+    }
+
+    @Override
+    public DBConnect getDbConnect() {
+        return redisConnect;
+    }
+
+    @Override
+    public JedisPool getClient() throws Exception {
+        return getSource();
+    }
+
+    @Override
+    public void close() throws Exception {
+        getClient().close();
+    }
+
+    @Override
+    public String toString() {
+        return "RedisAdapter{" +
+                "database=" + database +
+                ", host='" + host + '\'' +
+                ", password='" + password + '\'' +
+                ", port=" + port +
+                ", timeout=" + timeout +
+                '}';
+    }
 }

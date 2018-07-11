@@ -1,7 +1,7 @@
 package com.dagger4j.cache.client.eh;
 
 import com.dagger4j.cache.client.AbstractCacheClient;
-import com.dagger4j.cache.ds.EhCacheSource;
+import com.dagger4j.cache.ds.EhCacheAdapter;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -16,18 +16,26 @@ public class EhCacheClient extends AbstractCacheClient<Cache> {
 
     private CacheManager cacheManager = null;
     private Cache ehCache;
+    private EhCacheAdapter adapter;
 
-    public EhCacheClient() {
-        EhCacheSource ehCacheSource = new EhCacheSource.Builder().build();
-        cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(ehCacheSource.getAlias(),
-                        CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class,ehCacheSource.getSource()).build())
-                .build(true);
-        ehCache = cacheManager.getCache(ehCacheSource.getAlias(), String.class, Object.class);
+    public EhCacheClient(EhCacheAdapter ehCacheAdapter) {
+//        ehCacheAdapter = new EhCacheAdapter.Builder().build();
+
+        adapter = ehCacheAdapter;
+    }
+    public String getId() {
+        return adapter.getId();
     }
 
     @Override
     public Cache getClient() throws Exception {
+        if(null == ehCache) {
+            cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+                    .withCache(adapter.getAlias(),
+                            CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class, adapter.getSource()).build())
+                    .build(true);
+            ehCache = cacheManager.getCache(adapter.getAlias(), String.class, Object.class);
+        }
         return ehCache;
     }
 
@@ -41,7 +49,15 @@ public class EhCacheClient extends AbstractCacheClient<Cache> {
     }
 
     public void set(String key, Object value) {
+        ehCache.put(key, value);
+    }
+
+    public void putIfAbsent(String key, Object value) {
         ehCache.putIfAbsent(key, value);
+    }
+
+    public void replace(String key, Object value) {
+        ehCache.replace(key, value);
     }
 
     public void delete(String key) {

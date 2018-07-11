@@ -122,8 +122,12 @@ public abstract class BaseController {
 
 
     public Render getRender(Object resultObj) {
-        if(null == render && null != resultObj) {
-            render = new JsonRender(ToolsKit.buildReturnDto(null, resultObj));
+        if(null == render) {
+            if(null != resultObj) {
+                render = new JsonRender(ToolsKit.buildReturnDto(null, resultObj));
+            } else {
+                render = new TextRender("controller is not set render value");
+            }
         }
         return render;
     }
