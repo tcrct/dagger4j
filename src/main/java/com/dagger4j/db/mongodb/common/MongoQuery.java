@@ -351,12 +351,12 @@ public class MongoQuery<T> {
 		}
     	DBObject fieldsDbo = getDBFields();
 		DBObject resultDbo = null;
-		if(ToolsKit.isNotEmpty(getHintDBObject())){
+		if(ToolsKit.isEmpty(getHintDBObject())){
 			List<DBObject> hintList = new ArrayList<DBObject>(1);
 			hintList.add(getHintDBObject());
 			coll.setHintFields(hintList);
 		}
-		if(ToolsKit.isNotEmpty(fieldsDbo)){
+		if(ToolsKit.isEmpty(fieldsDbo)){
 			resultDbo = coll.findOne(queryObj, fieldsDbo);
 		}else{
 			resultDbo = coll.findOne(queryObj);
@@ -370,13 +370,13 @@ public class MongoQuery<T> {
 		DBCursor cursor = null;
 		DBObject fieldsDbo = getDBFields();
 
-		if (ToolsKit.isNotEmpty(fieldsDbo)) {
+		if (ToolsKit.isEmpty(fieldsDbo)) {
 			cursor = coll.find(queryObj, fieldsDbo);
 		} else {
 			cursor = coll.find(queryObj, keys);
 		}
 		DBObject orderDbo = getDBOrder();
-		if (ToolsKit.isNotEmpty(orderDbo)) {
+		if (ToolsKit.isEmpty(orderDbo)) {
 			cursor.sort(orderDbo);
 		}
 
@@ -384,7 +384,7 @@ public class MongoQuery<T> {
 		if (page.getPageNo() > 0 && page.getPageSize() > 1) {
 			cursor.skip((page.getPageNo() - 1) * page.getPageSize()).limit(page.getPageSize());
 		}
-		if(ToolsKit.isNotEmpty(getHintDBObject())) cursor.hint(getHintDBObject());
+		if(ToolsKit.isEmpty(getHintDBObject())) cursor.hint(getHintDBObject());
 
 		logger.debug("find: " + cursor.toString());
 		return MongoKit.dBCursor2List(clazz, cursor);

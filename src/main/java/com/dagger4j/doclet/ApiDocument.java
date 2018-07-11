@@ -5,13 +5,18 @@ import com.dagger4j.doclet.modle.ClassDocModle;
 import com.dagger4j.doclet.modle.MethodDocModle;
 import com.dagger4j.doclet.modle.ParameterModle;
 import com.dagger4j.doclet.modle.TagModle;
+import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Mapping;
+import com.dagger4j.mvc.annotation.Mock;
 import com.dagger4j.mvc.route.RequestMapping;
+import com.dagger4j.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,7 +137,28 @@ public class ApiDocument {
                                         }
                                     }
                                     */
-                                    ParameterModle parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "");
+                                    ParameterModle parameterModle = null;
+                                    Type type = parameter.type();
+                                    System.out.print(methodDoc.name()+"                    "+parameter.name()+"         "+type.toString()+"           "+type.typeName()+"             "+parameter.typeName());
+                                    try {
+
+//                                        System.out.println(type.asAnnotationTypeDoc().typeName());
+//                                        System.out.println(type.asTypeVariable().typeName());
+//                                        System.out.println(type.asParameterizedType().typeName());
+                                        System.out.println(type.getElementType().typeName());
+                                    } catch (Exception e) {
+                                        System.out.println("#############: " + e.getMessage());
+                                    }
+                                    Class<?> parameterType = ClassKit.loadClass(type.toString());
+                                    System.out.println("                " + parameterType.getName());
+                                    if(ToolsKit.isDaggerBean(parameterType)) {
+                                        Field[] fields = parameterType.getDeclaredFields();
+                                        for(Field field : fields) {
+                                            parameterModle = builderParameterModle(field);
+                                        }
+                                    } else {
+                                        parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"");
+                                    }
                                     parameterModleList.add(parameterModle);
                                 }
                                 methodDocModle.setParamModles(parameterModleList);
@@ -208,7 +234,7 @@ public class ApiDocument {
                         AnnotationTypeElementDoc elementDoc = pair.element();
                         AnnotationValue annotationValue = pair.value();
                         Object valueObj = annotationValue.value();
-                        System.out.println(valueObj.toString());
+//                        System.out.println(valueObj.toString());
                         if(RequestMapping.VALUE_FIELD.equalsIgnoreCase(elementDoc.name())) {
                             requestMapping.setValue(valueObj.toString());
                         }
@@ -245,6 +271,27 @@ public class ApiDocument {
             }
         }
         return requestMapping;
+    }
+
+    private ParameterModle builderParameterModle(Field field) {
+        ParameterModle parameterModle = new ParameterModle();
+        parameterModle.setName(field.getName());
+        parameterModle.setType(field.getType().getSimpleName());
+        Annotation[] annotations = field.getAnnotations();
+        if(ToolsKit.isNotEmpty(annotations)) {
+            for(Annotation annotation : annotations) {
+                Class<?> annotationClass = annotation.annotationType();
+                if(NotEmpty.class.equals(annotationClass)) {
+//                    System.out.println(field.getName() + "#####NotEmpty#####: " + annotation.getClass().getName() );
+                    parameterModle.setEmpty(false);  // no empty
+                }
+                if(Mock.class.equals(annotationClass)) {
+                    Mock mock = field.getAnnotation(Mock.class);
+                    System.out.println(field.getName() + "#####Mock#####: " +mock.value() );
+                }
+            }
+        }
+        return parameterModle;
     }
 
 }

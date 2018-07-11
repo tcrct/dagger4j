@@ -86,7 +86,7 @@ public abstract class BaseController {
         /*
         Map<String, Object> params = new HashMap<>();
         Map<String, Object> requestParams = request.getParameterMap();
-        if (ToolsKit.isNotEmpty(requestParams)) {
+        if (ToolsKit.isEmpty(requestParams)) {
             for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
                 String name = iter.next();
                 if(ConstEnums.INPUTSTREAM_STR_NAME.toString().equalsIgnoreCase(name)) {
@@ -121,9 +121,9 @@ public abstract class BaseController {
     }
 
 
-    public Render getRender() {
-        if(null == render) {
-            render = new JsonRender("request is not set render");
+    public Render getRender(Object resultObj) {
+        if(null == render && null != resultObj) {
+            render = new JsonRender(ToolsKit.buildReturnDto(null, resultObj));
         }
         return render;
     }

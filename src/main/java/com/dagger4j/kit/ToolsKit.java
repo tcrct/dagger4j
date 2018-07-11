@@ -8,15 +8,18 @@ import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import com.dagger4j.exception.IException;
+import com.dagger4j.mvc.annotation.Bean;
 import com.dagger4j.mvc.dto.HeadDto;
 import com.dagger4j.mvc.dto.ReturnDto;
 import com.dagger4j.utils.DaggerId;
+import com.dagger4j.utils.DataType;
 import com.dagger4j.utils.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -355,5 +358,13 @@ public final class ToolsKit {
         return dto;
     }
 
+    public static boolean isDaggerBean(Class<?> parameterType) {
+        if(DataType.isBaseType(parameterType)) {
+            return false;
+        }
+        return parameterType.isAnnotationPresent(Bean.class)
+                || DataType.isIdEntityType(parameterType)
+                || ObjectKit.newInstance(parameterType) instanceof Serializable;
+    }
 
 }

@@ -43,11 +43,13 @@ public class ActionInvocation {
 	 * 
 	 * @throws Throwable
 	 */
-	public void invoke() throws Exception {
+	public Object invoke() throws Exception {
+		Object returnObj = null;
 		// 如果方法设置了拦截器，则先按书写顺序从上至下执行拦截器
 		if (inters != null && index < inters.length) {
 			inters[index++].intercept(this);
 		} else {
+			System.out.println("method.getReturnType(): " + method.getReturnType());
 			//如果方法体里有参数设置
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {
@@ -58,11 +60,12 @@ public class ActionInvocation {
 				}
 				// 再根据参数名取出request里的value，然后再根据验证注解验证，通过后再注入到方法体内
 				Object[] argsObj =ParameterInvokeMethod.getParameterValues(controller, method, parameterNames);
-				method.invoke(controller, argsObj);
+				returnObj = method.invoke(controller, argsObj);
 			} else {
-				method.invoke(controller, NULL_ARGS);
+				returnObj = method.invoke(controller, NULL_ARGS);
 			}
 		}
+		return returnObj;
 	}
 
 	public BaseController getController() {

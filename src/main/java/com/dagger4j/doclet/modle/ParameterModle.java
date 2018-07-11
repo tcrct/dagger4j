@@ -10,12 +10,22 @@ public class ParameterModle {
     private String type;
     // 参数名称
     private String name;
+    // mock数据值
+    private String mock;
+    // 是否必填(必填为true)
+    private boolean empty;
     // 验证规则字符串
     private String rules;
 
-    public ParameterModle(String type, String name, String rules) {
+    public ParameterModle() {
+
+    }
+
+    public ParameterModle(String type, String name, String mock, boolean empty, String rules) {
         this.type = type;
         this.name = name;
+        this.mock = mock;
+        this.empty = empty;
         this.rules = rules;
     }
 
@@ -43,11 +53,29 @@ public class ParameterModle {
         this.rules = rules;
     }
 
+    public String getMock() {
+        return mock;
+    }
+
+    public void setMock(String mock) {
+        this.mock = mock;
+    }
+
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+    }
+
     @Override
     public String toString() {
         return "ParameterModle{" +
                 "type='" + type + '\'' +
                 ", name='" + name + '\'' +
+                ", mock='" + mock + '\'' +
+                ", empty=" + empty +
                 ", rules='" + rules + '\'' +
                 '}';
     }

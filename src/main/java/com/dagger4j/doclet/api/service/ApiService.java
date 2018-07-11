@@ -54,7 +54,7 @@ public class ApiService {
                     String uri = mapping.getValue() + "/"+name;
                     RequestMapping requestMapping = methodDocModle.getMappingModle();
                     if(ToolsKit.isNotEmpty(requestMapping)) {
-                        name = ToolsKit.isNotEmpty(requestMapping.getValue()) ? requestMapping.getValue() : name;
+//                        name = ToolsKit.isEmpty(requestMapping.getValue()) ? requestMapping.getValue() : name;
                         desc = ToolsKit.isNotEmpty(requestMapping.getDesc()) ? requestMapping.getDesc() : desc;
                         uri = mapping.getValue() + (ToolsKit.isEmpty(requestMapping.getValue()) ? "/"+name : requestMapping.getValue());
                     }
@@ -66,6 +66,7 @@ public class ApiService {
                     methodDto.setDesc(desc);
                     methodDto.setMethod(method);
                     methodDto.setUri(uri.toLowerCase());
+                    requestMapping.setValue(uri.toLowerCase());
                     methodDtoList.add(methodDto);
                     methodDetailMap.put(key+"."+name, methodDocModle);
                 }

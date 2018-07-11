@@ -22,6 +22,11 @@ public class ServiceException extends AbstractDaggerException implements IExcept
         this.code = code;
     }
 
+    public ServiceException(String msg , Throwable cause) {
+        super(msg, cause);
+        this.code = ExceptionEnums.ERROR.getCode();
+    }
+
     public ServiceException(int code, String msg , Throwable cause) {
         super(msg, cause);
         this.code = code;
