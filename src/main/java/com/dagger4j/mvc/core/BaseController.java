@@ -1,6 +1,7 @@
 package com.dagger4j.mvc.core;
 
 import com.dagger4j.exception.IException;
+import com.dagger4j.exception.ServiceException;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.http.IRequest;
@@ -133,20 +134,6 @@ public abstract class BaseController {
     }
 
     /**
-     * 是否local环境的请求
-     * @return
-     */
-    public Boolean isLocalRequest() {
-        String url = request.getRequestURL();
-        if (url.contains("http://local") || url.contains("https://local")
-                || url.contains("127.0") || url.contains("192.168") ) {
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
      * 返回文本格式
      * @param text
      */
@@ -169,7 +156,16 @@ public abstract class BaseController {
      * @param obj
      */
     protected void returnFailJson(Exception exception, Object obj) {
-        returnJson(ToolsKit.buildReturnDto((IException) exception, obj), null);
+        IException iException = null;
+        if(null != exception) {
+            if (exception instanceof IException) {
+                iException = (IException) exception;
+            } else {
+                logger.warn(exception.getMessage(), exception);
+                iException = new ServiceException(exception.getMessage()+"", exception);
+            }
+        }
+        returnJson(ToolsKit.buildReturnDto(iException, obj), null);
     }
 
     /**

@@ -6,10 +6,13 @@ import com.dagger4j.doclet.api.dto.MethodListDto;
 import com.dagger4j.doclet.modle.ClassDocModle;
 import com.dagger4j.doclet.modle.MethodDocModle;
 import com.dagger4j.exception.MvcException;
+import com.dagger4j.kit.ClassKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Mock;
 import com.dagger4j.mvc.annotation.Service;
 import com.dagger4j.mvc.route.RequestMapping;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -100,5 +103,34 @@ public class ApiService {
         }
         return methodDetailMap.get(key);
     }
+
+
+    /**
+     * 返回方法详细DTO
+     * @param key       Controller Name+"."+Method Name
+     * @return
+     */
+    public Map<String ,String> mock(String key) {
+        Class<?> clazz = null;
+        try {
+            clazz = ClassKit.loadClass(key);
+        } catch (Exception e) {
+            throw new MvcException(key +" is not exist");
+        }
+
+        Field[] fields = clazz.getDeclaredFields();
+        if(ToolsKit.isEmpty(fields)) {
+            return null;
+        }
+        Map<String ,String> map = new HashMap<>();
+        for(Field field : fields) {
+            Mock mock = field.getAnnotation(Mock.class);
+            if(ToolsKit.isNotEmpty(mock)) {
+                map.put(field.getName(), mock.value());
+            }
+        }
+        return map;
+    }
+
 
 }

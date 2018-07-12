@@ -13,4 +13,5 @@ import java.lang.annotation.*;
 public @interface Email {
     String regexp() default ".*";
     String message() default "不是一个正确的Email地址";
+    String defaultValue() default "";
 }

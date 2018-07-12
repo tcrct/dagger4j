@@ -17,4 +17,5 @@ import static java.lang.annotation.ElementType.*;
 @Documented
 public @interface Mock {
    String value() default "";
+   String desc() default "";
 }

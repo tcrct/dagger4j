@@ -15,5 +15,5 @@ public @interface Range {
     double min() default Double.MIN_VALUE;
     double max() default Double.MAX_VALUE;
     String message() default "不能小于[${min}]或大于[${max}]";
-
+    String defaultValue() default "";
 }
