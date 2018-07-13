@@ -11,6 +11,7 @@ import com.dagger4j.mvc.annotation.Mapping;
 import com.dagger4j.mvc.annotation.Mock;
 import com.dagger4j.mvc.route.RequestMapping;
 import com.dagger4j.utils.DataType;
+import com.dagger4j.utils.GenericsUtils;
 import com.dagger4j.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
 
@@ -18,8 +19,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -87,6 +90,13 @@ public class ApiDocument {
                             }
                         }
                     }
+                    Method[] jdkMethod = null;
+                    try {
+                        Class<?> controllerClass = Class.forName(classDoc.toString());
+                        jdkMethod = controllerClass.getDeclaredMethods();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     // Controller Mapping注解部份
                     RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
 
@@ -105,7 +115,18 @@ public class ApiDocument {
                             // 注释说明
                             methodDocModle.setCommentText(methodDoc.commentText().trim());
                             // 返回值
-                            methodDocModle.setReturnType(methodDoc.returnType().toString());
+                            String returnTypeString = methodDoc.returnType().toString();
+                            if(List.class.getName().equalsIgnoreCase(returnTypeString) ||
+                                    Set.class.getName().equalsIgnoreCase(returnTypeString)  ) {
+                                for(Method method : jdkMethod) {
+                                    if(method.getName().equalsIgnoreCase(methodDoc.name())) {
+                                        Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
+                                        returnTypeString = methodDoc.returnType().simpleTypeName()+"<"+typeClass.getTypeName()+">";
+                                        System.out.println(returnTypeString);
+                                    }
+                                }
+                            }
+                            methodDocModle.setReturnType(returnTypeString);
                             // 异常部份
                             Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
                             if(ToolsKit.isNotEmpty(exceptionTypeArray)) {
@@ -245,12 +266,22 @@ public class ApiDocument {
                             requestMapping.setDesc(valueObj.toString());
                         }
                         if(RequestMapping.METHOD_FIELD.equalsIgnoreCase(elementDoc.name())) {
-//                            HttpMethod[] method = (HttpMethod[])valueObj;
-//                            System.out.println(method);
-                            AnnotationTypeElementDoc annotationTypeElementDoc = pair.element();
-//                            annotationTypeElementDoc.annotations()
-                            System.out.println(pair.element());
-//                            requestMapping.setMethod(annotationValue.value().toString());
+                            StringBuilder methodString = new StringBuilder();
+                            if(annotationValue.value() instanceof Object[]) {
+                                AnnotationValue[] methods = (AnnotationValue[])annotationValue.value();
+                                if(ToolsKit.isNotEmpty(methods)) {
+                                    for (AnnotationValue httpMethod : methods) {
+                                        String method = httpMethod.toString();
+                                        method = method.substring(method.lastIndexOf(".")+1, method.length());
+                                        methodString.append(method).append(",");
+                                    }
+                                    if(methodString.length()>-1) {
+                                        methodString.deleteCharAt(methodString.length()-1);
+                                    }
+                                }
+                            }
+//                            System.out.println(annotationValue.toString());
+                            requestMapping.setMethod(methodString.toString());
                         }
 
                         if(RequestMapping.ORDER_FIELD.equalsIgnoreCase(elementDoc.name())) {

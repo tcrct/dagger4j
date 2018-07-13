@@ -14,9 +14,10 @@ import java.io.Serializable;
 public abstract class Render implements Serializable {
 	
 	private static final long serialVersionUID = -8406693915721288408L;
-	protected  static final String ENCODING  = HttpConstants.DEFAULT_CHARSET.toString();
+	protected  static String ENCODING  = HttpConstants.DEFAULT_CHARSET.toString();
     protected static String TEXT_PLAIN = HttpHeaderValues.TEXT_PLAIN.toString()+";charset=" + ENCODING;
 	protected static String JSON_PLAIN = HttpHeaderValues.APPLICATION_JSON.toString()+";charset=" + ENCODING;
+	protected static String XML_PLAIN = "text/xml;charset=" +ENCODING;
 
 	protected IRequest request;
 	protected IResponse response;

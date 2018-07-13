@@ -11,6 +11,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Min {
+
     double value() default 0;
+
     String message() default "不能小于[${value}]！";
+
 }

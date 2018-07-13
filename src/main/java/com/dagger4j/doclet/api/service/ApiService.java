@@ -110,7 +110,18 @@ public class ApiService {
      * @param key       Controller Name+"."+Method Name
      * @return
      */
-    public Map<String ,String> mock(String key) {
+    public Object mock(String key) {
+        if(ToolsKit.isEmpty(key) || "void".equalsIgnoreCase(key)) {
+            return new HashMap<String ,String>();
+        }
+
+        int startIndex = key.indexOf("<");
+        int endIndex = key.indexOf(">");
+        boolean isArray = key.toLowerCase().startsWith("list") || key.toLowerCase().startsWith("set");
+        if(startIndex > -1 && endIndex > -1) {
+            key = key.substring(startIndex+1, endIndex);
+        }
+
         Class<?> clazz = null;
         try {
             clazz = ClassKit.loadClass(key);
@@ -128,6 +139,15 @@ public class ApiService {
             if(ToolsKit.isNotEmpty(mock)) {
                 map.put(field.getName(), mock.value());
             }
+        }
+
+        if(isArray) {
+            List<Map<String, String>> list = new ArrayList<Map<String, String>>() {
+                {
+                    this.add(map);
+                }
+            };
+            return list;
         }
         return map;
     }
