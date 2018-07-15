@@ -10,6 +10,8 @@ import com.dagger4j.kit.ToolsKit;
 import com.dagger4j.mvc.annotation.Mapping;
 import com.dagger4j.mvc.annotation.Mock;
 import com.dagger4j.mvc.route.RequestMapping;
+import com.dagger4j.utils.DataType;
+import com.dagger4j.utils.GenericsUtils;
 import com.dagger4j.vtor.annotation.NotEmpty;
 import com.sun.javadoc.*;
 
@@ -17,8 +19,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -86,6 +90,13 @@ public class ApiDocument {
                             }
                         }
                     }
+                    Method[] jdkMethod = null;
+                    try {
+                        Class<?> controllerClass = Class.forName(classDoc.toString());
+                        jdkMethod = controllerClass.getDeclaredMethods();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     // Controller Mapping注解部份
                     RequestMapping mappingModle = buildRequestMapping(classDoc.annotations());
 
@@ -104,7 +115,18 @@ public class ApiDocument {
                             // 注释说明
                             methodDocModle.setCommentText(methodDoc.commentText().trim());
                             // 返回值
-                            methodDocModle.setReturnType(methodDoc.returnType().typeName());
+                            String returnTypeString = methodDoc.returnType().toString();
+                            if(List.class.getName().equalsIgnoreCase(returnTypeString) ||
+                                    Set.class.getName().equalsIgnoreCase(returnTypeString)  ) {
+                                for(Method method : jdkMethod) {
+                                    if(method.getName().equalsIgnoreCase(methodDoc.name())) {
+                                        Class<?> typeClass = GenericsUtils.getGenericReturnType(method);
+                                        returnTypeString = methodDoc.returnType().simpleTypeName()+"<"+typeClass.getTypeName()+">";
+                                        System.out.println(returnTypeString);
+                                    }
+                                }
+                            }
+                            methodDocModle.setReturnType(returnTypeString);
                             // 异常部份
                             Type[] exceptionTypeArray = methodDoc.thrownExceptionTypes();
                             if(ToolsKit.isNotEmpty(exceptionTypeArray)) {
@@ -126,9 +148,13 @@ public class ApiDocument {
                                             continue;
                                         }
                                         System.out.println("################################: " + typeDoc.toString());
+
                                         for(AnnotationTypeElementDoc elementDocs : typeDoc.elements()){
                                             System.out.println("parameterName:  " +parameter.name());
+                                            System.out.println("parameterType: " + parameter.type());
                                             System.out.println("elementName: " + elementDocs.name());
+
+                                            annotationDesc..elementValues();
                                             try {
                                             // 要将Unicode转为中文
                                                 System.out.println(URLDecoder.decode(elementDocs.defaultValue().toString(), "UTF-8"));
@@ -137,29 +163,27 @@ public class ApiDocument {
                                         }
                                     }
                                     */
+
                                     ParameterModle parameterModle = null;
                                     Type type = parameter.type();
-                                    System.out.print(methodDoc.name()+"                    "+parameter.name()+"         "+type.toString()+"           "+type.typeName()+"             "+parameter.typeName());
-                                    try {
-
-//                                        System.out.println(type.asAnnotationTypeDoc().typeName());
-//                                        System.out.println(type.asTypeVariable().typeName());
-//                                        System.out.println(type.asParameterizedType().typeName());
-                                        System.out.println(type.getElementType().typeName());
-                                    } catch (Exception e) {
-                                        System.out.println("#############: " + e.getMessage());
+                                    String typeString = type.toString();
+                                    Class<?> parameterType = null;
+                                    if(typeString.indexOf(".") == -1) {
+                                        parameterType = ClassKit.loadClass(DataType.conversionBaseType(typeString));
+                                    } else {
+                                        parameterType = ClassKit.loadClass(type.toString());
                                     }
-                                    Class<?> parameterType = ClassKit.loadClass(type.toString());
-                                    System.out.println("                " + parameterType.getName());
                                     if(ToolsKit.isDaggerBean(parameterType)) {
                                         Field[] fields = parameterType.getDeclaredFields();
                                         for(Field field : fields) {
                                             parameterModle = builderParameterModle(field);
+                                            parameterModleList.add(parameterModle);
                                         }
                                     } else {
-                                        parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"");
+                                        parameterModle = new ParameterModle(parameter.typeName(), parameter.name(), "", true,"", "");
+                                        builderParameterModle( parameterModle, parameter.annotations());
+                                        parameterModleList.add(parameterModle);
                                     }
-                                    parameterModleList.add(parameterModle);
                                 }
                                 methodDocModle.setParamModles(parameterModleList);
                             }
@@ -242,7 +266,22 @@ public class ApiDocument {
                             requestMapping.setDesc(valueObj.toString());
                         }
                         if(RequestMapping.METHOD_FIELD.equalsIgnoreCase(elementDoc.name())) {
-                            requestMapping.setMethod(valueObj.toString());
+                            StringBuilder methodString = new StringBuilder();
+                            if(annotationValue.value() instanceof Object[]) {
+                                AnnotationValue[] methods = (AnnotationValue[])annotationValue.value();
+                                if(ToolsKit.isNotEmpty(methods)) {
+                                    for (AnnotationValue httpMethod : methods) {
+                                        String method = httpMethod.toString();
+                                        method = method.substring(method.lastIndexOf(".")+1, method.length());
+                                        methodString.append(method).append(",");
+                                    }
+                                    if(methodString.length()>-1) {
+                                        methodString.deleteCharAt(methodString.length()-1);
+                                    }
+                                }
+                            }
+//                            System.out.println(annotationValue.toString());
+                            requestMapping.setMethod(methodString.toString());
                         }
 
                         if(RequestMapping.ORDER_FIELD.equalsIgnoreCase(elementDoc.name())) {
@@ -281,17 +320,48 @@ public class ApiDocument {
         if(ToolsKit.isNotEmpty(annotations)) {
             for(Annotation annotation : annotations) {
                 Class<?> annotationClass = annotation.annotationType();
+//                System.out.println(field.getName() + "##########: " + annotationClass.getName() );
                 if(NotEmpty.class.equals(annotationClass)) {
-//                    System.out.println(field.getName() + "#####NotEmpty#####: " + annotation.getClass().getName() );
                     parameterModle.setEmpty(false);  // no empty
                 }
                 if(Mock.class.equals(annotationClass)) {
                     Mock mock = field.getAnnotation(Mock.class);
-                    System.out.println(field.getName() + "#####Mock#####: " +mock.value() );
+                    parameterModle.setDefaultValue(mock.value());
+                    parameterModle.setDesc(mock.desc());
                 }
+//                builderParameterModleItem(parameterModle, annotationClass);
             }
         }
         return parameterModle;
     }
 
+    private void builderParameterModle(ParameterModle parameterModle, AnnotationDesc[] annotatedDescArray) {
+        if(ToolsKit.isNotEmpty(annotatedDescArray)) {
+            for(AnnotationDesc annotation : annotatedDescArray) {
+                // 这里注解能拿出注解里的值，名称，返回类型等信息
+                String typeString = annotation.annotationType().toString();
+                AnnotationDesc.ElementValuePair[] pairs = annotation.elementValues();
+                if(ToolsKit.isNotEmpty(pairs)) {
+                    for(AnnotationDesc.ElementValuePair pair : pairs) {
+                        if(NotEmpty.class.getName().equalsIgnoreCase(typeString)) {
+                            parameterModle.setEmpty(false);
+                        }
+                        if("defaultValue".equalsIgnoreCase(pair.element().name())) {
+                            parameterModle.setDefaultValue(pair.value().value().toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+//    private void builderParameterModleItem(ParameterModle parameterModle , Class<?> annotationClass) {
+//        if(NotEmpty.class.equals(annotationClass)) {
+//            parameterModle.setEmpty(false);  // no empty
+//        }
+//        if(Mock.class.equals(annotationClass)) {
+//            Mock mock = field.getAnnotation(Mock.class);
+//            parameterModle.setDefaultValue(mock.value());
+//        }
+//    }
 }

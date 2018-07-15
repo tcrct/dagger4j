@@ -1,7 +1,6 @@
 package com.dagger4j.mvc.render;
 
 import com.dagger4j.exception.MvcException;
-import io.netty.handler.codec.http.HttpHeaderValues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,7 @@ public class TextRender extends Render {
 	
 	public TextRender(String text, String contentType) {
 		this.text = text;
-		this.TEXT_PLAIN = contentType;
+		TEXT_PLAIN = contentType;
 	}
 	
 	@Override

@@ -10,23 +10,27 @@ public class ParameterModle {
     private String type;
     // 参数名称
     private String name;
-    // mock数据值
-    private String mock;
-    // 是否必填(必填为true)
-    private boolean empty;
+    // 默认数据值
+    private String defaultValue;
+    // 是否必填(必填为false)
+    private boolean empty = true;
+    // 属性说明
+    private String desc;
     // 验证规则字符串
     private String rules;
+
 
     public ParameterModle() {
 
     }
 
-    public ParameterModle(String type, String name, String mock, boolean empty, String rules) {
+    public ParameterModle(String type, String name, String defaultValue, boolean empty, String rules, String desc) {
         this.type = type;
         this.name = name;
-        this.mock = mock;
+        this.defaultValue = defaultValue;
         this.empty = empty;
         this.rules = rules;
+        this.desc = desc;
     }
 
     public String getType() {
@@ -53,12 +57,12 @@ public class ParameterModle {
         this.rules = rules;
     }
 
-    public String getMock() {
-        return mock;
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
-    public void setMock(String mock) {
-        this.mock = mock;
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
     public boolean isEmpty() {
@@ -69,13 +73,22 @@ public class ParameterModle {
         this.empty = empty;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     @Override
     public String toString() {
         return "ParameterModle{" +
                 "type='" + type + '\'' +
                 ", name='" + name + '\'' +
-                ", mock='" + mock + '\'' +
+                ", defaultValue='" + defaultValue + '\'' +
                 ", empty=" + empty +
+                ", desc='" + desc + '\'' +
                 ", rules='" + rules + '\'' +
                 '}';
     }

@@ -3,9 +3,11 @@ package com.dagger4j.mvc.core.helper;
 import com.dagger4j.exception.MvcException;
 import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.annotation.Before;
 import com.dagger4j.mvc.annotation.Controller;
 import com.dagger4j.mvc.annotation.Mapping;
 import com.dagger4j.mvc.core.BaseController;
+import com.dagger4j.mvc.core.Interceptor;
 import com.dagger4j.mvc.http.enums.ConstEnums;
 import com.dagger4j.mvc.route.Route;
 import org.slf4j.Logger;
@@ -26,6 +28,9 @@ public class RouteHelper {
    private static Map<String, Route> routeMap = new HashMap<>();
     // restful风格
     private static Map<String, Route> restfulRouteMap = new HashMap<>();
+    // 拦截器
+    public static final Interceptor[] NULL_INTERS = new Interceptor[0];
+    private static Map<Class<? extends Interceptor>, Interceptor> intersMap = new HashMap<Class<? extends Interceptor>, Interceptor>();
 
     static {
         try {
@@ -45,7 +50,7 @@ public class RouteHelper {
                     if(ObjectKit.isExcludeMethod(actionMethod, excludedMethodName)) {
                         continue;
                     }
-                    Route route = new Route(controllerClass, null, controllerKey, actionMethod);
+                    Route route = new Route(controllerClass, buildMethodInterceptors(actionMethod), controllerKey, actionMethod);
                     String routeKey = route.getRequestMapping().getValue();
                     // 如果包含有{}的，则视为restful风格的URI
                     if (ToolsKit.isNotEmpty(routeKey) && routeKey.contains("{") && routeKey.contains("}")) {
@@ -92,5 +97,36 @@ public class RouteHelper {
 
     public static Map<String, Route> getRestfulRouteMap() {
         return restfulRouteMap;
+    }
+
+    /**
+     * 拦截器
+     * @param method
+     * @return
+     */
+    private static Interceptor[] buildMethodInterceptors(Method method) {
+        Before beforeAnnotation = method.getAnnotation(Before.class);
+        if (beforeAnnotation == null) {
+            return NULL_INTERS;
+        }
+
+        Class<? extends Interceptor>[] interceptorClasses = beforeAnnotation.value();
+        if (interceptorClasses.length == 0) {
+            return NULL_INTERS;
+        }
+
+        Interceptor[] result = new Interceptor[interceptorClasses.length];
+        try {
+            for (int i=0; i<result.length; i++) {
+                result[i] = intersMap.get(interceptorClasses[i]);
+                if (result[i] == null) {
+                    result[i] = (Interceptor)interceptorClasses[i].newInstance();
+                    intersMap.put(interceptorClasses[i], result[i]);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 }

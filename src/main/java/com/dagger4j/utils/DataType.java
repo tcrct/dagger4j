@@ -1,8 +1,12 @@
 package com.dagger4j.utils;
 
+import com.alibaba.druid.sql.visitor.functions.Char;
 import com.dagger4j.db.IdEntity;
+import sun.rmi.runtime.Log;
 
 import java.lang.reflect.Array;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @SuppressWarnings("rawtypes")
 public final class DataType {
@@ -193,6 +197,41 @@ public final class DataType {
 		}
 		return false;
 	}
+
+    /**
+     * 是否基础类型
+     * @param type
+     * @return
+     */
+    public static Class<?> conversionBaseType(String typeString) {
+        if(typeString.contains(".")) {
+            typeString = typeString.substring(typeString.lastIndexOf("."), typeString.length());
+        }
+        if(String.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return String.class;
+        }else if(Integer.class.getSimpleName().equalsIgnoreCase(typeString) || int.class.getSimpleName().equalsIgnoreCase(typeString)){
+            return Integer.class;
+        }else if(Long.class.getSimpleName().equalsIgnoreCase(typeString) || long.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Long.class;
+        }else if (Double.class.getSimpleName().equalsIgnoreCase(typeString) || double.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Double.class;
+        }else if(Float.class.getSimpleName().equalsIgnoreCase(typeString) || float.class.getSimpleName().equalsIgnoreCase(typeString)){
+            return Float.class;
+        } else if( Short.class.getSimpleName().equalsIgnoreCase(typeString) || short.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Short.class;
+        } else if ( Byte.class.getSimpleName().equalsIgnoreCase(typeString) || byte.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Byte.class;
+        } else if(Boolean.class.getSimpleName().equalsIgnoreCase(typeString) || boolean.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Boolean.class;
+        } else if(Character.class.getSimpleName().equalsIgnoreCase(typeString) || char.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Character.class;
+        } else if (Date.class.getSimpleName().equalsIgnoreCase(typeString) ){
+            return Date.class;
+        } else if (Timestamp.class.getSimpleName().equalsIgnoreCase(typeString)) {
+            return Timestamp.class;
+        }
+        return null;
+    }
 
     /**
      * 将可变参数确定类型返回

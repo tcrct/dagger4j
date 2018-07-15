@@ -11,6 +11,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Empty {
+
     boolean value() default  true;
+
     String message() default "";
+
 }

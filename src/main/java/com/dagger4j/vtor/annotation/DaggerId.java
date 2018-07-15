@@ -11,5 +11,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface DaggerId {
+
     String message() default "不是DaggerId";
+
+    String defaultValue() default "";
+
 }

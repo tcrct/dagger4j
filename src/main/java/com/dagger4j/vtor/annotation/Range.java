@@ -11,9 +11,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Range {
+
     double[] value() default {-1d, -1d};
+
     double min() default Double.MIN_VALUE;
+
     double max() default Double.MAX_VALUE;
+
     String message() default "不能小于[${min}]或大于[${max}]";
+
+    String defaultValue() default "";
 
 }

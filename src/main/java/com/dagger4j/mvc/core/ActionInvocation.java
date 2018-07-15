@@ -49,7 +49,7 @@ public class ActionInvocation {
 		if (inters != null && index < inters.length) {
 			inters[index++].intercept(this);
 		} else {
-			System.out.println("method.getReturnType(): " + method.getReturnType());
+//			System.out.println("method.getReturnType(): " + method.getReturnType());
 			//如果方法体里有参数设置
 			Parameter[] actionParams = method.getParameters();
 			if (ToolsKit.isNotEmpty(actionParams)) {

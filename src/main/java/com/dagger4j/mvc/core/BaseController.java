@@ -1,21 +1,31 @@
 package com.dagger4j.mvc.core;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.dagger4j.exception.IException;
+import com.dagger4j.exception.MvcException;
+import com.dagger4j.exception.ServiceException;
+import com.dagger4j.kit.ObjectKit;
 import com.dagger4j.kit.PropKit;
 import com.dagger4j.kit.ToolsKit;
+import com.dagger4j.mvc.dto.ReturnDto;
 import com.dagger4j.mvc.http.IRequest;
 import com.dagger4j.mvc.http.IResponse;
 import com.dagger4j.mvc.http.enums.ConstEnums;
+import com.dagger4j.mvc.http.enums.ContentTypeEnums;
 import com.dagger4j.mvc.render.JsonRender;
 import com.dagger4j.mvc.render.Render;
 import com.dagger4j.mvc.render.TextRender;
+import com.dagger4j.mvc.render.XmlRender;
+import com.dagger4j.utils.DataType;
+import com.dagger4j.vtor.core.VtorFactory;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Created by laotang on 2018/6/15.
@@ -83,41 +93,367 @@ public abstract class BaseController {
             requestParams.remove(ConstEnums.INPUTSTREAM_STR_NAME.toString());
         }
         return requestParams;
-        /*
-        Map<String, Object> params = new HashMap<>();
-        Map<String, Object> requestParams = request.getParameterMap();
-        if (ToolsKit.isEmpty(requestParams)) {
-            for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
-                String name = iter.next();
-                if(ConstEnums.INPUTSTREAM_STR_NAME.toString().equalsIgnoreCase(name)) {
-                    continue;
+    }
+
+    /**
+     * 返回XML格式
+     * @param xml
+     */
+    public void returnXml(String xml) {
+        render = new XmlRender(xml);
+    }
+
+    public BaseController setValue(String key, Object obj) {
+        request.setAttribute(key, obj);
+        return this;
+    }
+
+    /**
+     * 取出请求值
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果存在则返回字符串内容,不存在则返回""
+     */
+    public String getValue(String key) {
+        String values = "";
+        try {
+            values = request.getParameter(key);
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
+        }
+        return values;
+    }
+
+    private Object getValueObj(String key) {
+        Object values = null;
+        try {
+            values = request.getParameter(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return values;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getValueObj(String key, Class<?> cls) {
+        Object values = getValueObj(key);
+        if(ToolsKit.isEmpty(values)) {
+            return null;
+        }
+        if(DataType.isBaseType(cls)) {
+            logger.warn("基础类型请使用getValue或getXXXValue方法");
+            return null;
+        }
+        String jsonText = ToolsKit.toJsonString(values);
+        if(ToolsKit.isEmpty(jsonText)) {
+            try {
+                return ObjectKit.newInstance(cls);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return (T) ToolsKit.jsonParseObject(jsonText, cls);
+    }
+
+    /**
+     * 取出请求值
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果存在则返回字符串内容,不存在则返回null
+     */
+    public String[] getValues(String key) {
+        String[] values = null;
+        String errorMsg = "";
+        try {
+            values = request.getParameterValues(key);
+            if (ToolsKit.isEmpty(values)) {
+                values = ToolsKit.isEmpty(request.getAttribute(key)) ? null : (String[]) request.getAttribute(key);
+            }
+        } catch (Exception e) {
+            errorMsg = e.getMessage();
+            try{
+                Object valObj = request.getAttribute(key);
+                if(valObj instanceof JSONArray) {
+                    JSONArray array = (JSONArray)valObj;
+                    values = array.toArray(new String[]{});
                 }
-                Object valueObj = requestParams.get(name);
-                String valueStr = "";
-                if(valueObj instanceof List) {
-                    List<String> values = (List)valueObj;
-                    for (int i = 0; i < values.size(); i++) {
-                        valueStr = (i == values.size() - 1) ? valueStr + values.get(i) : valueStr + values.get(i) + ",";
+            }catch(Exception e1) {
+                errorMsg = e1.getMessage();
+            }
+        }
+        if(ToolsKit.isEmpty(values)) {
+            logger.warn(errorMsg);
+        }
+        return values;
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为int返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回-1
+     */
+    protected int getIntValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                return Integer.parseInt(value);
+            } catch (Exception e) {
+                try {
+                    logger.warn(e.getMessage(), e);
+                    return getNumberValue(value).intValue();
+                } catch (Exception e1) {
+                    throw new MvcException(e1.getMessage(), e1);
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为long返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回-1
+     */
+    protected long getLongValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                return Long.parseLong(value);
+            } catch (Exception e) {
+                try {
+                    logger.warn(e.getMessage(), e);
+                    return getNumberValue(value).longValue();
+                } catch (Exception e1) {
+                    throw new MvcException(e1.getMessage(), e1);
+                }
+            }
+        }
+        return -1L;
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为float返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回-1
+     */
+    protected float getFloatValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                return Float.parseFloat(value);
+            } catch (Exception e) {
+                try {
+                    logger.warn(e.getMessage(), e);
+                    return getNumberValue(value).floatValue();
+                } catch (Exception e1) {
+                    throw new MvcException(e1.getMessage(), e1);
+                }
+            }
+        }
+        return -1f;
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为double返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回-1
+     */
+    protected double getDoubleValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                return Double.parseDouble(value);
+            } catch (Exception e) {
+                throw new MvcException(e.getMessage(), e);
+            }
+        }
+        return -1d;
+    }
+
+    private Double getNumberValue(String key) {
+        try {
+            return  getDoubleValue(key);
+        } catch (Exception e) {
+            throw new MvcException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为Boolean返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回false
+     */
+    protected Boolean getBooleanValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                return Boolean.parseBoolean(value);
+            } catch (Exception e) {
+                throw new MvcException(e.getMessage(), e);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 根据key取请求值，并将数据转换为Date返回
+     *
+     * @param key
+     *            请求参数的key
+     * @return 如果值为空或转换异常时，返回null
+     */
+    protected Date getDateValue(String key) {
+        String value = getValue(key);
+        if (ToolsKit.isNotEmpty(value)) {
+            try {
+                long millisecond = Long.parseLong(value);
+                return new Date(millisecond);
+            } catch (Exception ex) {
+                try {
+                    return ToolsKit.parseDate(value, "yyyy-MM-dd HH:mm:ss");
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 取请求body
+     * @return
+     */
+    private Object getBodyString() {
+        return getValue(ConstEnums.DAGGER_INPUTSTREAM_STR_FIELD.getValue());
+    }
+
+    /**
+     * 取出请求对象的json字符串
+     * @return
+     */
+    protected String getJson() {
+        Object inputStreamObj = getBodyString();
+        String jsonString = "";
+        if (ToolsKit.isNotEmpty(inputStreamObj)) {
+            if(inputStreamObj instanceof String[]) {
+                jsonString = ((String[])inputStreamObj)[0];
+            } else {
+                jsonString = (String) inputStreamObj;
+            }
+        }
+        return jsonString;
+    }
+
+    /**
+     * 取出请求对象的xml字符串
+     * @return
+     */
+    protected String getXml() {
+        return getJson();
+    }
+
+    /**
+     * 取出请求body对象的InputStream对象
+     * @return
+     */
+    public InputStream getInputStream() {
+        InputStream is = null;
+        Object inputStreamObj = getBodyString();
+        try{
+            if(ToolsKit.isNotEmpty(inputStreamObj)) {
+                is = IOUtils.toInputStream((String)inputStreamObj, ConstEnums.DEFAULT_ENCODING.getValue());
+            }
+        }catch(Exception e) {
+            logger.warn("Controller.getInputStream() fail: " + e.getMessage() + " return null...", e);
+        }
+        return is;
+    }
+
+    /**
+     * 根据类，取出请求参数并将其转换为Bean对象返回
+     * 默认验证
+     * @param tClass            要转换的类
+     * @return
+     */
+    protected <T> T getBean(Class<T> tClass) {
+        return getBean(tClass, ReturnDto.DATA_FIELD);
+    }
+
+    /**
+     * 根据类，取出请求参数并将其转换为Bean对象返回
+     * 默认验证
+     * @param tClass            要转换的类
+     * @return
+     */
+    protected <T> T getBean(Class<T> tClass, String dataKey) {
+        return getBean(tClass, dataKey, true);
+    }
+
+    /**
+     * 根据类，取出请求参数并将其转换为Bean对象返回
+     * @param tClass            要转换的类
+     * @param isValidator     是否验证
+     * @param <T>
+     * @return
+     */
+    protected <T> T getBean(Class<T> tClass, String dataKey, boolean isValidator) {
+        List<T> resultBeanList = new ArrayList<>();
+        T resultBean = null;
+        String contentType = request.getHeader(HttpHeaderNames.CONTENT_TYPE.toString());
+        try {
+            if (ToolsKit.isEmpty(contentType) || contentType.contains(ContentTypeEnums.FORM.getValue())) {
+                String paramsJson = ToolsKit.toJsonString(getAllParams());
+                resultBean = ToolsKit.jsonParseObject(paramsJson, tClass);
+            }else if(contentType.contains(ContentTypeEnums.JSON.getValue())) {
+                String jsonString = getJson();
+                JSONObject jsonObject = JSONObject.parseObject(jsonString);
+                String tokenid = jsonObject.getString(ReturnDto.TOKENID_FIELD);
+                if(ToolsKit.isNotEmpty(tokenid)) {
+                    request.setAttribute(ReturnDto.TOKENID_FIELD, tokenid);
+                }
+                Object dataObj = jsonObject.getString(dataKey);
+                if (ToolsKit.isNotEmpty(dataObj)) {
+                    if (dataObj instanceof JSONArray) {
+                        jsonString = ((JSONArray) dataObj).toJSONString();
+                    } else if (dataObj instanceof JSONObject) {
+                        jsonString = ((JSONObject) dataObj).toJSONString();
                     }
-                } else {
-                    valueStr = (String)valueObj;
                 }
-
-                params.put(name, valueStr);
+                if(ToolsKit.isArrayJsonString(jsonString)) {
+                    resultBeanList.addAll(ToolsKit.jsonParseArray(jsonString, tClass));
+                } else if(ToolsKit.isMapJsonString(jsonString)) {
+                    resultBean = ToolsKit.jsonParseObject(jsonString, tClass);
+                }
+            } else if(contentType.contains(ContentTypeEnums.XML.getValue())) {
+                resultBean = ToolsKit.xmlParseObject(getXml(), tClass);
             }
-        }
-
-        Enumeration<String> attributeNames = request.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            String name = attributeNames.nextElement();
-            if(ConstEnums.INPUTSTREAM_STR_NAME.toString().equalsIgnoreCase(name) ||
-                    name.contains(".")) {
-                continue;
+            // 开启验证
+            if(isValidator) {
+                if(ToolsKit.isNotEmpty(resultBean)) {
+                    VtorFactory.validator(resultBean);
+                } else if(ToolsKit.isNotEmpty(resultBeanList)) {
+                    for(int i=0; i<resultBeanList.size(); i++) {
+                        VtorFactory.validator(resultBeanList.get(i));
+                    }
+                }
             }
-            params.put(name, request.getAttribute(name));
+        } catch (Exception e) {
+            logger.warn("getBean is fail : " + e.getMessage(), e);
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
-        return params;
-        */
+        return ToolsKit.isNotEmpty(resultBeanList) ? (T)resultBeanList : resultBean;
     }
 
 
@@ -131,20 +467,6 @@ public abstract class BaseController {
         }
         return render;
     }
-
-    /**
-     * 是否local环境的请求
-     * @return
-     */
-    public Boolean isLocalRequest() {
-        String url = request.getRequestURL();
-        if (url.contains("http://local") || url.contains("https://local")
-                || url.contains("127.0") || url.contains("192.168") ) {
-            return true;
-        }
-        return false;
-    }
-
 
     /**
      * 返回文本格式
@@ -169,7 +491,16 @@ public abstract class BaseController {
      * @param obj
      */
     protected void returnFailJson(Exception exception, Object obj) {
-        returnJson(ToolsKit.buildReturnDto((IException) exception, obj), null);
+        IException iException = null;
+        if(null != exception) {
+            if (exception instanceof IException) {
+                iException = (IException) exception;
+            } else {
+                logger.warn(exception.getMessage(), exception);
+                iException = new ServiceException(exception.getMessage()+"", exception);
+            }
+        }
+        returnJson(ToolsKit.buildReturnDto(iException, obj), null);
     }
 
     /**
@@ -180,4 +511,5 @@ public abstract class BaseController {
     private void returnJson(Object obj, Set<String> fieldSet) {
         render = new JsonRender(obj, fieldSet);
     }
+
 }

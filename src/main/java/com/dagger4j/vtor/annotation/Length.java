@@ -15,4 +15,6 @@ public @interface Length {
     int value() default 50;
 
     String message() default "超出指定的长度[${value}]限制！";
+
+    String defaultValue() default "";
 }
