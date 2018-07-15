@@ -198,11 +198,11 @@ public class BootStrap implements Closeable {
         try {
             MultithreadEventLoopGroup workerGroup = getGroup().getWorkerMultithreadEventLoopGroup();
             if (null != workerGroup) {
-                workerGroup.shutdownGracefully();
+                workerGroup.shutdownGracefully().sync(); //sync()等待访问全结束??
             }
             MultithreadEventLoopGroup bossGroup = getGroup().getBoosMultithreadEventLoopGroup();
             if (null != bossGroup) {
-                bossGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully().sync();
             }
 
             if (null != allocator) {

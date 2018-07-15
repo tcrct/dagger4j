@@ -50,7 +50,7 @@ public class WebKit {
         int readableBytesLength = 0;
         try {
             readableBytesLength = fullHttpResponse.content().readableBytes();
-        } catch (Exception e) {}
+        } catch (Exception e) {logger.warn(e.getMessage(), e);}
         responseHeaders.set(HttpHeaderNames.CONTENT_LENGTH.toString(), readableBytesLength);
     }
 
